@@ -27,7 +27,7 @@ class GrpcRemote:
         try:
             result = await self.stub.SendMessage(
                 message,
-                metadata=self.metadata,
+                metadata=self.metadata + tuple(outgoing_headers().items()),
                 timeout=float(os.environ.get("MAPLEWOOD_VENDOR_TIMEOUT", "5")),
             )
         except grpc.aio.AioRpcError as exc:

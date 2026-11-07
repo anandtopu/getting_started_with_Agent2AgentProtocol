@@ -56,6 +56,19 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Walkthrough
 
+The [seven-framework integration matrix](../../integrations/README.md) provides
+the isolated installation commands, native runtime APIs and dependency rationale.
+Run uv run python scripts/setup_frameworks.py, then
+uv run python scripts/check_frameworks.py to execute all six isolated adapters.
+LangGraph is included in the main environment.
+
+The actual pause/resume captures are
+[ADK](wire/adk.jsonl), [Strands](wire/strands.jsonl),
+[Pydantic AI](wire/pydantic.jsonl), [CrewAI](wire/crewai.jsonl),
+[Microsoft](wire/microsoft.jsonl) and [BeeAI](wire/beeai.jsonl).
+For a live mixed-framework network, use
+uv run python scripts/network.py up --module 11 --frameworks.
+
 ### 01: delegate
 
 Separate framework internals from the protocol.

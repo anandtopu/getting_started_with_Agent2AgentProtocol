@@ -50,22 +50,25 @@ Microsoft Agent Framework 1.25.0 and BeeAI 0.1.86.
 
 | Framework | Evidence at check time | Course status |
 |---|---|---|
-| Google ADK | A2A extra permits SDK below 2 and at least 0.3.4 | Native API not yet tested here |
+| Google ADK | BaseAgent and InMemoryRunner verified | Isolated worker, official v1 boundary, pause/resume tested |
 | LangGraph | 1.2.20 StateGraph verified in the installed package | Working official-v1-SDK adapter, MCP tool and pause/resume tests |
-| Strands | Native A2A extra pins SDK below 0.4 | Incompatible with this main environment |
-| Pydantic AI | Main package delegates integrations to slim extras | Native v1 integration not yet tested here |
-| CrewAI | Native A2A extra requires SDK 0.3.x | Incompatible; also has differing MCP/Pydantic constraints |
-| Microsoft Agent Framework | Aggregate package; core metadata alone insufficient | Full integration pending |
-| BeeAI | A2A extra pins SDK below 0.4 and older Uvicorn | Incompatible with this main environment |
+| Strands | Agent.invoke_async verified; native A2A extra pins SDK below 0.4 | Isolated worker behind v1 boundary, tested |
+| Pydantic AI | slim 2.66.0 Agent and FunctionModel verified | Isolated worker behind v1 boundary, tested |
+| CrewAI | Crew.kickoff_async verified; native A2A extra requires SDK 0.3.x | Isolated worker behind v1 boundary, tested |
+| Microsoft Agent Framework | core 1.25.0 WorkflowBuilder and executor verified | Isolated worker behind v1 boundary, tested |
+| BeeAI | Workflow verified; native A2A extra pins SDK below 0.4 | Isolated worker behind v1 boundary, tested |
 
-Do not install incompatible native adapters into the core environment. An isolated
-framework worker behind an official v1 SDK boundary is a possible future solution;
-this release does not claim all seven integrations work. LangGraph is implemented
-and tested; the other six remain compatibility research.
+Do not install incompatible native adapters into the core environment. The six
+isolated workers use each framework's real execution API behind the official v1
+SDK boundary. All pass authenticated A2A continuation checks on Windows and Linux.
+This is not an exhaustive cross-product of framework-native A2A clients and servers.
+See [the integration matrix](../integrations/README.md).
 
 Official Go v2.8.0 and Java v1.5.0.Final releases were observed. The Go venue agent
 is compiled and its authenticated quote is checked against the Python inventory.
-Java remains unimplemented. The official .NET release list reports
+Java now compiles and passes native authentication, ownership, quote and rejection
+checks with SDK 1.5.0.Final and Quarkus 3.40.1.1. A Vert.x route filter is required:
+Jakarta REST filters do not protect this SDK's router. The official .NET release list reports
 v1.0.0-preview4 as a prerelease; no stable .NET integration is claimed.
 
 ## Model configuration
@@ -108,14 +111,14 @@ Design checks are structural only; human rubric review is mandatory.
 
 ## Remaining gaps against the original brief
 
-- The remaining six framework adapters, Java and a stable .NET agent.
+- A stable .NET agent; upstream currently provides a preview.
 - Complete SDK/feature coverage and distinct Build, Secure and Interop tasks testing
   full agents rather than only small contract transformations.
 - Production OAuth/OIDC/mTLS wiring, live Keycloak realm/client configuration,
   rate limiting, durable replay storage and automated key rotation.
 - The hold-compensation lab is separate from the live Concierge's quote workflow.
 - All-vendor golden state assertions, stream-disconnect/resubscription chaos,
-  gRPC trace propagation and durable multi-replica delivery.
+  and durable multi-replica delivery. HTTP and gRPC trace parentage are now tested.
 - Complete production capstones, advanced model-native streaming/tool calling,
   and a successful official TCK run.
 
@@ -123,7 +126,7 @@ All eleven operations have actual JSON-RPC, HTTP+JSON and in-process gRPC captur
 the terminal-task SubscribeToTask error is deliberately included.
 
 Docker has no running engine on the authoring machine. GitHub's Linux runner
-built and ran the network and verified PostgreSQL restart continuation; the first
-trace-export check found an obsolete Jaeger query URL, corrected to the v3 API.
+built and ran the network and verified PostgreSQL restart continuation and Jaeger
+trace export through its v3 API.
 See [the validation report](VALIDATION_REPORT.md) for the final CI result.
 Real model calls and official TCK execution were not verified.

@@ -13,23 +13,26 @@ scope below is not represented as finished.
 | Python offline tests | pytest with socket access disabled and A2A deprecations treated as errors |
 | Style | Ruff lint and formatting |
 | Gym | 157 tasks across 25 modules; every starter fails and every reference solution passes |
-| Examples | 100 original standalone commands and all 25 notebooks passed; integration additions are tested separately and included in the final runner |
+| Examples | 112 standalone commands and all 25 notebooks passed |
 | Actual network | Six-agent authenticated network, signed cards, gRPC-only print service, cross-binding Concierge |
 | TypeScript | Type checking and real Python-to-TypeScript quote exchange |
 | Go | Native compilation and real Python-to-Go venue quote matching the Python dataset |
+| Java | Official SDK 1.5.0.Final compiled; actual authentication, quote and rejection checks passed |
 | Golden cases | All 20 scenarios, including dietary interruption and conflicting counts |
 | Persistence | SQLite engine/handler restart and continuation |
-| Containers | Six-agent plan and PostgreSQL restart passed in Linux CI; corrected Jaeger v3 check is awaiting the final run |
+| Containers | Six-agent plan, PostgreSQL restart and Jaeger trace export passed in Linux CI |
+| Frameworks | All seven runtimes executed; six isolated workers passed on both Windows and Linux |
 | Captures | All eleven operations across JSON-RPC, HTTP+JSON and gRPC service calls |
-| Links | Original 498 local and 57 external documentation links passed; final additions are rechecked before release |
+| Links | 686 local links checked; 62 external links passed before the latest documentation additions |
 
 The first published revision passed all nine CI jobs: Python 3.11, 3.12 and 3.13
 on Ubuntu and Windows, plus local-network/TypeScript checks on Ubuntu, Windows and
 macOS. [Baseline run](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42416003303).
 
-The next deployment run successfully built containers and checked PostgreSQL
-recovery, then found that Jaeger 2.23 uses /api/v3/services. The check was corrected
-against the official API schema. The final run is linked here when completed.
+The [deployment and native Go run](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42417547352)
+passed all ten jobs. It includes the corrected Jaeger v3 API check.
+The [framework matrix](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42418652586)
+adds twelve isolated-framework jobs, all of which passed.
 
 ## Definition of done against the requested brief
 
@@ -53,12 +56,11 @@ protocol boundaries. Design checks verify structure and require human rubric rev
 
 ## Unverified or incomplete work
 
-- Six of seven requested framework integrations; LangGraph is implemented.
-- Java and stable .NET native agents; TypeScript and Go are implemented.
+- A stable .NET native agent; the official release remains a preview.
 - Provider-native streamed model tool calls and live model-account access.
 - Full Keycloak/OIDC/mTLS wiring, per-skill authorization, rate limiting and automated key rotation.
 - Durable webhook replay/outbox storage, multi-replica event delivery and reconnect chaos tests.
-- Every-vendor intermediate-state golden assertions and gRPC trace propagation.
+- Every-vendor intermediate-state golden assertions.
 - Complete production capstone requirements and an official TCK result.
 - A deep bank of six distinct full-agent tasks for every individual feature.
 

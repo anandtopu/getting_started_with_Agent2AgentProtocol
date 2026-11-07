@@ -62,6 +62,12 @@ jobs:
           go-version: "1.26.4"
           cache-dependency-path: modules/bonus/B2_other_sdks/go/go.sum
       - run: uv run --offline python scripts/check_go_interop.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - run: uv run --offline python scripts/check_java_interop.py
       - run: uv run --offline python scripts/check_network.py --module 0
       - run: uv run --offline python scripts/check_network.py --module 5
       - run: uv run --offline python scripts/check_network.py --module 8
@@ -77,6 +83,7 @@ jobs:
       - run: uv run python deploy/prepare.py
       - run: docker compose --env-file deploy/secrets/network.env -f deploy/docker-compose.yml up --build -d
       - run: uv run python scripts/check_compose.py
+      - run: uv run python scripts/check_keycloak.py
       - if: failure()
         run: docker compose --env-file deploy/secrets/network.env -f deploy/docker-compose.yml logs --tail 80
       - if: always()

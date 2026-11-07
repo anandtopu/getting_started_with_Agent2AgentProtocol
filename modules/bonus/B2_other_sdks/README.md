@@ -56,6 +56,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Walkthrough
 
+The [native Go lab](go/README.md) and [native Java lab](java/README.md) compile
+official SDK servers and compare actual Python requests against shared inventory.
+Java's [captured JSON-RPC traffic](wire/java.jsonl) includes rejected requests.
+
 ### 01: grpc
 
 Inspect language compatibility.

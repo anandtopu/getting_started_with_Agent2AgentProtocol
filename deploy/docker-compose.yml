@@ -247,15 +247,28 @@
     "keycloak": {
       "image": "quay.io/keycloak/keycloak:26.8.2",
       "command": [
-        "start-dev"
+        "start-dev",
+        "--import-realm"
       ],
       "environment": {
         "KC_BOOTSTRAP_ADMIN_USERNAME": "admin",
+        "KC_HOSTNAME": "http://127.0.0.1:8080",
         "KC_BOOTSTRAP_ADMIN_PASSWORD": "${KEYCLOAK_PASSWORD:?Run deploy/prepare.py}"
       },
+      "volumes": ["./secrets/maplewood-realm.json:/opt/keycloak/data/import/maplewood-realm.json:ro"],
       "ports": [
         "127.0.0.1:8080:8080"
       ]
+    },
+    "oidc-venue": {
+      "build": {"context": "..", "dockerfile": "deploy/Dockerfile"},
+      "command": ["uv", "run", "--no-sync", "python", "-m", "agents.oidc_server", "--host", "0.0.0.0"],
+      "environment": {
+        "OIDC_ISSUER": "http://127.0.0.1:8080/realms/maplewood",
+        "OIDC_JWKS_URL": "http://keycloak:8080/realms/maplewood/protocol/openid-connect/certs"
+      },
+      "ports": ["127.0.0.1:8106:8106"],
+      "depends_on": ["keycloak"]
     },
     "jaeger": {
       "image": "jaegertracing/jaeger:2.23.0",

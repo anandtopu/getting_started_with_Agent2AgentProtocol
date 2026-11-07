@@ -56,6 +56,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Walkthrough
 
+For actual token issuance and verification, run the
+[Keycloak service-account lab](../../deploy/OIDC_LAB.md). It obtains a token
+outside A2A, then authenticates a venue quote using the standard bearer header.
+
 ### 01: auth
 
 Reject missing credentials.

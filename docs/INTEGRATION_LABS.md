@@ -91,11 +91,12 @@ reservation expiry and recovery after a process crash remain deployment work.
 
 OIDC tests use locally generated RSA keys and real signed JWTs. Wrong issuer,
 audience, scope, tenant, expiry, signature or attacker-nominated key URL is rejected.
-They test the verifier; they do not claim that the running Keycloak service is
-already connected to every vendor's credential flow.
+The [Keycloak lab](../deploy/OIDC_LAB.md) additionally obtains real service-account
+tokens and uses them with a separate OIDC venue. The primary network retains its
+per-vendor credentials.
 
-Trace tests inject W3C traceparent into HTTP and extract it in the remote ASGI
-application. Parent span IDs are asserted. Database tests close the original
+Trace tests inject W3C traceparent into HTTP headers and gRPC metadata and extract
+it at each receiver. Parent span IDs are asserted. Database tests close the original
 SQLite engine and handler, create new ones, then resume the stored task.
 
 ~~~console
@@ -118,10 +119,12 @@ npm ci
 npm run typecheck
 uv run python scripts/check_typescript_interop.py
 uv run python scripts/check_go_interop.py
+uv run python scripts/check_java_interop.py
 ~~~
 
 Go requires a Go 1.26 toolchain. The initial dependency download needs internet;
-the subsequent exchange is local. Java is not implemented here. The .NET official
+the subsequent exchange is local. Java uses official SDK 1.5.0.Final and requires
+Java 17+ and Maven. The .NET official
 release list currently identifies v1.0.0-preview4 as a prerelease; this course does
 not represent it as a verified stable integration.
 

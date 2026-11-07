@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from common.card_trust import jwks
 from common.security import b64
+from deploy.keycloak import realm
 
 
 def main() -> None:
@@ -34,6 +35,11 @@ def main() -> None:
             separators=(",", ":"),
         ),
     ]
+    oidc_secret = existing.get("OIDC_CLIENT_SECRET", secrets.token_urlsafe(32))
+    rows.append("OIDC_CLIENT_SECRET=" + oidc_secret)
+    realm_file = folder / "maplewood-realm.json"
+    realm_file.write_text(json.dumps(realm(oidc_secret), indent=2), encoding="utf-8")
+    realm_file.chmod(0o600)
     if "TRUSTED_KEYS" in existing:
         rows += [
             name + "=" + value

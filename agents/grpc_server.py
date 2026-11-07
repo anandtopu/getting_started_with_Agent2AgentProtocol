@@ -13,6 +13,8 @@ from a2a.server.request_handlers.grpc_handler import (
 from a2a.server.routes import create_agent_card_routes
 from a2a.types.a2a_pb2_grpc import add_A2AServiceServicer_to_server
 from fastapi import FastAPI
+from opentelemetry import trace
+from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from agents.app import make_handler
 from agents.catalog import card
@@ -39,14 +41,16 @@ class AuthenticatedContext(DefaultGrpcServerCallContextBuilder):
 class TokenInterceptor(grpc.aio.ServerInterceptor):
     """Reject missing tokens and cross-tenant requests before the SDK sees them."""
 
-    def __init__(self, token: str):
+    def __init__(self, token: str, tracer=None):
         self.token = token
+        self.tracer = tracer or trace.get_tracer("maplewood")
 
     async def intercept_service(self, continuation, details):
         handler = await continuation(details)
         if handler is None:
             return None
         headers = dict(details.invocation_metadata)
+        parent = TraceContextTextMapPropagator().extract(headers)
         authorized = hmac.compare_digest(headers.get("authorization", ""), f"Bearer {self.token}")
 
         async def check(request, context):
@@ -59,7 +63,10 @@ class TokenInterceptor(grpc.aio.ServerInterceptor):
 
             async def unary(request, context):
                 await check(request, context)
-                return await handler.unary_unary(request, context)
+                with self.tracer.start_as_current_span(
+                    "print.rpc", context=parent, kind=trace.SpanKind.SERVER
+                ):
+                    return await handler.unary_unary(request, context)
 
             return grpc.unary_unary_rpc_method_handler(
                 unary,
@@ -70,8 +77,11 @@ class TokenInterceptor(grpc.aio.ServerInterceptor):
 
             async def stream(request, context):
                 await check(request, context)
-                async for response in handler.unary_stream(request, context):
-                    yield response
+                with self.tracer.start_as_current_span(
+                    "print.rpc", context=parent, kind=trace.SpanKind.SERVER
+                ):
+                    async for response in handler.unary_stream(request, context):
+                        yield response
 
             return grpc.unary_stream_rpc_method_handler(
                 stream,
