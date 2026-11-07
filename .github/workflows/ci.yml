@@ -68,6 +68,10 @@ jobs:
           java-version: "21"
           cache: maven
       - run: uv run --offline python scripts/check_java_interop.py
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - run: uv run --offline python scripts/check_dotnet_interop.py
       - run: uv run --offline python scripts/check_network.py --module 0
       - run: uv run --offline python scripts/check_network.py --module 5
       - run: uv run --offline python scripts/check_network.py --module 8

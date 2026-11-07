@@ -23,9 +23,22 @@ def main() -> None:
     )
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument(
+        "--llm", action="store_true", help="Use the configured model for catering or Concierge"
+    )
+    parser.add_argument(
         "--framework", choices=["adk", "strands", "pydantic", "crewai", "microsoft", "beeai"]
     )
     args = parser.parse_args()
+    if args.llm and (args.vendor not in {"catering", "concierge"} or args.framework):
+        parser.error("--llm is for catering or concierge and cannot combine with --framework.")
+    model = None
+    if args.llm:
+        from common.llm import create_model
+
+        try:
+            model = create_model()
+        except ValueError as exc:
+            parser.error(str(exc))
     settings = Settings()
     if args.demo and args.host != "127.0.0.1":
         parser.error("Unauthenticated demos must listen only on 127.0.0.1.")
@@ -37,6 +50,10 @@ def main() -> None:
     engine = create_async_engine(settings.database_url) if settings.database_url else None
     store = DatabaseTaskStore(engine, table_name=args.vendor + "_tasks") if engine else None
     handler = make_handler(args.vendor, secure=not args.demo, task_store=store)
+    if model and args.vendor == "catering":
+        from agents.langgraph_vendor import LangGraphCatering
+
+        handler = make_handler(args.vendor, task_store=store, executor=LangGraphCatering(model))
     if args.framework:
         from agents.framework_vendor import FrameworkVendor
 
@@ -51,7 +68,10 @@ def main() -> None:
     if args.vendor == "concierge":
         tokens = json.loads(os.environ.get("MAPLEWOOD_VENDOR_TOKENS", "{}"))
         handler = make_handler(
-            "concierge", secure=not args.demo, executor=ConciergeExecutor(tokens), task_store=store
+            "concierge",
+            secure=not args.demo,
+            executor=ConciergeExecutor(tokens, model),
+            task_store=store,
         )
     app = make_app(
         args.vendor,

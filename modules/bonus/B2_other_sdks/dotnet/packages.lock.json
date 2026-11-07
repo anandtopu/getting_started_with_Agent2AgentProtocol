@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "A2A.AspNetCore": {
+        "type": "Direct",
+        "requested": "[1.0.0-preview4, )",
+        "resolved": "1.0.0-preview4",
+        "contentHash": "EEkhZG3NHnL/1U8UTNQ0gzUbtuP7yQqjktRnegMg8xdz4laKtUYLYVFzv8CUeAH5EDyFa9uqaBna3BS100N3Ow==",
+        "dependencies": {
+          "A2A": "1.0.0-preview4"
+        }
+      },
+      "A2A": {
+        "type": "Transitive",
+        "resolved": "1.0.0-preview4",
+        "contentHash": "UPx11e3owpRJyHUfAK3Ipo2t2t8baQ+5eXOSDVQZBb3JhyKZpYafP6q6l3C3ZRvMtaqZsGUFgQufyKaA3T3aOg==",
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "10.11.0"
+        }
+      },
+      "Microsoft.Extensions.AI.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.11.0",
+        "contentHash": "h4DX/TdJU4fk1GGaf19n6Kujkj6VXbGeL4UEOsQ8+ZJC5fVApPauokCtvBP684BYbczUYZQNfo1mbmyHG4WVSg=="
+      }
+    }
+  }
+}

@@ -253,6 +253,7 @@
       "environment": {
         "KC_BOOTSTRAP_ADMIN_USERNAME": "admin",
         "KC_HOSTNAME": "http://127.0.0.1:8080",
+        "MAPLEWOOD_OIDC_SECRET": "${OIDC_CLIENT_SECRET:?Run deploy/prepare.py}",
         "KC_BOOTSTRAP_ADMIN_PASSWORD": "${KEYCLOAK_PASSWORD:?Run deploy/prepare.py}"
       },
       "volumes": ["./secrets/maplewood-realm.json:/opt/keycloak/data/import/maplewood-realm.json:ro"],

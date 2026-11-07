@@ -33,6 +33,9 @@ def main() -> None:
     parser.add_argument("action", choices=["up", "down", "status"])
     parser.add_argument("--module", type=int, default=0)
     parser.add_argument(
+        "--llm", action="store_true", help="Use the configured model for Concierge and catering"
+    )
+    parser.add_argument(
         "--frameworks",
         action="store_true",
         help="Use isolated framework workers; run scripts/setup_frameworks.py first",
@@ -90,6 +93,10 @@ def main() -> None:
             }
             if args.frameworks and vendor in framework_map:
                 command += ["--framework", framework_map[vendor]]
+            if args.llm and (
+                vendor == "concierge" or (vendor == "catering" and not args.frameworks)
+            ):
+                command += ["--llm"]
             if args.module < 4:
                 command.append("--demo")
             process = subprocess.Popen(

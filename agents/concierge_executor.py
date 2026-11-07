@@ -17,8 +17,9 @@ from common.remote import GrpcRemote
 
 
 class ConciergeExecutor(AgentExecutor):
-    def __init__(self, tokens: dict[str, str]):
+    def __init__(self, tokens: dict[str, str], model=None):
         self.tokens = tokens
+        self.model = model
 
     async def execute(self, context, event_queue):
         task = context.current_task or new_task_from_user_message(context.message)
@@ -37,12 +38,14 @@ class ConciergeExecutor(AgentExecutor):
             )
         )
         async with AsyncExitStack() as stack:
+            skills = {}
             # Discovery is read from a configured URL; only its pinned vendor key is accepted.
             async with httpx.AsyncClient(timeout=5) as discovery:
                 for vendor in self.tokens:
                     response = await discovery.get(url(vendor) + "/.well-known/agent-card.json")
                     response.raise_for_status()
                     verify_vendor(response.json(), vendor)
+                    skills[vendor] = [skill["id"] for skill in response.json()["skills"]]
             clients = {
                 vendor: await stack.enter_async_context(
                     GrpcRemote(token)
@@ -54,7 +57,20 @@ class ConciergeExecutor(AgentExecutor):
                 )
                 for vendor, token in self.tokens.items()
             }
-            result = await Concierge(clients).plan(brief, previous)
+            try:
+                result = await Concierge(clients, model=self.model, skills=skills).plan(
+                    brief, previous
+                )
+            except (ValueError, TypeError, KeyError):
+                await event_queue.enqueue_event(
+                    new_text_status_update_event(
+                        task.id,
+                        task.context_id,
+                        TaskState.TASK_STATE_FAILED,
+                        "Planning could not select safe vendors. Check model configuration and retry.",
+                    )
+                )
+                return
         await event_queue.enqueue_event(
             TaskArtifactUpdateEvent(
                 task_id=task.id,

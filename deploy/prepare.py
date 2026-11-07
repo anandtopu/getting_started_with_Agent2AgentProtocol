@@ -38,8 +38,10 @@ def main() -> None:
     oidc_secret = existing.get("OIDC_CLIENT_SECRET", secrets.token_urlsafe(32))
     rows.append("OIDC_CLIENT_SECRET=" + oidc_secret)
     realm_file = folder / "maplewood-realm.json"
-    realm_file.write_text(json.dumps(realm(oidc_secret), indent=2), encoding="utf-8")
-    realm_file.chmod(0o600)
+    # Keycloak runs as a different UID. The readable import contains only an
+    # environment placeholder; the actual secret stays in the protected env file.
+    realm_file.write_text(json.dumps(realm("${MAPLEWOOD_OIDC_SECRET}"), indent=2), encoding="utf-8")
+    realm_file.chmod(0o644)
     if "TRUSTED_KEYS" in existing:
         rows += [
             name + "=" + value

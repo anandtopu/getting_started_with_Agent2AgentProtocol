@@ -69,7 +69,9 @@ is compiled and its authenticated quote is checked against the Python inventory.
 Java now compiles and passes native authentication, ownership, quote and rejection
 checks with SDK 1.5.0.Final and Quarkus 3.40.1.1. A Vert.x route filter is required:
 Jakarta REST filters do not protect this SDK's router. The official .NET release list reports
-v1.0.0-preview4 as a prerelease; no stable .NET integration is claimed.
+v1.0.0-preview4 as a prerelease. Its native venue lab now compiles on .NET 10 and
+passes actual Python-to-.NET quote, authentication and invalid-input checks.
+No stable .NET SDK release is claimed.
 
 ## Model configuration
 

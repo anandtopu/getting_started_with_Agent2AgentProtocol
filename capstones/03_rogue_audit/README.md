@@ -1,6 +1,8 @@
 # Rogue Agent Audit
 
-As an auditor, I can demonstrate that a changed vendor card fails signature verification and document the trust assumption.
+As an auditor, I can reproduce six rogue-vendor attacks, show that hardened
+boundaries reject them, and deliver an evidence-based findings report.
+The [filled-in findings report](FINDINGS.md) records impact, outcome and fix.
 
 ## Architecture
 
@@ -14,7 +16,8 @@ flowchart LR
 
 ## Acceptance criteria
 
-- Run the reference slice: uv run python capstones/03_rogue_audit/solution/run.py.
+- Run the six-attack reference: uv run python capstones/03_rogue_audit/solution/run.py.
+- Require all_attacks_blocked to be true and retain the six finding IDs as regression evidence.
 - Identify the request, task state, trust decision and resulting deliverable.
 - Run this project's tests with uv run pytest capstones/03_rogue_audit/tests.
 - State which production properties are not demonstrated by this slice.

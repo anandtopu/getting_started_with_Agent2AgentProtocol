@@ -56,6 +56,12 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Walkthrough
 
+Run uv run python modules/10_orchestrator/examples/04_model_selection.py for an
+offline scripted selection followed by a real A2A request. Predict which fields
+the model needs before inspecting its prompt in tests/test_model_planning.py.
+The [optional live-model guide](../../docs/LIVE_MODELS.md) explains how to use the
+same helper with Ollama or a hosted provider.
+
 ### 01: delegate
 
 Delegate concurrently.

@@ -18,6 +18,7 @@ scope below is not represented as finished.
 | TypeScript | Type checking and real Python-to-TypeScript quote exchange |
 | Go | Native compilation and real Python-to-Go venue quote matching the Python dataset |
 | Java | Official SDK 1.5.0.Final compiled; actual authentication, quote and rejection checks passed |
+| .NET | Official 1.0.0-preview4 compiled; actual authentication, quote and rejection checks passed; upstream is prerelease |
 | Golden cases | All 20 scenarios, including dietary interruption and conflicting counts |
 | Persistence | SQLite engine/handler restart and continuation |
 | Containers | Six-agent plan, PostgreSQL restart and Jaeger trace export passed in Linux CI |
@@ -56,7 +57,7 @@ protocol boundaries. Design checks verify structure and require human rubric rev
 
 ## Unverified or incomplete work
 
-- A stable .NET native agent; the official release remains a preview.
+- Stable .NET SDK availability is external: the implemented native lab uses the official preview.
 - Provider-native streamed model tool calls and live model-account access.
 - Full Keycloak/OIDC/mTLS wiring, per-skill authorization, rate limiting and automated key rotation.
 - Durable webhook replay/outbox storage, multi-replica event delivery and reconnect chaos tests.

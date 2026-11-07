@@ -59,6 +59,8 @@ Executed by the course authoring tool through the same recording transport as sc
 The [native Go lab](go/README.md) and [native Java lab](java/README.md) compile
 official SDK servers and compare actual Python requests against shared inventory.
 Java's [captured JSON-RPC traffic](wire/java.jsonl) includes rejected requests.
+The [.NET preview lab](dotnet/README.md) also runs native interoperability checks;
+its upstream package is explicitly prerelease.
 
 ### 01: grpc
 
