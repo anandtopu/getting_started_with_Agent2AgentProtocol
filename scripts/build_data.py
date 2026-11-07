@@ -118,9 +118,15 @@ def main() -> None:
                 "catering_states": [
                     "TASK_STATE_SUBMITTED",
                     "TASK_STATE_WORKING",
-                    "TASK_STATE_COMPLETED" if "dietary" in brief else "TASK_STATE_INPUT_REQUIRED",
+                    "TASK_STATE_INPUT_REQUIRED"
+                    if "dietary" not in brief
+                    else "TASK_STATE_REJECTED"
+                    if sum(brief["dietary"].values()) != brief["guests"]
+                    else "TASK_STATE_COMPLETED",
                 ],
-                "artifacts": ["quote"] if "dietary" in brief else [],
+                "artifacts": ["quote"]
+                if "dietary" in brief and sum(brief["dietary"].values()) == brief["guests"]
+                else [],
             }
         )
     path = ROOT / "eval" / "golden.jsonl"

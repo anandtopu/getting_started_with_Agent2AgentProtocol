@@ -47,11 +47,15 @@ def make_app(
     tracer=None,
     verifier=None,
     engine=None,
+    agent_card=None,
 ):
     if not demo and not tokens and not verifier:
         raise ValueError("Set MAPLEWOOD_TOKEN or start the network with scripts/network.py.")
     handler = handler or make_handler(vendor, secure=not demo)
-    routes = create_agent_card_routes(published_card(card(vendor, secure=not demo), vendor))
+    advertised = (
+        agent_card or getattr(handler, "course_card", None) or card(vendor, secure=not demo)
+    )
+    routes = create_agent_card_routes(published_card(advertised, vendor))
     routes += create_jsonrpc_routes(handler, rpc_url="/rpc", context_builder=CallContext())
     routes += create_rest_routes(handler, context_builder=CallContext())
 

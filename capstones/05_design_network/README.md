@@ -1,6 +1,14 @@
 # Design Your Own Network
 
-As a recruiting-network designer, I can map the Maplewood coordination example to recruiter, candidate scheduling and background-check responsibilities. The executable reference is Maplewood; the hiring implementation remains an extension.
+As a recruiting-network designer, I can coordinate three real in-process A2A agents: a recruiter, a candidate scheduling assistant and a consent-gated background-check fixture. All data is synthetic. The reference never makes an employment eligibility decision.
+
+The recruiter sends only proposed UTC slots to the candidate and only consent to
+the background fixture. Missing consent pauses both the background task and the
+recruiter task. The next turn resumes their original task IDs while preserving
+the completed scheduling result. All final results require human review.
+
+The implementation is [common/hiring.py](../../common/hiring.py). Tests inspect
+actual requests for minimal disclosure and verify the complete consent continuation.
 
 ## Architecture
 

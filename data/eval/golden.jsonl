@@ -7,7 +7,7 @@
 {"brief": "event-07", "delegations": ["venues", "catering", "av", "travel", "print"], "catering_states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", "TASK_STATE_COMPLETED"], "artifacts": ["quote"]}
 {"brief": "event-08", "delegations": ["venues", "catering", "av", "travel", "print"], "catering_states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", "TASK_STATE_COMPLETED"], "artifacts": ["quote"]}
 {"brief": "event-09", "delegations": ["venues", "catering", "av", "travel", "print"], "catering_states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", "TASK_STATE_COMPLETED"], "artifacts": ["quote"]}
-{"brief": "event-10", "delegations": ["venues", "catering", "av", "travel", "print"], "catering_states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", "TASK_STATE_COMPLETED"], "artifacts": ["quote"]}
+{"brief": "event-10", "delegations": ["venues", "catering", "av", "travel", "print"], "catering_states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", "TASK_STATE_REJECTED"], "artifacts": []}
 {"brief": "event-11", "delegations": ["venues", "catering", "av", "travel", "print"], "catering_states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", "TASK_STATE_COMPLETED"], "artifacts": ["quote"]}
 {"brief": "event-12", "delegations": ["venues", "catering", "av", "travel", "print"], "catering_states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", "TASK_STATE_COMPLETED"], "artifacts": ["quote"]}
 {"brief": "event-13", "delegations": ["venues", "catering", "av", "travel", "print"], "catering_states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", "TASK_STATE_COMPLETED"], "artifacts": ["quote"]}

@@ -2,12 +2,12 @@
 
 import asyncio
 
-from common.lessons import experiment
+from common.hiring import hiring_lab
 from common.pretty import show
 
 
 async def main() -> None:
-    show(await experiment("orchestrate"))
+    show(await hiring_lab())
 
 
 if __name__ == "__main__":

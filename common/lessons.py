@@ -231,7 +231,11 @@ async def experiment(name: str, records: list | None = None) -> object:
             return await catering_agent(ScriptedModel(replies), BRIEF)
         except ValueError as exc:
             return {"rejected": str(exc)}
-    if name in {"orchestrate", "eval", "delegate", "minimize", "compensate"}:
+    if name == "compensate":
+        from common.saga import compensation_lab
+
+        return await compensation_lab(records)
+    if name in {"orchestrate", "eval", "delegate", "minimize"}:
         async with AsyncExitStack() as stack:
             clients = {
                 vendor: await stack.enter_async_context(client(vendor, records=records))

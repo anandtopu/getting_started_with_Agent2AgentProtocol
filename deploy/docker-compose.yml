@@ -20,11 +20,22 @@
         "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
         "MAPLEWOOD_SIGNING_KEY": "${VENUES_SIGNING_KEY:?Run deploy/prepare.py}",
         "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
-        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+        "MAPLEWOOD_GRPC_TARGET": "print:8204",
+        "DATABASE_URL": "postgresql+asyncpg://maplewood:${POSTGRES_PASSWORD}@postgres:5432/maplewood",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://jaeger:4318",
+        "OTEL_SERVICE_NAME": "maplewood-venues"
       },
       "ports": [
         "127.0.0.1:8100:8100"
-      ]
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_healthy"
+        },
+        "jaeger": {
+          "condition": "service_started"
+        }
+      }
     },
     "catering": {
       "build": {
@@ -46,11 +57,22 @@
         "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
         "MAPLEWOOD_SIGNING_KEY": "${CATERING_SIGNING_KEY:?Run deploy/prepare.py}",
         "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
-        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+        "MAPLEWOOD_GRPC_TARGET": "print:8204",
+        "DATABASE_URL": "postgresql+asyncpg://maplewood:${POSTGRES_PASSWORD}@postgres:5432/maplewood",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://jaeger:4318",
+        "OTEL_SERVICE_NAME": "maplewood-catering"
       },
       "ports": [
         "127.0.0.1:8101:8101"
-      ]
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_healthy"
+        },
+        "jaeger": {
+          "condition": "service_started"
+        }
+      }
     },
     "av": {
       "build": {
@@ -72,11 +94,22 @@
         "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
         "MAPLEWOOD_SIGNING_KEY": "${AV_SIGNING_KEY:?Run deploy/prepare.py}",
         "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
-        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+        "MAPLEWOOD_GRPC_TARGET": "print:8204",
+        "DATABASE_URL": "postgresql+asyncpg://maplewood:${POSTGRES_PASSWORD}@postgres:5432/maplewood",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://jaeger:4318",
+        "OTEL_SERVICE_NAME": "maplewood-av"
       },
       "ports": [
         "127.0.0.1:8102:8102"
-      ]
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_healthy"
+        },
+        "jaeger": {
+          "condition": "service_started"
+        }
+      }
     },
     "travel": {
       "build": {
@@ -98,11 +131,22 @@
         "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
         "MAPLEWOOD_SIGNING_KEY": "${TRAVEL_SIGNING_KEY:?Run deploy/prepare.py}",
         "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
-        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+        "MAPLEWOOD_GRPC_TARGET": "print:8204",
+        "DATABASE_URL": "postgresql+asyncpg://maplewood:${POSTGRES_PASSWORD}@postgres:5432/maplewood",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://jaeger:4318",
+        "OTEL_SERVICE_NAME": "maplewood-travel"
       },
       "ports": [
         "127.0.0.1:8103:8103"
-      ]
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_healthy"
+        },
+        "jaeger": {
+          "condition": "service_started"
+        }
+      }
     },
     "print": {
       "build": {
@@ -124,12 +168,23 @@
         "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
         "MAPLEWOOD_SIGNING_KEY": "${PRINT_SIGNING_KEY:?Run deploy/prepare.py}",
         "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
-        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+        "MAPLEWOOD_GRPC_TARGET": "print:8204",
+        "DATABASE_URL": "postgresql+asyncpg://maplewood:${POSTGRES_PASSWORD}@postgres:5432/maplewood",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://jaeger:4318",
+        "OTEL_SERVICE_NAME": "maplewood-print"
       },
       "ports": [
         "127.0.0.1:8104:8104",
         "127.0.0.1:8204:8204"
-      ]
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_healthy"
+        },
+        "jaeger": {
+          "condition": "service_started"
+        }
+      }
     },
     "concierge": {
       "build": {
@@ -152,18 +207,22 @@
         "MAPLEWOOD_VENDOR_TOKENS": "${VENDOR_TOKENS:?Run deploy/prepare.py}",
         "MAPLEWOOD_SIGNING_KEY": "${CONCIERGE_SIGNING_KEY:?Run deploy/prepare.py}",
         "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
-        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+        "MAPLEWOOD_GRPC_TARGET": "print:8204",
+        "DATABASE_URL": "postgresql+asyncpg://maplewood:${POSTGRES_PASSWORD}@postgres:5432/maplewood",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://jaeger:4318",
+        "OTEL_SERVICE_NAME": "maplewood-concierge"
       },
       "ports": [
         "127.0.0.1:8105:8105"
       ],
-      "depends_on": [
-        "venues",
-        "catering",
-        "av",
-        "travel",
-        "print"
-      ]
+      "depends_on": {
+        "postgres": {
+          "condition": "service_healthy"
+        },
+        "jaeger": {
+          "condition": "service_started"
+        }
+      }
     },
     "postgres": {
       "image": "postgres:17",
@@ -174,7 +233,16 @@
       },
       "volumes": [
         "postgres_data:/var/lib/postgresql/data"
-      ]
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "pg_isready -U maplewood -d maplewood"
+        ],
+        "interval": "2s",
+        "timeout": "3s",
+        "retries": 30
+      }
     },
     "keycloak": {
       "image": "quay.io/keycloak/keycloak:26.8.2",
