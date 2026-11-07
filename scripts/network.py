@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import secrets
+import signal
 import socket
 import subprocess
 import sys
@@ -31,6 +32,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=["up", "down", "status"])
     parser.add_argument("--module", type=int, default=0)
+    parser.add_argument(
+        "--frameworks",
+        action="store_true",
+        help="Use isolated framework workers; run scripts/setup_frameworks.py first",
+    )
     args = parser.parse_args()
     STATE.parent.mkdir(exist_ok=True)
     if args.action == "down":
@@ -69,11 +75,21 @@ def main() -> None:
                 "MAPLEWOOD_TOKEN": tokens[vendor],
                 "MAPLEWOOD_SIGNING_KEY": b64(keys[vendor].private_bytes_raw()),
                 "MAPLEWOOD_TRUSTED_KEYS": json.dumps(trust),
+                "MAPLEWOOD_VENDOR_TIMEOUT": "90" if args.frameworks else "5",
                 "MAPLEWOOD_VENDOR_TOKENS": json.dumps(
                     {k: v for k, v in tokens.items() if k != "concierge"}
                 ),
             }
             command = [sys.executable, "-m", "agents.server", "--vendor", vendor]
+            framework_map = {
+                "venues": "adk",
+                "catering": "strands",
+                "av": "pydantic",
+                "travel": "crewai",
+                "print": "beeai",
+            }
+            if args.frameworks and vendor in framework_map:
+                command += ["--framework", framework_map[vendor]]
             if args.module < 4:
                 command.append("--demo")
             process = subprocess.Popen(
@@ -85,6 +101,7 @@ def main() -> None:
                 text=True,
                 encoding="utf-8",
                 errors="replace",
+                start_new_session=os.name != "nt",
             )
             children.append(process)
             threading.Thread(target=logs, args=(process, vendor, color), daemon=True).start()
@@ -100,12 +117,23 @@ def main() -> None:
     finally:
         for child in children:
             if child.poll() is None:
-                child.terminate()
+                if os.name == "nt":
+                    subprocess.run(
+                        ["taskkill", "/PID", str(child.pid), "/T", "/F"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        check=False,
+                    )
+                else:
+                    os.killpg(child.pid, signal.SIGTERM)
         for child in children:
             try:
                 child.wait(timeout=5)
             except subprocess.TimeoutExpired:
-                child.kill()
+                if os.name == "nt":
+                    child.kill()
+                else:
+                    os.killpg(child.pid, signal.SIGKILL)
                 child.wait()
         STATE.unlink(missing_ok=True)
         STOP.unlink(missing_ok=True)

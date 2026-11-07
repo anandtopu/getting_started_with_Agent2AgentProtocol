@@ -1,0 +1,5 @@
+[project]
+name = "maplewood-beeai-worker"
+version = "0.1.0"
+requires-python = ">=3.11,<3.14"
+dependencies = ["beeai-framework==0.1.86", "pydantic-settings>=2.14.2,<3", "pytest-socket>=0.8.1,<0.9"]

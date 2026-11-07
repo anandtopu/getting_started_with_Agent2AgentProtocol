@@ -1,5 +1,7 @@
 """Use a trusted configured binding; never send credentials to a card-supplied URL."""
 
+import os
+
 import grpc
 import httpx
 from a2a.types.a2a_pb2_grpc import A2AServiceStub
@@ -23,7 +25,11 @@ class GrpcRemote:
 
     async def send(self, message):
         try:
-            result = await self.stub.SendMessage(message, metadata=self.metadata, timeout=5)
+            result = await self.stub.SendMessage(
+                message,
+                metadata=self.metadata,
+                timeout=float(os.environ.get("MAPLEWOOD_VENDOR_TIMEOUT", "5")),
+            )
         except grpc.aio.AioRpcError as exc:
             raise httpx.TransportError(f"Print vendor: {exc.code().name}") from exc
         return as_dict(result)
@@ -33,7 +39,10 @@ async def send(client, message):
     if isinstance(client, GrpcRemote):
         return await client.send(message)
     response = await client.post(
-        "/message:send", json=as_dict(message), headers=outgoing_headers(), timeout=5
+        "/message:send",
+        json=as_dict(message),
+        headers=outgoing_headers(),
+        timeout=float(os.environ.get("MAPLEWOOD_VENDOR_TIMEOUT", "5")),
     )
     response.raise_for_status()
     return response.json()

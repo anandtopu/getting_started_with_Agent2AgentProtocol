@@ -1,0 +1,5 @@
+[project]
+name = "maplewood-strands-worker"
+version = "0.1.0"
+requires-python = ">=3.11,<3.14"
+dependencies = ["strands-agents==1.64.0", "pydantic-settings>=2.14.2,<3", "pytest-socket>=0.8.1,<0.9"]

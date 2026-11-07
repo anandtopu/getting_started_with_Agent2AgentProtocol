@@ -22,6 +22,9 @@ def main() -> None:
         "--demo", action="store_true", help="No authentication, earliest lessons only"
     )
     parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument(
+        "--framework", choices=["adk", "strands", "pydantic", "crewai", "microsoft", "beeai"]
+    )
     args = parser.parse_args()
     settings = Settings()
     if args.demo and args.host != "127.0.0.1":
@@ -34,6 +37,12 @@ def main() -> None:
     engine = create_async_engine(settings.database_url) if settings.database_url else None
     store = DatabaseTaskStore(engine, table_name=args.vendor + "_tasks") if engine else None
     handler = make_handler(args.vendor, secure=not args.demo, task_store=store)
+    if args.framework:
+        from agents.framework_vendor import FrameworkVendor
+
+        handler = make_handler(
+            args.vendor, task_store=store, executor=FrameworkVendor(args.vendor, args.framework)
+        )
     if args.vendor == "print":
         from agents.grpc_server import run
 

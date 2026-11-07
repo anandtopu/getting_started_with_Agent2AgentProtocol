@@ -1,0 +1,5 @@
+[project]
+name = "maplewood-crewai-worker"
+version = "0.1.0"
+requires-python = ">=3.11,<3.14"
+dependencies = ["crewai==1.15.37", "pydantic-settings>=2.14.2,<3", "pytest-socket>=0.8.1,<0.9"]

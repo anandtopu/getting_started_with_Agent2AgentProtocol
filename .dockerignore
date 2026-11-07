@@ -1,5 +1,7 @@
 .git
 .venv
+**/.venv
+**/*.exe
 node_modules
 workspace
 .env

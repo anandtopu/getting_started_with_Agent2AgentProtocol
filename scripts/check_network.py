@@ -17,12 +17,14 @@ from common.protocol import as_dict, request
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--module", type=int, default=8)
+    parser.add_argument("--frameworks", action="store_true")
     args = parser.parse_args()
     log = ROOT / "workspace/network-check.log"
     log.parent.mkdir(exist_ok=True)
     with log.open("w", encoding="utf-8") as handle:
         process = subprocess.Popen(
-            [sys.executable, "scripts/network.py", "up", "--module", str(args.module)],
+            [sys.executable, "scripts/network.py", "up", "--module", str(args.module)]
+            + (["--frameworks"] if args.frameworks else []),
             cwd=ROOT,
             stdout=handle,
             stderr=subprocess.STDOUT,
@@ -76,7 +78,7 @@ def main() -> None:
                                     ("authorization", headers["Authorization"]),
                                     ("a2a-version", "1.0"),
                                 ),
-                                timeout=5,
+                                timeout=90 if args.frameworks else 5,
                             )
                             assert (
                                 as_dict(result)["task"]["status"]["state"] == "TASK_STATE_COMPLETED"
@@ -86,7 +88,7 @@ def main() -> None:
                         url(vendor) + "/message:send",
                         headers=headers,
                         json=as_dict(payload),
-                        timeout=15,
+                        timeout=120 if args.frameworks else 15,
                     )
                     response.raise_for_status()
                     assert response.json()["task"]["status"]["state"] == "TASK_STATE_COMPLETED", (

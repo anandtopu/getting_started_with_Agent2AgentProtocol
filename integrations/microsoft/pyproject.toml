@@ -1,0 +1,5 @@
+[project]
+name = "maplewood-microsoft-worker"
+version = "0.1.0"
+requires-python = ">=3.11,<3.14"
+dependencies = ["agent-framework-core==1.25.0", "pydantic-settings>=2.14.2,<3", "pytest-socket>=0.8.1,<0.9"]

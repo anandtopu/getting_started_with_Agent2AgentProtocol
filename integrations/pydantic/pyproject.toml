@@ -1,0 +1,5 @@
+[project]
+name = "maplewood-pydantic-worker"
+version = "0.1.0"
+requires-python = ">=3.11,<3.14"
+dependencies = ["pydantic-ai-slim==2.66.0", "pydantic-settings>=2.14.2,<3", "pytest-socket>=0.8.1,<0.9"]
