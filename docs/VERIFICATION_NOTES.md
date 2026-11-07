@@ -116,11 +116,12 @@ Design checks are structural only; human rubric review is mandatory.
 - A stable .NET agent; upstream currently provides a preview.
 - Complete SDK/feature coverage and distinct Build, Secure and Interop tasks testing
   full agents rather than only small contract transformations.
-- Production OAuth/OIDC/mTLS wiring, live Keycloak realm/client configuration,
-  rate limiting, durable replay storage and automated key rotation.
+- Per-vendor production OAuth/OIDC/mTLS wiring and automated key rotation.
+  The separate Keycloak service-account lab is now verified in Docker CI.
+  Authenticated HTTP rate budgets are tested; they are per-process rather than distributed.
 - The hold-compensation lab is separate from the live Concierge's quote workflow.
-- All-vendor golden state assertions, stream-disconnect/resubscription chaos,
-  and durable multi-replica delivery. HTTP and gRPC trace parentage are now tested.
+- Stream-disconnect/resubscription chaos and durable multi-replica delivery.
+  Every vendor's golden states/artifacts and HTTP/gRPC trace parentage are now tested.
 - Complete production capstones, advanced model-native streaming/tool calling,
   and a successful official TCK run.
 
@@ -132,3 +133,15 @@ built and ran the network and verified PostgreSQL restart continuation and Jaege
 trace export through its v3 API.
 See [the validation report](VALIDATION_REPORT.md) for the final CI result.
 Real model calls and official TCK execution were not verified.
+
+## Additional reliability evidence
+
+The vendor kit now uses DatabasePushNotificationConfigStore as well as
+DatabaseTaskStore. A separate SQLite outbox/inbox lab persists notification
+delivery IDs and payload hashes. Its test loses an acknowledgement, closes and
+reopens both databases, and proves a signed retry is acknowledged without creating
+a second inbox record. This does not establish an atomic transaction between
+SDK task changes and outbox insertion, nor multi-dispatcher leasing.
+
+The Java, .NET, Go and TypeScript integrations and the Keycloak lab all passed in
+[CI run 42420093044](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42420093044).

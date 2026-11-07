@@ -16,6 +16,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 from starlette.authentication import SimpleUser
 from starlette.responses import JSONResponse
 
+from common.limits import RateBudget
+
 
 @dataclass(frozen=True)
 class Principal:
@@ -28,10 +30,18 @@ class BearerGate:
     """Authenticate before routing; an untrusted tenant header never grants access."""
 
     def __init__(
-        self, app, tokens: dict[str, Principal], max_bytes: int = 1_000_000, verifier=None
+        self,
+        app,
+        tokens: dict[str, Principal],
+        max_bytes: int = 1_000_000,
+        verifier=None,
+        rate_budget=None,
     ):
         self.app, self.tokens, self.max_bytes = app, tokens, max_bytes
+        if any(not secret for secret in tokens):
+            raise ValueError("Authentication tokens must not be empty.")
         self.verifier = verifier
+        self.rate_budget = rate_budget or RateBudget()
 
     async def __call__(self, scope, receive, send) -> None:
         if scope["type"] != "http" or scope["path"] in ("/.well-known/agent-card.json", "/health"):
@@ -53,6 +63,11 @@ class BearerGate:
             return
         if headers.get("x-tenant", principal.tenant) != principal.tenant:
             await JSONResponse({"error": "Tenant not authorized"}, 403)(scope, receive, send)
+            return
+        if not self.rate_budget.allow(f"{principal.tenant}:{principal.subject}"):
+            await JSONResponse(
+                {"error": "Request budget exceeded"}, 429, headers={"Retry-After": "60"}
+            )(scope, receive, send)
             return
         body = bytearray()
         while True:

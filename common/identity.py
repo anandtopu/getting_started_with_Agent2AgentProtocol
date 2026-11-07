@@ -27,6 +27,8 @@ class OIDCVerifier:
                 issuer=self.issuer,
                 options={"require": ["exp", "iat", "sub", "iss", "aud"]},
             )
+            if not isinstance(claims.get("scope", ""), str) or not isinstance(claims["sub"], str):
+                return None
             if (
                 claims.get("tenant") != "maplewood"
                 or "quote" not in claims.get("scope", "").split()

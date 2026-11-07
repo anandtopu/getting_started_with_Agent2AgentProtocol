@@ -75,11 +75,11 @@ def main():
             response = http.get("http://127.0.0.1:16686/api/v3/services")
             response.raise_for_status()
             services = response.json().get("services", [])
-            if "maplewood-concierge" in services:
+            if {f"maplewood-{vendor}" for vendor in VENDORS}.issubset(services):
                 break
             time.sleep(1)
         else:
-            raise AssertionError("No Concierge traces reached Jaeger.")
+            raise AssertionError(f"Not all six services exported traces to Jaeger: {services}")
     print(
         json.dumps(
             {"six_agent_plan": "passed", "postgres_restart": "passed", "jaeger_export": "passed"}

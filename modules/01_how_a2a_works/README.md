@@ -56,6 +56,21 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Walkthrough
 
+### Inspect one envelope without an A2A SDK
+
+Run uv run python modules/01_how_a2a_works/examples/04_manual_envelope.py.
+The [small server](../../common/manual_server.py) handles one operation with
+ordinary Python dictionaries. Its [actual capture](wire/manual.jsonl) shows the
+same SendMessage envelope used by the official SDK.
+
+> **Predict, then run:** Which identifier comes back unchanged: the JSON-RPC id,
+> messageId or task id? The RPC id correlates the response. The server creates
+> a separate task id for the work.
+
+This microscope has no network listener and implements only SendMessage. It is
+not a complete A2A server. Module 03 introduces the SDK's full route handlers,
+which enforce the remaining lifecycle and capability contracts.
+
 ### 01: jsonrpc
 
 Read a JSON-RPC envelope.

@@ -4,8 +4,11 @@ As a vendor, I can expose a signed card, require authentication, persist tasks,
 pause for dietary counts, continue over a stream and deliver verified push events.
 The [integrated implementation](../../common/vendor_kit.py) composes all of these
 features and accepts a SQLite or PostgreSQL URL and operator-provisioned keys.
-It remains a teaching kit: callback registrations and replay tracking are in memory,
-and it does not claim durable production webhook delivery.
+Callback registrations and tasks use database stores. The immediate callback
+receiver still keeps replay history in memory; the separate
+[durable-delivery lab](../../modules/19_deployment/examples/04_durable_delivery.py)
+demonstrates restart-safe outbox/inbox behavior. Combining task changes and outbox
+insertion in one transaction remains production work.
 
 ## Architecture
 
@@ -44,4 +47,6 @@ Score contract clarity, correctness, security, failure handling and evidence fro
 
 ## Extend it
 
-Add persistent task storage, negative contract tests, reconnect behavior, a durable callback outbox and a real deployment. Prove each property with captured traffic and a regression test.
+Add migrations, backup/restore checks, reconnect behavior, an atomic task/outbox
+transaction and a public TLS deployment. Prove each property with captured traffic
+and a regression test.

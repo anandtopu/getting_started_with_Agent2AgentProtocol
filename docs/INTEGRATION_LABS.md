@@ -104,9 +104,8 @@ uv run pytest tests/test_identity.py tests/test_observability.py tests/test_pers
 uv run pytest tests/test_golden.py
 ~~~
 
-The 20 golden cases assert delegation, quote totals and catering state/artifact
-sequences, including incomplete and conflicting briefs. The test does not yet
-assert every intermediate state for every vendor.
+The 20 golden cases assert delegation, exact quote artifacts and state/artifact
+sequences for every vendor, including incomplete and conflicting briefs.
 
 ## Native language interoperability
 
@@ -125,8 +124,9 @@ uv run python scripts/check_java_interop.py
 Go requires a Go 1.26 toolchain. The initial dependency download needs internet;
 the subsequent exchange is local. Java uses official SDK 1.5.0.Final and requires
 Java 17+ and Maven. The .NET official
-release list currently identifies v1.0.0-preview4 as a prerelease; this course does
-not represent it as a verified stable integration.
+release list currently identifies v1.0.0-preview4 as a prerelease. Its
+[native lab](../modules/bonus/B2_other_sdks/dotnet/README.md) is implemented and tested,
+but this course does not represent the package as stable.
 
 [Go source](../modules/bonus/B2_other_sdks/go/main.go) ·
 [official .NET releases](https://github.com/a2aproject/a2a-dotnet/releases)

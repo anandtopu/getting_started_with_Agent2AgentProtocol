@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 import httpx
 from a2a.server.request_handlers import DefaultRequestHandler
-from a2a.server.tasks import DatabaseTaskStore, InMemoryPushNotificationConfigStore
+from a2a.server.tasks import DatabasePushNotificationConfigStore, DatabaseTaskStore
 from a2a.types import AgentCard
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from google.protobuf.json_format import ParseDict
@@ -23,7 +23,7 @@ from common.wire import Recorder
 async def vendor_kit(database_url: str, tokens: dict, private_key, callback_client, destinations):
     engine = create_async_engine(database_url)
     store = DatabaseTaskStore(engine)
-    callbacks = InMemoryPushNotificationConfigStore()
+    callbacks = DatabasePushNotificationConfigStore(engine)
     identity = card("catering")
     identity.capabilities.push_notifications = True
     identity = ParseDict(sign_card(as_dict(identity), private_key, "saffron-kit"), AgentCard())

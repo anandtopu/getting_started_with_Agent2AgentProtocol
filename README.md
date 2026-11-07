@@ -6,9 +6,14 @@ cloud account for the examples and graded exercises.
 
 **Target:** A2A specification **1.0.1**, official Python SDK **1.3.0**.
 This is an initial course implementation, with 21 core modules, four bonus
-introductions, 75 runnable examples and 150 exercises. Read
+modules, 80 runnable examples and 157 exercises. Read
 [verification notes](docs/VERIFICATION_NOTES.md) for the distinction between
 implemented examples, introductory coverage and remaining advanced work.
+
+The tested integrations include all seven requested frameworks, native TypeScript,
+Go, Java and an explicitly labeled .NET preview, a Keycloak token lab,
+PostgreSQL recovery, and HTTP/gRPC tracing. See the
+[validation report](docs/VALIDATION_REPORT.md) for evidence and limitations.
 
 A2A is an open protocol for independently operated agents to exchange work.
 An **Agent Card** describes a vendor's skills and interfaces. A **message**

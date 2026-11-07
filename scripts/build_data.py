@@ -129,6 +129,26 @@ def main() -> None:
                 else [],
             }
         )
+        from agents.business import quote
+
+        expectations = {}
+        for vendor in brief["needs"]:
+            outcome, result = "TASK_STATE_COMPLETED", None
+            if vendor == "catering" and "dietary" not in brief:
+                outcome = "TASK_STATE_INPUT_REQUIRED"
+            else:
+                try:
+                    result = quote(vendor, brief)
+                except ValueError:
+                    outcome = "TASK_STATE_REJECTED"
+            expectations[vendor] = {
+                "states": ["TASK_STATE_SUBMITTED", "TASK_STATE_WORKING", outcome],
+                "artifact_ids": (["plan"] * 3 if vendor == "av" else []) + ["quote"]
+                if result
+                else [],
+                "quotes": [result] if result else [],
+            }
+        scenarios[-1]["vendors"] = expectations
     path = ROOT / "eval" / "golden.jsonl"
     path.parent.mkdir(exist_ok=True)
     path.write_text("".join(json.dumps(s) + "\n" for s in scenarios), encoding="utf-8")

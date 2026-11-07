@@ -56,6 +56,20 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Walkthrough
 
+Run uv run python modules/19_deployment/examples/04_durable_delivery.py to reopen
+a SQLite outbox and deliver a pending signed notification. The corresponding
+tests/test_durable_delivery.py additionally loses the first acknowledgement,
+restarts sender and receiver, and proves the retry creates only one inbox record.
+
+> **Predict, then run:** If a receiver saved the event but its HTTP response was
+> lost, should the sender invent a new delivery ID? No: keep the ID so the durable
+> inbox can recognize a retry. Authenticate every retry before deduplicating it.
+
+This lab uses one dispatcher and a transactional inbox. It does not make SDK
+task persistence and outbox insertion one atomic transaction; closing that gap
+requires a shared transaction boundary or reconciliation process. Production
+workers also need leases, retention policies and dead-letter operations.
+
 ### 01: persist
 
 Persist and reload a task.

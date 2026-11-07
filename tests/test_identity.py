@@ -14,7 +14,8 @@ from common.protocol import as_dict, request
 
 
 @pytest.mark.parametrize(
-    "mutation", ["valid", "issuer", "audience", "expired", "scope", "tenant", "signature", "jku"]
+    "mutation",
+    ["valid", "issuer", "audience", "expired", "scope", "scope_type", "tenant", "signature", "jku"],
 )
 async def test_oidc_boundary(mutation):
     private = generate_private_key(public_exponent=65537, key_size=2048)
@@ -34,6 +35,7 @@ async def test_oidc_boundary(mutation):
         "audience": ("aud", "other"),
         "expired": ("exp", 1),
         "scope": ("scope", "read"),
+        "scope_type": ("scope", ["quote"]),
         "tenant": ("tenant", "other"),
     }
     if mutation in changes:

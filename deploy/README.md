@@ -2,8 +2,9 @@
 
 This lab packages six authenticated agents with signed cards. PostgreSQL stores
 each vendor's tasks in a separate table, and OpenTelemetry exports HTTP request
-traces to Jaeger. Inkwell uses gRPC operations. Keycloak also starts, but realm,
-client and token acquisition are not yet wired into the live network.
+traces to Jaeger. Inkwell uses gRPC operations and propagates trace metadata.
+Keycloak imports a service-account realm and authorizes an additional OIDC venue;
+see [the token acquisition lab](OIDC_LAB.md).
 
 Generate unique local secrets:
 
@@ -24,6 +25,6 @@ plan, restart Saffron and resume its PostgreSQL-backed task, and query Jaeger v3
 for exported traces. GitHub CI runs this integration on Linux; see the
 [validation report](../docs/VALIDATION_REPORT.md).
 
-Production still requires TLS, identity-provider wiring, durable event delivery,
+Production still requires TLS, per-vendor identity integration, durable event delivery,
 migrations, backups, reliable callback outboxes and operational runbooks.
 Task persistence alone does not make in-flight streams survive a replica loss.
