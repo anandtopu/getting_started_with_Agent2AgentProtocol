@@ -178,3 +178,7 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/17_obs
 ## Next: Module 18
 
 Use [the learning path](../../LEARNING_PATH.md) to continue or choose a capstone.
+
+## Connected integration lab
+
+Continue with [the tested integration walkthrough](../../docs/INTEGRATION_LABS.md), including actual commands, expected behavior, security boundaries and current limitations.

@@ -72,7 +72,9 @@ def main():
         ).json()["task"]
         assert second["id"] == first["id"] and second["status"]["state"] == "TASK_STATE_COMPLETED"
         for attempt in range(30):
-            services = http.get("http://127.0.0.1:16686/api/services").json().get("data", [])
+            response = http.get("http://127.0.0.1:16686/api/v3/services")
+            response.raise_for_status()
+            services = response.json().get("services", [])
             if "maplewood-concierge" in services:
                 break
             time.sleep(1)

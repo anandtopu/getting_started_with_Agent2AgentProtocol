@@ -38,7 +38,7 @@ agents/                   Vendor and Concierge implementations
 data/                     Inventory, 20 events and attack fixtures
 modules/00_* to 20_*/      Lessons, examples, notebooks, captures and tests
 modules/bonus/B1_* to B4_* Optional ecosystem introductions
-gym/                      CLI, grading and 150 task folders
+gym/                      CLI, grading and 157 task folders
 workspace/                Ignored attempts, local tokens and progress
 control_room/             Streamlit network viewer
 capstones/                Specifications, starters, references and rubrics

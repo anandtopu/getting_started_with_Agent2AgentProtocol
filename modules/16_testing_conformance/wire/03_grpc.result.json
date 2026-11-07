@@ -1,13 +1,13 @@
 {
   "task": {
-    "id": "48da3522-f206-41e4-8f96-1f0a3fa8764d",
-    "contextId": "042422e4-4e12-426e-a7f7-4a5c47e910a4",
+    "id": "f0dff7ee-3592-45c2-8b91-3ad28337c483",
+    "contextId": "96807f12-4daf-41a5-bf8a-3fafac6a229f",
     "status": {
       "state": "TASK_STATE_COMPLETED",
       "message": {
-        "messageId": "e970f6f8-10d7-4472-9365-d16777efbf30",
-        "contextId": "042422e4-4e12-426e-a7f7-4a5c47e910a4",
-        "taskId": "48da3522-f206-41e4-8f96-1f0a3fa8764d",
+        "messageId": "23d16d26-2b84-4528-91f1-2c87f0bf3f70",
+        "contextId": "96807f12-4daf-41a5-bf8a-3fafac6a229f",
+        "taskId": "f0dff7ee-3592-45c2-8b91-3ad28337c483",
         "role": "ROLE_AGENT",
         "parts": [
           {
@@ -37,9 +37,9 @@
     ],
     "history": [
       {
-        "messageId": "9f102baa-03a4-45fc-87fa-c852ef91681f",
-        "contextId": "042422e4-4e12-426e-a7f7-4a5c47e910a4",
-        "taskId": "48da3522-f206-41e4-8f96-1f0a3fa8764d",
+        "messageId": "caa129b7-ed92-4c19-802b-d8dcf25a7ade",
+        "contextId": "96807f12-4daf-41a5-bf8a-3fafac6a229f",
+        "taskId": "f0dff7ee-3592-45c2-8b91-3ad28337c483",
         "role": "ROLE_USER",
         "parts": [
           {
@@ -57,9 +57,9 @@
         ]
       },
       {
-        "messageId": "be9fc4fa-b716-4524-979d-51a8f0997def",
-        "contextId": "042422e4-4e12-426e-a7f7-4a5c47e910a4",
-        "taskId": "48da3522-f206-41e4-8f96-1f0a3fa8764d",
+        "messageId": "8069c94a-36bf-4814-b8c0-403eaaa26a91",
+        "contextId": "96807f12-4daf-41a5-bf8a-3fafac6a229f",
+        "taskId": "f0dff7ee-3592-45c2-8b91-3ad28337c483",
         "role": "ROLE_AGENT",
         "parts": [
           {

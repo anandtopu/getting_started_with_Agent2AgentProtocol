@@ -2,12 +2,12 @@
 
 import asyncio
 
-from common.lessons import experiment
 from common.pretty import show
+from common.vendor_kit import kit_lab
 
 
 async def main() -> None:
-    show(await experiment("push"))
+    show(await kit_lab())
 
 
 if __name__ == "__main__":

@@ -16,3 +16,5 @@ deploy/secrets/
 **/bin/
 **/obj/
 **/target/
+*.exe
+modules/bonus/B2_other_sdks/go/granite

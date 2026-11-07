@@ -52,8 +52,17 @@ async def client(
 
 
 class ServiceContext:
+    def __init__(self):
+        self.trailing = ()
+
     def invocation_metadata(self):
         return (("a2a-version", "1.0"),)
+
+    def trailing_metadata(self):
+        return self.trailing
+
+    def set_trailing_metadata(self, value):
+        self.trailing = value
 
     async def abort(self, code, details, trailing_metadata=()):
         raise RuntimeError(f"{code}: {details}")

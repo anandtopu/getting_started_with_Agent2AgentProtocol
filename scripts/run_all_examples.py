@@ -15,6 +15,8 @@ def main() -> None:
     args = parser.parse_args()
     paths = sorted((ROOT / "modules").glob("**/examples/*.py"))
     paths += sorted((ROOT / "modules").glob("**/use_case/run.py"))
+    paths += sorted((ROOT / "capstones").glob("*/solution/run.py"))
+    paths += sorted((ROOT / "capstones").glob("*/starter/run.py"))
     for path in paths:
         result = subprocess.run(
             [sys.executable, str(path)], cwd=ROOT, capture_output=True, text=True, timeout=60

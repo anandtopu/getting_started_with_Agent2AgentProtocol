@@ -1,6 +1,11 @@
 # Vendor Agent Kit
 
-As a vendor, I can send authenticated asynchronous progress and a final deliverable. The reference slice demonstrates push delivery, not a production-ready packaged vendor.
+As a vendor, I can expose a signed card, require authentication, persist tasks,
+pause for dietary counts, continue over a stream and deliver verified push events.
+The [integrated implementation](../../common/vendor_kit.py) composes all of these
+features and accepts a SQLite or PostgreSQL URL and operator-provisioned keys.
+It remains a teaching kit: callback registrations and replay tracking are in memory,
+and it does not claim durable production webhook delivery.
 
 ## Architecture
 

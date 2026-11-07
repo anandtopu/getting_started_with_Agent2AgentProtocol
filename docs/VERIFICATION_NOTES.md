@@ -51,7 +51,7 @@ Microsoft Agent Framework 1.25.0 and BeeAI 0.1.86.
 | Framework | Evidence at check time | Course status |
 |---|---|---|
 | Google ADK | A2A extra permits SDK below 2 and at least 0.3.4 | Native API not yet tested here |
-| LangGraph | No native A2A dependency in core metadata | Adapter boundary taught; full integration pending |
+| LangGraph | 1.2.20 StateGraph verified in the installed package | Working official-v1-SDK adapter, MCP tool and pause/resume tests |
 | Strands | Native A2A extra pins SDK below 0.4 | Incompatible with this main environment |
 | Pydantic AI | Main package delegates integrations to slim extras | Native v1 integration not yet tested here |
 | CrewAI | Native A2A extra requires SDK 0.3.x | Incompatible; also has differing MCP/Pydantic constraints |
@@ -60,11 +60,13 @@ Microsoft Agent Framework 1.25.0 and BeeAI 0.1.86.
 
 Do not install incompatible native adapters into the core environment. An isolated
 framework worker behind an official v1 SDK boundary is a possible future solution;
-this release does not claim all seven integrations work.
+this release does not claim all seven integrations work. LangGraph is implemented
+and tested; the other six remain compatibility research.
 
-Official Go v2.8.0 and Java v1.5.0.Final releases were observed. The .NET repository
-was read, but a stable NuGet version was not established in this run.
-The Go/Java/.NET bonus is an introduction, not a completed three-language implementation.
+Official Go v2.8.0 and Java v1.5.0.Final releases were observed. The Go venue agent
+is compiled and its authenticated quote is checked against the Python inventory.
+Java remains unimplemented. The official .NET release list reports
+v1.0.0-preview4 as a prerelease; no stable .NET integration is claimed.
 
 ## Model configuration
 
@@ -85,30 +87,43 @@ functions. This is not a complete provider-native streaming tool-call implementa
 - Deterministic quote artifacts for five vendors.
 - Catering interruption and continuation, stream ordering, chunks and cancellation.
 - Protobuf roundtrip calls to the real gRPC servicer without a listening port.
+- A deployed gRPC-only Inkwell endpoint with authentication, plus the Concierge's
+  HTTP-to-gRPC delegation and signed-card trust checks.
+- Real LangGraph and MCP SDK execution inside Saffron's A2A boundary.
+- OAuth/OIDC token-verifier negative cases, SQLite restart continuation, HTTP trace
+  propagation, bounded fallback, explicit hold compensation and 20 golden scenarios.
+- The vendor kit combines signed cards, authentication, durable tasks and verified
+  push; the hiring capstone coordinates three A2A agents and pauses for consent.
 - Missing-credential rejection, owner isolation, signature tampering rejection,
   unsafe file URL rejection and webhook replay checks.
 - Every gym starter fails and every reference solution passes its task checks.
 - Module files and cleared notebooks are structurally checked.
 
-The gym currently has 126 core tasks and 24 bonus tasks across six types.
+The gym currently has 133 core tasks and 24 bonus tasks across eight types.
 Build/Fix/Conformance tasks share a small contract within each module; this is
 introductory practice, not the requested deep bank of six distinct tasks per feature.
+Seven additional tasks use real protocol and adversarial acceptance checks for
+continuation, streaming, gRPC, authentication, signing, SSRF and minimal disclosure.
 Design checks are structural only; human rubric review is mandatory.
 
 ## Remaining gaps against the original brief
 
-- Native adapters for all seven frameworks, a live MCP integration, and Go/Java/.NET agents.
-- A gRPC-only deployed Inkwell vendor and every-binding operation capture.
+- The remaining six framework adapters, Java and a stable .NET agent.
 - Complete SDK/feature coverage and distinct Build, Secure and Interop tasks testing
   full agents rather than only small contract transformations.
-- Production OAuth/OIDC/mTLS integration, live Keycloak configuration, rate limiting,
-  durable replay storage, key rotation, and signed public cards on every server.
-- End-to-end continuation/fallback/compensation through the Concierge; current
-  continuation is demonstrated directly against the catering vendor.
-- Real distributed trace propagation, all golden scenario assertions, chaos
-  resubscription tests, and durable multi-replica delivery.
-- Full production capstone implementations and a successful official TCK run.
+- Production OAuth/OIDC/mTLS wiring, live Keycloak realm/client configuration,
+  rate limiting, durable replay storage and automated key rotation.
+- The hold-compensation lab is separate from the live Concierge's quote workflow.
+- All-vendor golden state assertions, stream-disconnect/resubscription chaos,
+  gRPC trace propagation and durable multi-replica delivery.
+- Complete production capstones, advanced model-native streaming/tool calling,
+  and a successful official TCK run.
 
-Docker is installed on the authoring machine but its engine was not running.
-Compose execution, real model calls and official TCK execution were not verified.
-See the release validation report for exact commands that were run.
+All eleven operations have actual JSON-RPC, HTTP+JSON and in-process gRPC captures;
+the terminal-task SubscribeToTask error is deliberately included.
+
+Docker has no running engine on the authoring machine. GitHub's Linux runner
+built and ran the network and verified PostgreSQL restart continuation; the first
+trace-export check found an obsolete Jaeger query URL, corrected to the v3 API.
+See [the validation report](VALIDATION_REPORT.md) for the final CI result.
+Real model calls and official TCK execution were not verified.

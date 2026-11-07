@@ -149,3 +149,5 @@ Generated IDs and timestamps vary between runs.
 
 Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
 License: [MIT](LICENSE).
+
+See [integration labs](docs/INTEGRATION_LABS.md), [all operations on the wire](docs/OPERATIONS_ON_THE_WIRE.md), and [the validation report](docs/VALIDATION_REPORT.md) for executed checks and remaining scope.

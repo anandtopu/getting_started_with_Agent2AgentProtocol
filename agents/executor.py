@@ -13,6 +13,7 @@ from a2a.types import Artifact, TaskArtifactUpdateEvent, TaskState
 from google.protobuf.json_format import MessageToDict, ParseDict
 
 from agents.business import quote
+from agents.catalog import QUOTE_EXTENSION
 from common.protocol import brief_from, data_part
 
 
@@ -80,7 +81,14 @@ class VendorExecutor(AgentExecutor):
                 task_id=task.id,
                 context_id=task.context_id,
                 last_chunk=True,
-                artifact=Artifact(artifact_id="quote", name="quote", parts=[data_part(result)]),
+                artifact=Artifact(
+                    artifact_id="quote",
+                    name="quote",
+                    parts=[data_part(result)],
+                    extensions=[QUOTE_EXTENSION]
+                    if QUOTE_EXTENSION in context.requested_extensions
+                    else [],
+                ),
             )
         )
         await state(TaskState.TASK_STATE_COMPLETED, "Quote ready; no money has been spent.")

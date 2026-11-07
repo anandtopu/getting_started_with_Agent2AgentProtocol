@@ -39,6 +39,11 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: uv run --offline python scripts/check_typescript_interop.py
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.4"
+          cache-dependency-path: modules/bonus/B2_other_sdks/go/go.sum
+      - run: uv run --offline python scripts/check_go_interop.py
       - run: uv run --offline python scripts/check_network.py --module 0
       - run: uv run --offline python scripts/check_network.py --module 5
       - run: uv run --offline python scripts/check_network.py --module 8

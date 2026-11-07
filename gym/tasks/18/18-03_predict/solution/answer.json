@@ -27,6 +27,9 @@
             },
             "mediaType": "application/json"
           }
+        ],
+        "extensions": [
+          "https://maplewood.example/extensions/structured-quote/v1"
         ]
       }
     ],

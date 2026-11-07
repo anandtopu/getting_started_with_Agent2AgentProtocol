@@ -13,6 +13,10 @@ A2A 1.0.1 uses one normative protobuf schema across JSON-RPC, HTTP+JSON and gRPC
 
 ## Operations
 
+Read [Every operation on the wire](OPERATIONS_ON_THE_WIRE.md) for the actual
+requests, responses, streaming events and expected error example. Each operation
+has JSON-RPC, HTTP+JSON and protobuf service-boundary captures.
+
 | Operation | Request | Response | Form |
 |---|---|---|---|
 | SendMessage | SendMessageRequest | SendMessageResponse | unary |
