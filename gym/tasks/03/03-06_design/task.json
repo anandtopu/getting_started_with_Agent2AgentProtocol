@@ -1,0 +1,41 @@
+{
+  "id": "03-06",
+  "module": "03",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "artifacts": [
+          "quote"
+        ]
+      },
+      "expected": [
+        "task",
+        "working",
+        "quote",
+        "completed"
+      ]
+    },
+    {
+      "input": {
+        "artifacts": []
+      },
+      "expected": [
+        "task",
+        "working",
+        "completed"
+      ]
+    }
+  ],
+  "feedback": "Introduce the task before updates and explicitly reach a final state.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

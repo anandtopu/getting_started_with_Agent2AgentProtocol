@@ -1,0 +1,45 @@
+{
+  "id": "16-01",
+  "module": "16",
+  "title": "Detect invalid mixed event streams",
+  "type": "build",
+  "level": "medium",
+  "cases": [
+    {
+      "input": [
+        "message"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "message",
+        "task"
+      ],
+      "expected": false
+    },
+    {
+      "input": [
+        "working",
+        "completed"
+      ],
+      "expected": false
+    },
+    {
+      "input": [
+        "task",
+        "working",
+        "completed"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "task",
+        "working"
+      ],
+      "expected": false
+    }
+  ],
+  "feedback": "A direct message is a complete response; a task stream needs a valid introduction and stop condition."
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "text": "Floor plan"
+  },
+  {
+    "raw": "c3ludGhldGljIGZsb29yIHBsYW4=",
+    "filename": "plan.txt",
+    "mediaType": "text/plain"
+  },
+  {
+    "url": "https://maplewood.example/plan",
+    "mediaType": "text/plain"
+  },
+  {
+    "data": {
+      "total_cents": 96000.0
+    },
+    "mediaType": "application/json"
+  }
+]

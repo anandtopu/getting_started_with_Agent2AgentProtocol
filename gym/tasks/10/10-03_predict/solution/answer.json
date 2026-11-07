@@ -1,0 +1,51 @@
+{
+  "delegations": [
+    {
+      "vendor": "venues",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "venues",
+          "approved": false,
+          "selection": "room-1",
+          "total_cents": 80000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "catering",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "catering",
+          "approved": false,
+          "selection": "garden",
+          "total_cents": 96000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    }
+  ],
+  "total_cents": 176000.0,
+  "within_budget": true,
+  "approval_required": true
+}

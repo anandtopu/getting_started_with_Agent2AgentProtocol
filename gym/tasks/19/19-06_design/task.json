@@ -1,0 +1,45 @@
+{
+  "id": "19-06",
+  "module": "19",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "base_seconds": 1,
+        "attempt": 2,
+        "cap_seconds": 3,
+        "max_attempts": 5
+      },
+      "expected": 3
+    },
+    {
+      "input": {
+        "base_seconds": 1,
+        "attempt": 5,
+        "cap_seconds": 30,
+        "max_attempts": 5
+      },
+      "expected": null
+    },
+    {
+      "input": {
+        "base_seconds": 2,
+        "attempt": 0,
+        "cap_seconds": 30,
+        "max_attempts": 5
+      },
+      "expected": 2
+    }
+  ],
+  "feedback": "Cap both delay and attempts; persist retry state if delivery must survive a restart.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

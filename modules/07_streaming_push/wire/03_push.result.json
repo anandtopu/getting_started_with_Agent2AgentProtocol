@@ -1,0 +1,193 @@
+{
+  "task": {
+    "task": {
+      "id": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+      "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+      "status": {
+        "state": "TASK_STATE_COMPLETED",
+        "message": {
+          "messageId": "52a957ce-bb60-4bf9-bf9f-eb3f6605f872",
+          "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+          "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "Quote ready; no money has been spent."
+            }
+          ]
+        }
+      },
+      "artifacts": [
+        {
+          "artifactId": "quote",
+          "name": "quote",
+          "parts": [
+            {
+              "data": {
+                "guests": 40.0,
+                "vendor": "venues",
+                "approved": false,
+                "selection": "room-1",
+                "total_cents": 80000.0,
+                "currency": "USD"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        }
+      ],
+      "history": [
+        {
+          "messageId": "895e2a86-6e80-45ef-8d34-fbf27cc83659",
+          "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+          "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+          "role": "ROLE_USER",
+          "parts": [
+            {
+              "data": {
+                "dietary": {
+                  "standard": 30.0,
+                  "vegan": 10.0
+                },
+                "guests": 40.0,
+                "budget_cents": 1000000.0,
+                "date": "2027-06-01"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        },
+        {
+          "messageId": "0587abfa-f295-4cdf-b827-ac5e38e809e8",
+          "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+          "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "venues: checking the brief"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "brief": {
+          "guests": 40.0,
+          "dietary": {
+            "standard": 30.0,
+            "vegan": 10.0
+          },
+          "budget_cents": 1000000.0,
+          "date": "2027-06-01"
+        }
+      }
+    }
+  },
+  "verified_deliveries": [
+    {
+      "task": {
+        "id": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+        "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+        "status": {
+          "state": "TASK_STATE_SUBMITTED"
+        },
+        "history": [
+          {
+            "messageId": "895e2a86-6e80-45ef-8d34-fbf27cc83659",
+            "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+            "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+            "role": "ROLE_USER",
+            "parts": [
+              {
+                "data": {
+                  "guests": 40.0,
+                  "dietary": {
+                    "standard": 30.0,
+                    "vegan": 10.0
+                  },
+                  "budget_cents": 1000000.0,
+                  "date": "2027-06-01"
+                },
+                "mediaType": "application/json"
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "brief": {
+            "dietary": {
+              "standard": 30.0,
+              "vegan": 10.0
+            },
+            "guests": 40.0,
+            "budget_cents": 1000000.0,
+            "date": "2027-06-01"
+          }
+        }
+      }
+    },
+    {
+      "statusUpdate": {
+        "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+        "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+        "status": {
+          "state": "TASK_STATE_WORKING",
+          "message": {
+            "messageId": "0587abfa-f295-4cdf-b827-ac5e38e809e8",
+            "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+            "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+            "role": "ROLE_AGENT",
+            "parts": [
+              {
+                "text": "venues: checking the brief"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "artifactUpdate": {
+        "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+        "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+        "artifact": {
+          "artifactId": "quote",
+          "name": "quote",
+          "parts": [
+            {
+              "data": {
+                "guests": 40.0,
+                "vendor": "venues",
+                "approved": false,
+                "selection": "room-1",
+                "total_cents": 80000.0,
+                "currency": "USD"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        },
+        "lastChunk": true
+      }
+    },
+    {
+      "statusUpdate": {
+        "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+        "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+        "status": {
+          "state": "TASK_STATE_COMPLETED",
+          "message": {
+            "messageId": "52a957ce-bb60-4bf9-bf9f-eb3f6605f872",
+            "contextId": "799d1123-aead-40b2-81dd-15e46790cd47",
+            "taskId": "fb2b2079-f3bd-491b-bb5a-e212965e0610",
+            "role": "ROLE_AGENT",
+            "parts": [
+              {
+                "text": "Quote ready; no money has been spent."
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

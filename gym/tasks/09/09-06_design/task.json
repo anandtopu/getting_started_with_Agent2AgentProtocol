@@ -1,0 +1,36 @@
+{
+  "id": "09-06",
+  "module": "09",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "tool": "quote_menu"
+      },
+      "expected": "quote_menu"
+    },
+    {
+      "input": {
+        "tool": "ask_dietary"
+      },
+      "expected": "ask_dietary"
+    },
+    {
+      "input": {
+        "tool": "send_credentials"
+      },
+      "expected": "reject"
+    }
+  ],
+  "feedback": "A model suggests tools; application code owns the allow-list.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

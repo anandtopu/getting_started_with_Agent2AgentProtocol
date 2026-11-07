@@ -1,0 +1,66 @@
+{
+  "name": "Granite Hall Venues",
+  "description": "Find an available room for a date and guest count; return capacity and a quote in cents. No purchase.",
+  "supportedInterfaces": [
+    {
+      "url": "http://127.0.0.1:8100/rpc",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "http://127.0.0.1:8100",
+      "protocolBinding": "HTTP+JSON",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "provider": {
+    "url": "https://maplewood.example",
+    "organization": "Granite Hall Venues"
+  },
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": true,
+    "extensions": [
+      {
+        "uri": "https://maplewood.example/extensions/structured-quote/v1"
+      }
+    ],
+    "extendedAgentCard": false
+  },
+  "securitySchemes": {
+    "vendor_token": {
+      "httpAuthSecurityScheme": {
+        "scheme": "Bearer"
+      }
+    }
+  },
+  "securityRequirements": [
+    {
+      "schemes": {
+        "vendor_token": {}
+      }
+    }
+  ],
+  "defaultInputModes": [
+    "text/plain",
+    "application/json",
+    "application/octet-stream"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "name": "Granite Hall Venues quote",
+      "description": "Find an available room for a date and guest count; return capacity and a quote in cents. No purchase.",
+      "tags": [
+        "events",
+        "venues"
+      ],
+      "examples": [
+        "Quote a 40-person offsite on 2027-06-01"
+      ]
+    }
+  ]
+}

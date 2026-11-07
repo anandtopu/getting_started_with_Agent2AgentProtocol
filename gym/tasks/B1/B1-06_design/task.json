@@ -1,0 +1,44 @@
+{
+  "id": "B1-06",
+  "module": "B1",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "python": {
+          "total_cents": 100,
+          "currency": "USD"
+        },
+        "typescript": {
+          "total_cents": 100,
+          "currency": "EUR"
+        }
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "python": {
+          "total_cents": 100,
+          "currency": "USD"
+        },
+        "typescript": {
+          "total_cents": 100,
+          "currency": "USD"
+        }
+      },
+      "expected": true
+    }
+  ],
+  "feedback": "Compare semantic values, not generated identifiers or object implementations.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

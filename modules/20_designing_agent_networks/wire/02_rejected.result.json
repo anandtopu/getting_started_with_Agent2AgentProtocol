@@ -1,0 +1,52 @@
+{
+  "task": {
+    "id": "68da441b-28f4-454b-8e11-5650c56dc213",
+    "contextId": "d4e7ad58-c059-4633-a51d-a69668f03bce",
+    "status": {
+      "state": "TASK_STATE_REJECTED",
+      "message": {
+        "messageId": "794e3063-b462-4bb9-8f34-270f059be43d",
+        "contextId": "d4e7ad58-c059-4633-a51d-a69668f03bce",
+        "taskId": "68da441b-28f4-454b-8e11-5650c56dc213",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "No available room has sufficient capacity."
+          }
+        ]
+      }
+    },
+    "history": [
+      {
+        "messageId": "2ee06b92-e942-4d0a-a54f-f3b629d88912",
+        "contextId": "d4e7ad58-c059-4633-a51d-a69668f03bce",
+        "taskId": "68da441b-28f4-454b-8e11-5650c56dc213",
+        "role": "ROLE_USER",
+        "parts": [
+          {
+            "data": {
+              "guests": 900.0
+            },
+            "mediaType": "application/json"
+          }
+        ]
+      },
+      {
+        "messageId": "ada7effc-7b30-4e24-b02a-b3b59cf844fe",
+        "contextId": "d4e7ad58-c059-4633-a51d-a69668f03bce",
+        "taskId": "68da441b-28f4-454b-8e11-5650c56dc213",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "venues: checking the brief"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "brief": {
+        "guests": 900.0
+      }
+    }
+  }
+}

@@ -1,0 +1,133 @@
+[
+  {
+    "task": {
+      "status": {
+        "state": "TASK_STATE_SUBMITTED"
+      },
+      "history": [
+        {
+          "role": "ROLE_USER",
+          "parts": [
+            {
+              "data": {
+                "guests": 40.0,
+                "dietary": {
+                  "standard": 30.0,
+                  "vegan": 10.0
+                },
+                "budget_cents": 1000000.0,
+                "date": "2027-06-01"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "brief": {
+          "dietary": {
+            "standard": 30.0,
+            "vegan": 10.0
+          },
+          "guests": 40.0,
+          "budget_cents": 1000000.0,
+          "date": "2027-06-01"
+        }
+      }
+    }
+  },
+  {
+    "statusUpdate": {
+      "status": {
+        "state": "TASK_STATE_WORKING",
+        "message": {
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "av: checking the brief"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "artifactUpdate": {
+      "artifact": {
+        "artifactId": "plan",
+        "name": "setup-plan",
+        "parts": [
+          {
+            "text": "Microphone check. "
+          }
+        ]
+      }
+    }
+  },
+  {
+    "artifactUpdate": {
+      "artifact": {
+        "artifactId": "plan",
+        "name": "setup-plan",
+        "parts": [
+          {
+            "text": "Projector alignment. "
+          }
+        ]
+      },
+      "append": true
+    }
+  },
+  {
+    "artifactUpdate": {
+      "artifact": {
+        "artifactId": "plan",
+        "name": "setup-plan",
+        "parts": [
+          {
+            "text": "Sound check complete."
+          }
+        ]
+      },
+      "append": true,
+      "lastChunk": true
+    }
+  },
+  {
+    "artifactUpdate": {
+      "artifact": {
+        "artifactId": "quote",
+        "name": "quote",
+        "parts": [
+          {
+            "data": {
+              "guests": 40.0,
+              "vendor": "av",
+              "approved": false,
+              "selection": "microphone, projector, speaker",
+              "total_cents": 28000.0,
+              "currency": "USD"
+            },
+            "mediaType": "application/json"
+          }
+        ]
+      },
+      "lastChunk": true
+    }
+  },
+  {
+    "statusUpdate": {
+      "status": {
+        "state": "TASK_STATE_COMPLETED",
+        "message": {
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "Quote ready; no money has been spent."
+            }
+          ]
+        }
+      }
+    }
+  }
+]

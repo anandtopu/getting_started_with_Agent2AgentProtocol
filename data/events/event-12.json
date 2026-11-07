@@ -1,0 +1,19 @@
+{
+  "id": "event-12",
+  "title": "Maplewood gathering 12",
+  "guests": 80,
+  "date": "2027-06-12",
+  "budget_cents": 1440000,
+  "dietary": {
+    "vegan": 16,
+    "standard": 64
+  },
+  "rooms": 40,
+  "needs": [
+    "venues",
+    "catering",
+    "av",
+    "travel",
+    "print"
+  ]
+}

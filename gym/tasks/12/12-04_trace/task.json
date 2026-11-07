@@ -1,0 +1,28 @@
+{
+  "id": "12-04",
+  "module": "12",
+  "title": "Identify the captured transport boundaries",
+  "type": "trace",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "operation": "inventory_lookup"
+      },
+      "expected": "MCP"
+    },
+    {
+      "input": {
+        "operation": "vendor_quote"
+      },
+      "expected": "A2A"
+    },
+    {
+      "input": {
+        "operation": "hotel_task"
+      },
+      "expected": "A2A"
+    }
+  ],
+  "feedback": "Internal inventory lookup is a tool; independently owned work remains an agent task."
+}

@@ -1,0 +1,11 @@
+{
+  "label": "SYNTHETIC DEFENSE FIXTURE - DO NOT TRUST",
+  "payload": {
+    "name": "Granite Hall Venues",
+    "signatures": [
+      {
+        "signature": "FORGED-TEST-ONLY"
+      }
+    ]
+  }
+}

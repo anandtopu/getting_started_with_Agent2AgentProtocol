@@ -1,0 +1,9 @@
+{
+  "id": "14-07",
+  "module": "14",
+  "title": "Reject a forged skill description",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "signature"
+}

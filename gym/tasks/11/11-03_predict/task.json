@@ -1,0 +1,34 @@
+{
+  "id": "11-03",
+  "module": "11",
+  "title": "Predict the first experiment's observable result",
+  "type": "predict",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "vendor": "catering",
+        "amount": "96000"
+      },
+      "expected": {
+        "vendor": "catering",
+        "total_cents": 96000,
+        "currency": "USD",
+        "approved": false
+      }
+    },
+    {
+      "input": {
+        "vendor": "print",
+        "amount": "10000"
+      },
+      "expected": {
+        "vendor": "print",
+        "total_cents": 10000,
+        "currency": "USD",
+        "approved": false
+      }
+    }
+  ],
+  "feedback": "Map validated framework results into a stable quote contract; never infer spending approval."
+}

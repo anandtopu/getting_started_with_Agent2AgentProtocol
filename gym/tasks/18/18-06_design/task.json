@@ -1,0 +1,56 @@
+{
+  "id": "18-06",
+  "module": "18",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "extensions": [
+          {
+            "uri": "urn:quote:v1",
+            "required": true
+          }
+        ],
+        "requested": []
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "extensions": [
+          {
+            "uri": "urn:quote:v1",
+            "required": true
+          }
+        ],
+        "requested": [
+          "urn:quote:v1"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "extensions": [
+          {
+            "uri": "urn:quote:v1",
+            "required": false
+          }
+        ],
+        "requested": []
+      },
+      "expected": true
+    }
+  ],
+  "feedback": "A required extension must be understood and requested; optional extensions need not be active.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

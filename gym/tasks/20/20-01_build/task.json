@@ -1,0 +1,59 @@
+{
+  "id": "20-01",
+  "module": "20",
+  "title": "Compensate only confirmed holds",
+  "type": "build",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "failed": true,
+        "holds": [
+          {
+            "id": "hotel",
+            "confirmed": true
+          },
+          {
+            "id": "venue",
+            "confirmed": false
+          }
+        ]
+      },
+      "expected": [
+        "release:hotel"
+      ]
+    },
+    {
+      "input": {
+        "failed": false,
+        "holds": [
+          {
+            "id": "hotel",
+            "confirmed": true
+          }
+        ]
+      },
+      "expected": []
+    },
+    {
+      "input": {
+        "failed": true,
+        "holds": [
+          {
+            "id": "hotel",
+            "confirmed": true
+          },
+          {
+            "id": "print",
+            "confirmed": true
+          }
+        ]
+      },
+      "expected": [
+        "release:print",
+        "release:hotel"
+      ]
+    }
+  ],
+  "feedback": "Compensation is an explicit business action, normally reversing successfully completed steps."
+}

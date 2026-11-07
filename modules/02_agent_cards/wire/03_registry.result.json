@@ -1,0 +1,14 @@
+{
+  "venues": [
+    {
+      "url": "http://127.0.0.1:8100/rpc",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "http://127.0.0.1:8100",
+      "protocolBinding": "HTTP+JSON",
+      "protocolVersion": "1.0"
+    }
+  ]
+}

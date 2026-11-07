@@ -1,0 +1,9 @@
+{
+  "id": "05-07",
+  "module": "05",
+  "title": "Resume Saffron without losing its work order",
+  "type": "fix",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "resume"
+}

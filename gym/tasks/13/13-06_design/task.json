@@ -1,0 +1,46 @@
+{
+  "id": "13-06",
+  "module": "13",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "authenticated": true,
+        "skill": "travel.partner_quote",
+        "scopes": []
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "authenticated": true,
+        "skill": "travel.partner_quote",
+        "scopes": [
+          "partner"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "authenticated": false,
+        "skill": "travel.quote",
+        "scopes": [
+          "partner"
+        ]
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "Authentication alone does not grant partner pricing.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

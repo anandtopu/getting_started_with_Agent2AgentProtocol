@@ -1,0 +1,36 @@
+{
+  "id": "B1-02",
+  "module": "B1",
+  "title": "Repair: compare cross-language quote semantics",
+  "type": "fix",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "python": {
+          "total_cents": 100,
+          "currency": "USD"
+        },
+        "typescript": {
+          "total_cents": 100,
+          "currency": "EUR"
+        }
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "python": {
+          "total_cents": 100,
+          "currency": "USD"
+        },
+        "typescript": {
+          "total_cents": 100,
+          "currency": "USD"
+        }
+      },
+      "expected": true
+    }
+  ],
+  "feedback": "Compare semantic values, not generated identifiers or object implementations."
+}

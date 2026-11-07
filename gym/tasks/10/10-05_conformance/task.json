@@ -1,0 +1,31 @@
+{
+  "id": "10-05",
+  "module": "10",
+  "title": "Enforce the contract across edge cases",
+  "type": "conformance",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "guests": 40,
+        "date": "2027-06-01",
+        "authorization": "secret"
+      },
+      "expected": {
+        "guests": 40,
+        "date": "2027-06-01"
+      }
+    },
+    {
+      "input": {
+        "rooms": 10,
+        "private_notes": "sensitive",
+        "user_email": "fictional@example.invalid"
+      },
+      "expected": {
+        "rooms": 10
+      }
+    }
+  ],
+  "feedback": "Pass only the business fields required by the selected vendor."
+}

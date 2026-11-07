@@ -1,0 +1,28 @@
+{
+  "id": "B4-04",
+  "module": "B4",
+  "title": "Identify the captured transport boundaries",
+  "type": "trace",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "nextPageToken": "opaque-2"
+      },
+      "expected": "opaque-2"
+    },
+    {
+      "input": {
+        "nextPageToken": ""
+      },
+      "expected": null
+    },
+    {
+      "input": {
+        "tasks": []
+      },
+      "expected": null
+    }
+  ],
+  "feedback": "Use nextPageToken as the next request's pageToken; treat the token as opaque."
+}

@@ -1,0 +1,18 @@
+{
+  "supported": 200,
+  "unsupported": {
+    "error": {
+      "code": 400,
+      "status": "FAILED_PRECONDITION",
+      "message": "A2A version '99.0' is not supported by this handler. Expected version '1.0'.",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+          "reason": "VERSION_NOT_SUPPORTED",
+          "domain": "a2a-protocol.org",
+          "metadata": {}
+        }
+      ]
+    }
+  }
+}

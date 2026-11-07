@@ -1,0 +1,35 @@
+{
+  "id": "B3-02",
+  "module": "B3",
+  "title": "Repair: validate part oneof content",
+  "type": "fix",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "text": "quote"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "text": "quote",
+        "data": {}
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "raw": "YWJj"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "filename": "missing.txt"
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "A protobuf oneof permits exactly one selected content alternative."
+}

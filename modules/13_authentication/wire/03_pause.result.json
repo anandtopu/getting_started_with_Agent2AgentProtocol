@@ -1,0 +1,50 @@
+{
+  "id": "c3ff0ac8-a425-4249-92e2-643ec0c583f1",
+  "contextId": "15c35aed-57df-4eff-80c9-4de8db0e6bd9",
+  "status": {
+    "state": "TASK_STATE_INPUT_REQUIRED",
+    "message": {
+      "messageId": "7ca4652c-c9c1-4e2e-8e3c-dd2b64f9e99f",
+      "contextId": "15c35aed-57df-4eff-80c9-4de8db0e6bd9",
+      "taskId": "c3ff0ac8-a425-4249-92e2-643ec0c583f1",
+      "role": "ROLE_AGENT",
+      "parts": [
+        {
+          "text": "How many guests need each dietary option?"
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "messageId": "c4435e1e-2fc5-45f5-a09a-43a8152dc6e3",
+      "contextId": "15c35aed-57df-4eff-80c9-4de8db0e6bd9",
+      "taskId": "c3ff0ac8-a425-4249-92e2-643ec0c583f1",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "data": {
+            "guests": 40.0
+          },
+          "mediaType": "application/json"
+        }
+      ]
+    },
+    {
+      "messageId": "0e72af83-7979-4a91-b240-86dd2f41512f",
+      "contextId": "15c35aed-57df-4eff-80c9-4de8db0e6bd9",
+      "taskId": "c3ff0ac8-a425-4249-92e2-643ec0c583f1",
+      "role": "ROLE_AGENT",
+      "parts": [
+        {
+          "text": "catering: checking the brief"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brief": {
+      "guests": 40.0
+    }
+  }
+}

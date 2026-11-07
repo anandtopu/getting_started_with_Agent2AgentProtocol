@@ -1,0 +1,78 @@
+{
+  "id": "01-06",
+  "module": "01",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "id": 1,
+        "message": {
+          "messageId": "m1",
+          "role": "ROLE_USER",
+          "parts": [
+            {
+              "text": "Quote a venue"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "SendMessage",
+        "params": {
+          "message": {
+            "messageId": "m1",
+            "role": "ROLE_USER",
+            "parts": [
+              {
+                "text": "Quote a venue"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "id": "m2",
+        "message": {
+          "messageId": "m2",
+          "role": "ROLE_USER",
+          "parts": [
+            {
+              "text": "Hold a date"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "jsonrpc": "2.0",
+        "id": "m2",
+        "method": "SendMessage",
+        "params": {
+          "message": {
+            "messageId": "m2",
+            "role": "ROLE_USER",
+            "parts": [
+              {
+                "text": "Hold a date"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "feedback": "The method parameters contain a message object, not its individual fields.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "09-01",
+  "module": "09",
+  "title": "Validate model-selected tool names",
+  "type": "build",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "tool": "quote_menu"
+      },
+      "expected": "quote_menu"
+    },
+    {
+      "input": {
+        "tool": "ask_dietary"
+      },
+      "expected": "ask_dietary"
+    },
+    {
+      "input": {
+        "tool": "send_credentials"
+      },
+      "expected": "reject"
+    }
+  ],
+  "feedback": "A model suggests tools; application code owns the allow-list."
+}

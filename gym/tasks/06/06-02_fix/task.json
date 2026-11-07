@@ -1,0 +1,34 @@
+{
+  "id": "06-02",
+  "module": "06",
+  "title": "Repair: preserve binary files using protojson",
+  "type": "fix",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "text": "floor plan",
+        "media_type": "text/plain",
+        "filename": "plan.txt"
+      },
+      "expected": {
+        "raw": "Zmxvb3IgcGxhbg==",
+        "mediaType": "text/plain",
+        "filename": "plan.txt"
+      }
+    },
+    {
+      "input": {
+        "text": "abc",
+        "media_type": "application/octet-stream",
+        "filename": "art.bin"
+      },
+      "expected": {
+        "raw": "YWJj",
+        "mediaType": "application/octet-stream",
+        "filename": "art.bin"
+      }
+    }
+  ],
+  "feedback": "Binary content becomes base64 in JSON; keep the media type and filename."
+}

@@ -1,0 +1,53 @@
+{
+  "id": "16-06",
+  "module": "16",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": [
+        "message"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "message",
+        "task"
+      ],
+      "expected": false
+    },
+    {
+      "input": [
+        "working",
+        "completed"
+      ],
+      "expected": false
+    },
+    {
+      "input": [
+        "task",
+        "working",
+        "completed"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "task",
+        "working"
+      ],
+      "expected": false
+    }
+  ],
+  "feedback": "A direct message is a complete response; a task stream needs a valid introduction and stop condition.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

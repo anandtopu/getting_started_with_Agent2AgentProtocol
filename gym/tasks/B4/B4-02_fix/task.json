@@ -1,0 +1,28 @@
+{
+  "id": "B4-02",
+  "module": "B4",
+  "title": "Repair: follow task pagination tokens",
+  "type": "fix",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "nextPageToken": "opaque-2"
+      },
+      "expected": "opaque-2"
+    },
+    {
+      "input": {
+        "nextPageToken": ""
+      },
+      "expected": null
+    },
+    {
+      "input": {
+        "tasks": []
+      },
+      "expected": null
+    }
+  ],
+  "feedback": "Use nextPageToken as the next request's pageToken; treat the token as opaque."
+}

@@ -1,0 +1,43 @@
+{
+  "id": "B2-02",
+  "module": "B2",
+  "title": "Repair: select sdk releases by protocol support",
+  "type": "fix",
+  "level": "easy",
+  "cases": [
+    {
+      "input": [
+        {
+          "language": "Go",
+          "protocols": [
+            "1.0"
+          ],
+          "stable": true
+        },
+        {
+          "language": "Java",
+          "protocols": [
+            "0.3"
+          ],
+          "stable": true
+        }
+      ],
+      "expected": [
+        "Go"
+      ]
+    },
+    {
+      "input": [
+        {
+          "language": ".NET",
+          "protocols": [
+            "1.0"
+          ],
+          "stable": false
+        }
+      ],
+      "expected": []
+    }
+  ],
+  "feedback": "Official project membership and stable support for the target protocol are separate checks."
+}

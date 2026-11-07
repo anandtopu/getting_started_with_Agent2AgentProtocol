@@ -1,0 +1,67 @@
+{
+  "id": "20-06",
+  "module": "20",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "failed": true,
+        "holds": [
+          {
+            "id": "hotel",
+            "confirmed": true
+          },
+          {
+            "id": "venue",
+            "confirmed": false
+          }
+        ]
+      },
+      "expected": [
+        "release:hotel"
+      ]
+    },
+    {
+      "input": {
+        "failed": false,
+        "holds": [
+          {
+            "id": "hotel",
+            "confirmed": true
+          }
+        ]
+      },
+      "expected": []
+    },
+    {
+      "input": {
+        "failed": true,
+        "holds": [
+          {
+            "id": "hotel",
+            "confirmed": true
+          },
+          {
+            "id": "print",
+            "confirmed": true
+          }
+        ]
+      },
+      "expected": [
+        "release:print",
+        "release:hotel"
+      ]
+    }
+  ],
+  "feedback": "Compensation is an explicit business action, normally reversing successfully completed steps.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

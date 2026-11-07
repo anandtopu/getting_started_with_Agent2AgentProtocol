@@ -1,0 +1,9 @@
+{
+  "id": "10-07",
+  "module": "10",
+  "title": "Share only Granite's required brief",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "minimize"
+}

@@ -1,0 +1,48 @@
+{
+  "id": "18-03",
+  "module": "18",
+  "title": "Predict the first experiment's observable result",
+  "type": "predict",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "extensions": [
+          {
+            "uri": "urn:quote:v1",
+            "required": true
+          }
+        ],
+        "requested": []
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "extensions": [
+          {
+            "uri": "urn:quote:v1",
+            "required": true
+          }
+        ],
+        "requested": [
+          "urn:quote:v1"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "extensions": [
+          {
+            "uri": "urn:quote:v1",
+            "required": false
+          }
+        ],
+        "requested": []
+      },
+      "expected": true
+    }
+  ],
+  "feedback": "A required extension must be understood and requested; optional extensions need not be active."
+}

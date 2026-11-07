@@ -1,0 +1,43 @@
+{
+  "id": "B3-06",
+  "module": "B3",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "text": "quote"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "text": "quote",
+        "data": {}
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "raw": "YWJj"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "filename": "missing.txt"
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "A protobuf oneof permits exactly one selected content alternative.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "14-05",
+  "module": "14",
+  "title": "Enforce the contract across edge cases",
+  "type": "conformance",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "maplewood"
+        },
+        "principal": {
+          "subject": "bob",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "maplewood"
+        },
+        "principal": {
+          "subject": "alice",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "other"
+        },
+        "principal": {
+          "subject": "alice",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "A matching tenant is not permission to read another caller's task."
+}

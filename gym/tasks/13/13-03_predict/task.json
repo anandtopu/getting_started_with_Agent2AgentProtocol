@@ -1,0 +1,38 @@
+{
+  "id": "13-03",
+  "module": "13",
+  "title": "Predict the first experiment's observable result",
+  "type": "predict",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "authenticated": true,
+        "skill": "travel.partner_quote",
+        "scopes": []
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "authenticated": true,
+        "skill": "travel.partner_quote",
+        "scopes": [
+          "partner"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "authenticated": false,
+        "skill": "travel.quote",
+        "scopes": [
+          "partner"
+        ]
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "Authentication alone does not grant partner pricing."
+}

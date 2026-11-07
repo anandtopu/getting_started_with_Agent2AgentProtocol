@@ -1,0 +1,9 @@
+{
+  "id": "13-07",
+  "module": "13",
+  "title": "Close Granite's anonymous quote endpoint",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "auth"
+}

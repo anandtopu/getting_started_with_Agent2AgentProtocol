@@ -1,0 +1,53 @@
+{
+  "id": "02-06",
+  "module": "02",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "interfaces": [
+          {
+            "url": "http://print",
+            "protocolBinding": "GRPC",
+            "protocolVersion": "1.0"
+          },
+          {
+            "url": "http://venues",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0"
+          }
+        ],
+        "supported": [
+          "JSONRPC"
+        ]
+      },
+      "expected": "http://venues"
+    },
+    {
+      "input": {
+        "interfaces": [
+          {
+            "url": "http://old",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "0.3"
+          }
+        ],
+        "supported": [
+          "JSONRPC"
+        ]
+      },
+      "expected": null
+    }
+  ],
+  "feedback": "Respect both protocol version and binding, preserving advertised preference.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

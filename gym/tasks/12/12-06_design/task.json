@@ -1,0 +1,36 @@
+{
+  "id": "12-06",
+  "module": "12",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "operation": "inventory_lookup"
+      },
+      "expected": "MCP"
+    },
+    {
+      "input": {
+        "operation": "vendor_quote"
+      },
+      "expected": "A2A"
+    },
+    {
+      "input": {
+        "operation": "hotel_task"
+      },
+      "expected": "A2A"
+    }
+  ],
+  "feedback": "Internal inventory lookup is a tool; independently owned work remains an agent task.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

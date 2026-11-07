@@ -1,0 +1,16 @@
+[
+  {
+    "id": "cedar",
+    "name": "Cedar Lodge",
+    "room_block": 80,
+    "public_cents": 18000,
+    "partner_cents": 14500
+  },
+  {
+    "id": "willow",
+    "name": "Willow House",
+    "room_block": 180,
+    "public_cents": 22000,
+    "partner_cents": 17500
+  }
+]

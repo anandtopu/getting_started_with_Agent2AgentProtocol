@@ -1,0 +1,15 @@
+{
+  "id": "event-14",
+  "title": "Maplewood gathering 14",
+  "guests": 180,
+  "date": "2027-06-14",
+  "budget_cents": 3240000,
+  "rooms": 90,
+  "needs": [
+    "venues",
+    "catering",
+    "av",
+    "travel",
+    "print"
+  ]
+}

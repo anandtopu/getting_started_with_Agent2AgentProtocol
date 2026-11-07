@@ -1,0 +1,61 @@
+{
+  "delegations": [
+    {
+      "vendor": "venues",
+      "task_id": "ec480c86-6083-4def-87b2-b5690104ff07",
+      "context_id": "eac39c7f-3de7-4d70-972f-8fe263d85848",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "venues",
+          "approved": false,
+          "selection": "room-1",
+          "total_cents": 80000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "10394dc3-c3f3-4d87-8a6d-d29928f61be9",
+        "contextId": "eac39c7f-3de7-4d70-972f-8fe263d85848",
+        "taskId": "ec480c86-6083-4def-87b2-b5690104ff07",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "catering",
+      "task_id": "97cd7e65-43ef-4644-b247-48548dea6fbd",
+      "context_id": "48ab7e67-9cd3-4c45-88fb-379f41ba561c",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "catering",
+          "approved": false,
+          "selection": "garden",
+          "total_cents": 96000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "c3530d9d-72d2-4d48-a891-a6b33b677802",
+        "contextId": "48ab7e67-9cd3-4c45-88fb-379f41ba561c",
+        "taskId": "97cd7e65-43ef-4644-b247-48548dea6fbd",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    }
+  ],
+  "total_cents": 176000.0,
+  "within_budget": true,
+  "approval_required": true
+}

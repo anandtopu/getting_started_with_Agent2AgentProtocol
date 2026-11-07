@@ -1,0 +1,33 @@
+{
+  "id": "03-04",
+  "module": "03",
+  "title": "Identify the captured transport boundaries",
+  "type": "trace",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "artifacts": [
+          "quote"
+        ]
+      },
+      "expected": [
+        "task",
+        "working",
+        "quote",
+        "completed"
+      ]
+    },
+    {
+      "input": {
+        "artifacts": []
+      },
+      "expected": [
+        "task",
+        "working",
+        "completed"
+      ]
+    }
+  ],
+  "feedback": "Introduce the task before updates and explicitly reach a final state."
+}

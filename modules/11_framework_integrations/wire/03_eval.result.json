@@ -1,0 +1,146 @@
+{
+  "delegations": [
+    {
+      "vendor": "venues",
+      "task_id": "531bc6d3-00a6-40ff-8b9e-ab17f9115b86",
+      "context_id": "cb10b3d9-d943-4d80-837f-f12b5f648811",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "venues",
+          "approved": false,
+          "selection": "room-1",
+          "total_cents": 80000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "382ff109-6f37-4742-a817-612ca5dd12f9",
+        "contextId": "cb10b3d9-d943-4d80-837f-f12b5f648811",
+        "taskId": "531bc6d3-00a6-40ff-8b9e-ab17f9115b86",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "catering",
+      "task_id": "f5150977-2c64-4f23-81c0-40172b7cfae1",
+      "context_id": "140e8912-fa36-42fe-83b1-3bf3a1075821",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "catering",
+          "approved": false,
+          "selection": "garden",
+          "total_cents": 96000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "92d33c86-99f7-4d30-86a8-3b6b92c85490",
+        "contextId": "140e8912-fa36-42fe-83b1-3bf3a1075821",
+        "taskId": "f5150977-2c64-4f23-81c0-40172b7cfae1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "av",
+      "task_id": "79d93e19-cacb-4220-b566-79d55b53c879",
+      "context_id": "da0cbb54-3c2b-471c-b8bc-07a184f40f0e",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "av",
+          "approved": false,
+          "selection": "microphone, projector, speaker",
+          "total_cents": 28000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "0b65dd08-532f-4266-9fca-43b44f4c7f7a",
+        "contextId": "da0cbb54-3c2b-471c-b8bc-07a184f40f0e",
+        "taskId": "79d93e19-cacb-4220-b566-79d55b53c879",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "travel",
+      "task_id": "1f717525-64fe-4809-a1ae-4f050e8623c0",
+      "context_id": "59841e78-4260-4a8a-834a-7c725e1347b2",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "travel",
+          "approved": false,
+          "selection": "cedar",
+          "total_cents": 360000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "4858104a-4527-47b4-8721-df3753a6eac0",
+        "contextId": "59841e78-4260-4a8a-834a-7c725e1347b2",
+        "taskId": "1f717525-64fe-4809-a1ae-4f050e8623c0",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "print",
+      "task_id": "52a1cfff-cd5f-4602-abb7-1b42821e6658",
+      "context_id": "436a0a1e-9ac5-413e-990c-77b2f07aab63",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "print",
+          "approved": false,
+          "selection": "badge",
+          "total_cents": 10000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "97ca28ad-5779-470e-b0e6-b878c59511d9",
+        "contextId": "436a0a1e-9ac5-413e-990c-77b2f07aab63",
+        "taskId": "52a1cfff-cd5f-4602-abb7-1b42821e6658",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    }
+  ],
+  "total_cents": 574000.0,
+  "within_budget": true,
+  "approval_required": true,
+  "evaluation": {
+    "all_vendors": true,
+    "all_complete": true
+  }
+}

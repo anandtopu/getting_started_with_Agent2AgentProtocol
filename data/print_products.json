@@ -1,0 +1,12 @@
+[
+  {
+    "id": "badge",
+    "name": "Recycled badge",
+    "price_cents": 250
+  },
+  {
+    "id": "sign",
+    "name": "A2 welcome sign",
+    "price_cents": 4500
+  }
+]

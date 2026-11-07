@@ -1,0 +1,9 @@
+{
+  "id": "15-07",
+  "module": "15",
+  "title": "Stop artwork URLs reaching internal services",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "ssrf"
+}

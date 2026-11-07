@@ -1,0 +1,28 @@
+{
+  "id": "12-02",
+  "module": "12",
+  "title": "Repair: choose inventory tools versus remote work",
+  "type": "fix",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "operation": "inventory_lookup"
+      },
+      "expected": "MCP"
+    },
+    {
+      "input": {
+        "operation": "vendor_quote"
+      },
+      "expected": "A2A"
+    },
+    {
+      "input": {
+        "operation": "hotel_task"
+      },
+      "expected": "A2A"
+    }
+  ],
+  "feedback": "Internal inventory lookup is a tool; independently owned work remains an agent task."
+}

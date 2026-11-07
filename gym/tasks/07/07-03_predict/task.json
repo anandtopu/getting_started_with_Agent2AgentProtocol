@@ -1,0 +1,43 @@
+{
+  "id": "07-03",
+  "module": "07",
+  "title": "Predict the first experiment's observable result",
+  "type": "predict",
+  "level": "easy",
+  "cases": [
+    {
+      "input": [
+        {
+          "id": "a",
+          "text": "Mic "
+        },
+        {
+          "id": "b",
+          "text": "Light"
+        },
+        {
+          "id": "a",
+          "text": "check",
+          "append": true
+        }
+      ],
+      "expected": {
+        "a": "Mic check",
+        "b": "Light"
+      }
+    },
+    {
+      "input": [
+        {
+          "id": "a",
+          "text": "orphan",
+          "append": true
+        }
+      ],
+      "expected": {
+        "error": "unknown artifact"
+      }
+    }
+  ],
+  "feedback": "Append only to an existing artifact with the same ID."
+}

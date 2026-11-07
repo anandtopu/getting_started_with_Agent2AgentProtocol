@@ -1,0 +1,39 @@
+{
+  "status": {
+    "state": "TASK_STATE_INPUT_REQUIRED",
+    "message": {
+      "role": "ROLE_AGENT",
+      "parts": [
+        {
+          "text": "How many guests need each dietary option?"
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "data": {
+            "guests": 40.0
+          },
+          "mediaType": "application/json"
+        }
+      ]
+    },
+    {
+      "role": "ROLE_AGENT",
+      "parts": [
+        {
+          "text": "catering: checking the brief"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brief": {
+      "guests": 40.0
+    }
+  }
+}

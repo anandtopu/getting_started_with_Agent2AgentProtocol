@@ -1,0 +1,15 @@
+[
+  {
+    "name": "granite.quote",
+    "trace_id": "9c04a8e9d4093edf1a01a2c336fe2a4a",
+    "attributes": {
+      "a2a.task.id": "540fee0f-91ec-447c-b054-77c4a8db6bda",
+      "a2a.context.id": "f3fa05dd-7a94-43a5-b260-bede7fdc6931"
+    }
+  },
+  {
+    "name": "concierge.plan",
+    "trace_id": "9c04a8e9d4093edf1a01a2c336fe2a4a",
+    "attributes": {}
+  }
+]

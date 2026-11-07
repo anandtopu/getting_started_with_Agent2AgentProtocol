@@ -1,0 +1,193 @@
+{
+  "task": {
+    "task": {
+      "id": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+      "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+      "status": {
+        "state": "TASK_STATE_COMPLETED",
+        "message": {
+          "messageId": "42c2ce7b-d0bd-41f4-a772-d57589a6b5db",
+          "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+          "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "Quote ready; no money has been spent."
+            }
+          ]
+        }
+      },
+      "artifacts": [
+        {
+          "artifactId": "quote",
+          "name": "quote",
+          "parts": [
+            {
+              "data": {
+                "guests": 40.0,
+                "vendor": "venues",
+                "approved": false,
+                "selection": "room-1",
+                "total_cents": 80000.0,
+                "currency": "USD"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        }
+      ],
+      "history": [
+        {
+          "messageId": "934176b8-1d7c-47ea-ac34-4fce2dca5e04",
+          "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+          "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+          "role": "ROLE_USER",
+          "parts": [
+            {
+              "data": {
+                "dietary": {
+                  "standard": 30.0,
+                  "vegan": 10.0
+                },
+                "guests": 40.0,
+                "budget_cents": 1000000.0,
+                "date": "2027-06-01"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        },
+        {
+          "messageId": "12049ca9-f87d-4009-93ec-4ff603e143b0",
+          "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+          "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "venues: checking the brief"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "brief": {
+          "guests": 40.0,
+          "dietary": {
+            "standard": 30.0,
+            "vegan": 10.0
+          },
+          "budget_cents": 1000000.0,
+          "date": "2027-06-01"
+        }
+      }
+    }
+  },
+  "verified_deliveries": [
+    {
+      "task": {
+        "id": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+        "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+        "status": {
+          "state": "TASK_STATE_SUBMITTED"
+        },
+        "history": [
+          {
+            "messageId": "934176b8-1d7c-47ea-ac34-4fce2dca5e04",
+            "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+            "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+            "role": "ROLE_USER",
+            "parts": [
+              {
+                "data": {
+                  "guests": 40.0,
+                  "dietary": {
+                    "standard": 30.0,
+                    "vegan": 10.0
+                  },
+                  "budget_cents": 1000000.0,
+                  "date": "2027-06-01"
+                },
+                "mediaType": "application/json"
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "brief": {
+            "dietary": {
+              "standard": 30.0,
+              "vegan": 10.0
+            },
+            "guests": 40.0,
+            "budget_cents": 1000000.0,
+            "date": "2027-06-01"
+          }
+        }
+      }
+    },
+    {
+      "statusUpdate": {
+        "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+        "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+        "status": {
+          "state": "TASK_STATE_WORKING",
+          "message": {
+            "messageId": "12049ca9-f87d-4009-93ec-4ff603e143b0",
+            "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+            "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+            "role": "ROLE_AGENT",
+            "parts": [
+              {
+                "text": "venues: checking the brief"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "artifactUpdate": {
+        "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+        "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+        "artifact": {
+          "artifactId": "quote",
+          "name": "quote",
+          "parts": [
+            {
+              "data": {
+                "guests": 40.0,
+                "vendor": "venues",
+                "approved": false,
+                "selection": "room-1",
+                "total_cents": 80000.0,
+                "currency": "USD"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        },
+        "lastChunk": true
+      }
+    },
+    {
+      "statusUpdate": {
+        "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+        "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+        "status": {
+          "state": "TASK_STATE_COMPLETED",
+          "message": {
+            "messageId": "42c2ce7b-d0bd-41f4-a772-d57589a6b5db",
+            "contextId": "d6cfb2e1-9276-4e06-8bb4-35eb594bdd9a",
+            "taskId": "a97bb122-f18c-42b6-b1e5-7f2754e535a7",
+            "role": "ROLE_AGENT",
+            "parts": [
+              {
+                "text": "Quote ready; no money has been spent."
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

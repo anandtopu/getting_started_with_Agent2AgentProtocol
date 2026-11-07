@@ -1,0 +1,43 @@
+{
+  "id": "07-01",
+  "module": "07",
+  "title": "Assemble artifact chunks by artifact ID",
+  "type": "build",
+  "level": "medium",
+  "cases": [
+    {
+      "input": [
+        {
+          "id": "a",
+          "text": "Mic "
+        },
+        {
+          "id": "b",
+          "text": "Light"
+        },
+        {
+          "id": "a",
+          "text": "check",
+          "append": true
+        }
+      ],
+      "expected": {
+        "a": "Mic check",
+        "b": "Light"
+      }
+    },
+    {
+      "input": [
+        {
+          "id": "a",
+          "text": "orphan",
+          "append": true
+        }
+      ],
+      "expected": {
+        "error": "unknown artifact"
+      }
+    }
+  ],
+  "feedback": "Append only to an existing artifact with the same ID."
+}

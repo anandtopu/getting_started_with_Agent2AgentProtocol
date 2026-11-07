@@ -1,0 +1,49 @@
+{
+  "id": "14-01",
+  "module": "14",
+  "title": "Keep task owners isolated",
+  "type": "build",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "maplewood"
+        },
+        "principal": {
+          "subject": "bob",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "maplewood"
+        },
+        "principal": {
+          "subject": "alice",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "other"
+        },
+        "principal": {
+          "subject": "alice",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "A matching tenant is not permission to read another caller's task."
+}

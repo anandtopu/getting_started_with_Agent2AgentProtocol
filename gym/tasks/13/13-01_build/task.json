@@ -1,0 +1,38 @@
+{
+  "id": "13-01",
+  "module": "13",
+  "title": "Authorize the requested partner skill",
+  "type": "build",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "authenticated": true,
+        "skill": "travel.partner_quote",
+        "scopes": []
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "authenticated": true,
+        "skill": "travel.partner_quote",
+        "scopes": [
+          "partner"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "authenticated": false,
+        "skill": "travel.quote",
+        "scopes": [
+          "partner"
+        ]
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "Authentication alone does not grant partner pricing."
+}

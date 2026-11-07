@@ -1,0 +1,86 @@
+{
+  "unauthorized_status": 401,
+  "authorized": {
+    "task": {
+      "id": "06ac9718-a95e-4f71-85f3-4b941eec67fe",
+      "contextId": "902b8faa-7f86-4dbd-912b-9295f32d8859",
+      "status": {
+        "state": "TASK_STATE_COMPLETED",
+        "message": {
+          "messageId": "51871644-c159-4c35-ad2c-da10ec851d11",
+          "contextId": "902b8faa-7f86-4dbd-912b-9295f32d8859",
+          "taskId": "06ac9718-a95e-4f71-85f3-4b941eec67fe",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "Quote ready; no money has been spent."
+            }
+          ]
+        }
+      },
+      "artifacts": [
+        {
+          "artifactId": "quote",
+          "name": "quote",
+          "parts": [
+            {
+              "data": {
+                "guests": 40.0,
+                "vendor": "venues",
+                "approved": false,
+                "selection": "room-1",
+                "total_cents": 80000.0,
+                "currency": "USD"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        }
+      ],
+      "history": [
+        {
+          "messageId": "f80c24ab-13c0-455c-ac77-0548416f69dc",
+          "contextId": "902b8faa-7f86-4dbd-912b-9295f32d8859",
+          "taskId": "06ac9718-a95e-4f71-85f3-4b941eec67fe",
+          "role": "ROLE_USER",
+          "parts": [
+            {
+              "data": {
+                "dietary": {
+                  "standard": 30.0,
+                  "vegan": 10.0
+                },
+                "guests": 40.0,
+                "budget_cents": 1000000.0,
+                "date": "2027-06-01"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        },
+        {
+          "messageId": "50997608-9c23-4585-b806-7f6f163e09a4",
+          "contextId": "902b8faa-7f86-4dbd-912b-9295f32d8859",
+          "taskId": "06ac9718-a95e-4f71-85f3-4b941eec67fe",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "venues: checking the brief"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "brief": {
+          "guests": 40.0,
+          "dietary": {
+            "standard": 30.0,
+            "vegan": 10.0
+          },
+          "budget_cents": 1000000.0,
+          "date": "2027-06-01"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "07-07",
+  "module": "07",
+  "title": "Finish Brightline's streamed artifact",
+  "type": "fix",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "chunks"
+}

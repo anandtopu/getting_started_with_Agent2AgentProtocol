@@ -1,0 +1,83 @@
+{
+  "task": {
+    "id": "42edc2cd-6329-4540-879d-d0f680ddbb20",
+    "contextId": "cbd1904b-6f0e-4b4d-addf-d12b16783cc1",
+    "status": {
+      "state": "TASK_STATE_COMPLETED",
+      "message": {
+        "messageId": "b7bc63ca-2873-4893-a31d-b86c04a5ee49",
+        "contextId": "cbd1904b-6f0e-4b4d-addf-d12b16783cc1",
+        "taskId": "42edc2cd-6329-4540-879d-d0f680ddbb20",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "artifactId": "quote",
+        "name": "quote",
+        "parts": [
+          {
+            "data": {
+              "guests": 40.0,
+              "vendor": "venues",
+              "approved": false,
+              "selection": "room-1",
+              "total_cents": 80000.0,
+              "currency": "USD"
+            },
+            "mediaType": "application/json"
+          }
+        ]
+      }
+    ],
+    "history": [
+      {
+        "messageId": "550eed3a-85e4-4810-ae81-c1fcb5cddade",
+        "contextId": "cbd1904b-6f0e-4b4d-addf-d12b16783cc1",
+        "taskId": "42edc2cd-6329-4540-879d-d0f680ddbb20",
+        "role": "ROLE_USER",
+        "parts": [
+          {
+            "data": {
+              "dietary": {
+                "standard": 30.0,
+                "vegan": 10.0
+              },
+              "guests": 40.0,
+              "budget_cents": 1000000.0,
+              "date": "2027-06-01"
+            },
+            "mediaType": "application/json"
+          }
+        ]
+      },
+      {
+        "messageId": "584cada8-0aa5-4e80-96b4-1812900faeff",
+        "contextId": "cbd1904b-6f0e-4b4d-addf-d12b16783cc1",
+        "taskId": "42edc2cd-6329-4540-879d-d0f680ddbb20",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "venues: checking the brief"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "brief": {
+        "guests": 40.0,
+        "dietary": {
+          "standard": 30.0,
+          "vegan": 10.0
+        },
+        "budget_cents": 1000000.0,
+        "date": "2027-06-01"
+      }
+    }
+  }
+}

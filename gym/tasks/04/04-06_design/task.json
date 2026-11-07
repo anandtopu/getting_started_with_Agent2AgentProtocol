@@ -1,0 +1,42 @@
+{
+  "id": "04-06",
+  "module": "04",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "task": {
+          "id": "t1"
+        }
+      },
+      "expected": "task"
+    },
+    {
+      "input": {
+        "message": {
+          "messageId": "m1"
+        }
+      },
+      "expected": "message"
+    },
+    {
+      "input": {
+        "error": {
+          "code": -32001
+        }
+      },
+      "expected": "error"
+    }
+  ],
+  "feedback": "Inspect the response wrapper instead of assuming every reply creates a task.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

@@ -1,0 +1,156 @@
+[
+  {
+    "task": {
+      "id": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+      "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+      "status": {
+        "state": "TASK_STATE_SUBMITTED"
+      },
+      "history": [
+        {
+          "messageId": "979f873c-34fa-4c63-a9d8-bfd022a9169c",
+          "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+          "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+          "role": "ROLE_USER",
+          "parts": [
+            {
+              "data": {
+                "guests": 40.0,
+                "dietary": {
+                  "standard": 30.0,
+                  "vegan": 10.0
+                },
+                "budget_cents": 1000000.0,
+                "date": "2027-06-01"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "brief": {
+          "dietary": {
+            "standard": 30.0,
+            "vegan": 10.0
+          },
+          "guests": 40.0,
+          "budget_cents": 1000000.0,
+          "date": "2027-06-01"
+        }
+      }
+    }
+  },
+  {
+    "statusUpdate": {
+      "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+      "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+      "status": {
+        "state": "TASK_STATE_WORKING",
+        "message": {
+          "messageId": "a4d47b9b-6ccf-4716-8ede-29e63656fdc8",
+          "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+          "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "av: checking the brief"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "artifactUpdate": {
+      "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+      "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+      "artifact": {
+        "artifactId": "plan",
+        "name": "setup-plan",
+        "parts": [
+          {
+            "text": "Microphone check. "
+          }
+        ]
+      }
+    }
+  },
+  {
+    "artifactUpdate": {
+      "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+      "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+      "artifact": {
+        "artifactId": "plan",
+        "name": "setup-plan",
+        "parts": [
+          {
+            "text": "Projector alignment. "
+          }
+        ]
+      },
+      "append": true
+    }
+  },
+  {
+    "artifactUpdate": {
+      "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+      "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+      "artifact": {
+        "artifactId": "plan",
+        "name": "setup-plan",
+        "parts": [
+          {
+            "text": "Sound check complete."
+          }
+        ]
+      },
+      "append": true,
+      "lastChunk": true
+    }
+  },
+  {
+    "artifactUpdate": {
+      "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+      "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+      "artifact": {
+        "artifactId": "quote",
+        "name": "quote",
+        "parts": [
+          {
+            "data": {
+              "guests": 40.0,
+              "vendor": "av",
+              "approved": false,
+              "selection": "microphone, projector, speaker",
+              "total_cents": 28000.0,
+              "currency": "USD"
+            },
+            "mediaType": "application/json"
+          }
+        ]
+      },
+      "lastChunk": true
+    }
+  },
+  {
+    "statusUpdate": {
+      "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+      "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+      "status": {
+        "state": "TASK_STATE_COMPLETED",
+        "message": {
+          "messageId": "a7781100-a188-44af-a81e-aeb3d785e975",
+          "contextId": "7277f375-fe88-453b-a23b-2ecdf614778d",
+          "taskId": "c352a151-0cf8-4d35-9dbf-4b2189dd3863",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "Quote ready; no money has been spent."
+            }
+          ]
+        }
+      }
+    }
+  }
+]

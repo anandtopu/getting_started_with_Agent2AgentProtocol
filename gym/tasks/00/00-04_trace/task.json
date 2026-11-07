@@ -1,0 +1,22 @@
+{
+  "id": "00-04",
+  "module": "00",
+  "title": "Identify the captured transport boundaries",
+  "type": "trace",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "port": 8100
+      },
+      "expected": "http://127.0.0.1:8100"
+    },
+    {
+      "input": {
+        "port": 8102
+      },
+      "expected": "http://127.0.0.1:8102"
+    }
+  ],
+  "feedback": "Bind local teaching services to the loopback interface."
+}

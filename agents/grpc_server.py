@@ -1,0 +1,115 @@
+"""Inkwell: a gRPC-only protocol endpoint plus HTTP card discovery and health."""
+
+import asyncio
+import hmac
+
+import grpc
+import uvicorn
+from a2a.auth.user import User
+from a2a.server.request_handlers.grpc_handler import (
+    DefaultGrpcServerCallContextBuilder,
+    GrpcHandler,
+)
+from a2a.server.routes import create_agent_card_routes
+from a2a.types.a2a_pb2_grpc import add_A2AServiceServicer_to_server
+from fastapi import FastAPI
+
+from agents.app import make_handler
+from agents.catalog import card
+from common.card_trust import published_card
+from common.config import GRPC_PORT, PORTS
+
+
+class GrpcUser(User):
+    @property
+    def is_authenticated(self) -> bool:
+        return True
+
+    @property
+    def user_name(self) -> str:
+        return "maplewood:concierge"
+
+
+class AuthenticatedContext(DefaultGrpcServerCallContextBuilder):
+    def build_user(self, context):
+        # This builder is used only behind TokenInterceptor.
+        return GrpcUser()
+
+
+class TokenInterceptor(grpc.aio.ServerInterceptor):
+    """Reject missing tokens and cross-tenant requests before the SDK sees them."""
+
+    def __init__(self, token: str):
+        self.token = token
+
+    async def intercept_service(self, continuation, details):
+        handler = await continuation(details)
+        if handler is None:
+            return None
+        headers = dict(details.invocation_metadata)
+        authorized = hmac.compare_digest(headers.get("authorization", ""), f"Bearer {self.token}")
+
+        async def check(request, context):
+            if not authorized:
+                await context.abort(grpc.StatusCode.UNAUTHENTICATED, "Bearer token required")
+            if getattr(request, "tenant", "") not in ("", "maplewood"):
+                await context.abort(grpc.StatusCode.PERMISSION_DENIED, "Tenant not authorized")
+
+        if handler.unary_unary:
+
+            async def unary(request, context):
+                await check(request, context)
+                return await handler.unary_unary(request, context)
+
+            return grpc.unary_unary_rpc_method_handler(
+                unary,
+                request_deserializer=handler.request_deserializer,
+                response_serializer=handler.response_serializer,
+            )
+        if handler.unary_stream:
+
+            async def stream(request, context):
+                await check(request, context)
+                async for response in handler.unary_stream(request, context):
+                    yield response
+
+            return grpc.unary_stream_rpc_method_handler(
+                stream,
+                request_deserializer=handler.request_deserializer,
+                response_serializer=handler.response_serializer,
+            )
+        return handler
+
+
+async def serve(token: str, host: str = "127.0.0.1", *, handler=None, engine=None) -> None:
+    handler = handler or make_handler("print")
+    server = grpc.aio.server(
+        interceptors=[TokenInterceptor(token)],
+        options=[("grpc.max_receive_message_length", 1_000_000)],
+    )
+    add_A2AServiceServicer_to_server(GrpcHandler(handler, AuthenticatedContext()), server)
+    if not server.add_insecure_port(f"{host}:{GRPC_PORT}"):
+        raise RuntimeError("Inkwell gRPC port is busy. Run scripts/check_env.py.")
+    app = FastAPI(
+        routes=create_agent_card_routes(published_card(card("print", grpc_only=True), "print"))
+    )
+
+    @app.get("/health")
+    async def health():
+        return {"status": "ready", "vendor": "print", "binding": "GRPC"}
+
+    # Local development only: production transports require TLS at a trusted gateway.
+    await server.start()
+    try:
+        await uvicorn.Server(
+            uvicorn.Config(app, host=host, port=PORTS["print"], log_level="info")
+        ).serve()
+    finally:
+        await server.stop(grace=2)
+        await handler.aclose()
+        if engine:
+            await engine.dispose()
+
+
+def run(token: str, host: str = "127.0.0.1", *, handler=None, engine=None) -> None:
+    asyncio.run(serve(token, host, handler=handler, engine=engine))

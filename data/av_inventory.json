@@ -1,0 +1,17 @@
+[
+  {
+    "id": "microphone",
+    "stock": 20,
+    "price_cents": 3500
+  },
+  {
+    "id": "projector",
+    "stock": 8,
+    "price_cents": 18000
+  },
+  {
+    "id": "speaker",
+    "stock": 16,
+    "price_cents": 6500
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "id": "15-02",
+  "module": "15",
+  "title": "Repair: reject private and reserved ip addresses",
+  "type": "fix",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "address": "127.0.0.1"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "address": "10.1.2.3"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "address": "169.254.169.254"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "address": "::1"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "address": "8.8.8.8"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "address": "attacker.example"
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "This IP check is one layer; production fetches also need allow-lists, no redirects and DNS rebinding protection."
+}

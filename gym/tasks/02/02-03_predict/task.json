@@ -1,0 +1,45 @@
+{
+  "id": "02-03",
+  "module": "02",
+  "title": "Predict the first experiment's observable result",
+  "type": "predict",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "interfaces": [
+          {
+            "url": "http://print",
+            "protocolBinding": "GRPC",
+            "protocolVersion": "1.0"
+          },
+          {
+            "url": "http://venues",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0"
+          }
+        ],
+        "supported": [
+          "JSONRPC"
+        ]
+      },
+      "expected": "http://venues"
+    },
+    {
+      "input": {
+        "interfaces": [
+          {
+            "url": "http://old",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "0.3"
+          }
+        ],
+        "supported": [
+          "JSONRPC"
+        ]
+      },
+      "expected": null
+    }
+  ],
+  "feedback": "Respect both protocol version and binding, preserving advertised preference."
+}

@@ -1,0 +1,34 @@
+{
+  "id": "04-05",
+  "module": "04",
+  "title": "Enforce the contract across edge cases",
+  "type": "conformance",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "task": {
+          "id": "t1"
+        }
+      },
+      "expected": "task"
+    },
+    {
+      "input": {
+        "message": {
+          "messageId": "m1"
+        }
+      },
+      "expected": "message"
+    },
+    {
+      "input": {
+        "error": {
+          "code": -32001
+        }
+      },
+      "expected": "error"
+    }
+  ],
+  "feedback": "Inspect the response wrapper instead of assuming every reply creates a task."
+}

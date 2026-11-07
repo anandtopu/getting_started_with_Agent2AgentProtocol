@@ -1,0 +1,11 @@
+{
+  "state": "TASK_STATE_COMPLETED",
+  "quote": {
+    "vendor": "catering",
+    "selection": "garden",
+    "currency": "USD",
+    "total_cents": 96000,
+    "guests": 40,
+    "approved": false
+  }
+}

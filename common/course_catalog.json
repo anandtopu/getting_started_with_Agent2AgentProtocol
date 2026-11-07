@@ -1,0 +1,452 @@
+[
+  {
+    "id": "00",
+    "slug": "setup",
+    "title": "Setup and orientation",
+    "labs": [
+      "discover",
+      "data",
+      "jsonrpc"
+    ],
+    "idea": "A2A gives independently operated agents a shared contract. A vendor can change its internal code without changing how Maplewood discovers its skills or requests a quote. HTTP is a request and response exchange; JSON is the text format used for structured values. Start with a ready-made deterministic agent so that networking and model behavior do not become tangled.",
+    "objectives": [
+      "Discover a vendor",
+      "Run an offline example",
+      "Distinguish A2A from MCP"
+    ],
+    "analogy": "A business directory tells you who offers a service without revealing how they run their office.",
+    "tier": 1
+  },
+  {
+    "id": "01",
+    "slug": "how_a2a_works",
+    "title": "How A2A works",
+    "labs": [
+      "jsonrpc",
+      "parts",
+      "rejected"
+    ],
+    "idea": "A message is a communication; a task is tracked work; an artifact is its deliverable. A context groups related interactions, like a project folder. JSON-RPC adds a method name, parameters and request ID to a JSON envelope. Its request ID correlates the response and is different from messageId and task ID. A server may return a direct Message or a Task.",
+    "objectives": [
+      "Read a JSON-RPC envelope",
+      "Identify task and context IDs",
+      "Explain the three bindings"
+    ],
+    "analogy": "A work order tracks progress, while the finished estimate is a separate deliverable.",
+    "tier": 1
+  },
+  {
+    "id": "02",
+    "slug": "agent_cards",
+    "title": "Agent Cards and discovery",
+    "labs": [
+      "discover",
+      "validate_card",
+      "registry"
+    ],
+    "idea": "An Agent Card describes identity, ordered interfaces, capabilities, input and output media types, skills and security requirements. Discovery does not establish trust. A registry is a directory of configured locations, not permission to contact every URL it returns. A skill description is untrusted descriptive text, not an instruction to the Concierge.",
+    "objectives": [
+      "Validate a card against protobuf",
+      "Select a supported interface",
+      "Build a local registry"
+    ],
+    "analogy": "Read a vendor's business card, then check that it came from the vendor you trust.",
+    "tier": 1
+  },
+  {
+    "id": "03",
+    "slug": "first_server",
+    "title": "Your first A2A server",
+    "labs": [
+      "rest",
+      "stream",
+      "rejected"
+    ],
+    "idea": "The executor performs business work. The SDK handles routing, serialization, task storage and subscribers. An async function cooperatively yields while waiting rather than blocking other work. A new task starts with a Task event. Thereafter it produces status and artifact updates. A one-message response is a separate pattern and cannot be mixed with task events. The current SDK owns snapshots when resuming stored tasks.",
+    "objectives": [
+      "Compose SDK routes",
+      "Emit a valid task stream",
+      "Reject an impossible booking"
+    ],
+    "analogy": "A reception desk routes work orders; the estimator does the work and reports progress.",
+    "tier": 1
+  },
+  {
+    "id": "04",
+    "slug": "first_client",
+    "title": "Your first A2A client",
+    "labs": [
+      "sdk_client",
+      "rest",
+      "errors"
+    ],
+    "idea": "The client reads the card and selects an interface it understands. It sends A2A-Version: 1.0 and authenticates in headers. A timeout means the caller did not see a result; it does not prove that work was not performed. Retrying a purchase blindly can duplicate spending. Message IDs identify messages, but the protocol does not grant universal exactly-once execution.",
+    "objectives": [
+      "Create an SDK client",
+      "Handle protocol errors",
+      "Separate safe retries from side effects"
+    ],
+    "analogy": "A lost phone connection does not mean a vendor tore up your order.",
+    "tier": 1
+  },
+  {
+    "id": "05",
+    "slug": "task_lifecycle",
+    "title": "The task lifecycle in depth",
+    "labs": [
+      "pause",
+      "resume",
+      "cancel"
+    ],
+    "idea": "Submitted and working are active states. Input-required and auth-required interrupt work without ending the task. Completed, failed, canceled and rejected are terminal: create a new task for new work after these states. Keep task and context IDs when answering a request for missing input. The wire uses uppercase protobuf enum names. TASK_STATE_UNSPECIFIED is a sentinel, not a useful success state.",
+    "objectives": [
+      "Resume a paused catering task",
+      "Cancel unfinished work",
+      "Distinguish interrupted from terminal states"
+    ],
+    "analogy": "A work order awaiting dietary counts stays open; a completed quote is filed.",
+    "tier": 1
+  },
+  {
+    "id": "06",
+    "slug": "parts_artifacts",
+    "title": "Parts and artifacts",
+    "labs": [
+      "parts",
+      "rest",
+      "ssrf"
+    ],
+    "idea": "A Part contains exactly one of text, raw bytes, a URL or structured data. Protobuf encodes raw bytes as base64 in JSON. A data Part holds a JSON value; integer-valued numbers may round-trip as floating point. Validate quantities and money at the boundary. Files referenced by URL need a separate safe fetching policy. Artifacts collect one or more parts into a named deliverable.",
+    "objectives": [
+      "Construct all four part alternatives",
+      "Validate a quote",
+      "Block unsafe file destinations"
+    ],
+    "analogy": "An envelope can contain a note, an attachment, or a reference to an approved document.",
+    "tier": 1
+  },
+  {
+    "id": "07",
+    "slug": "streaming_push",
+    "title": "Streaming and push notifications",
+    "labs": [
+      "stream",
+      "chunks",
+      "push"
+    ],
+    "idea": "Server-Sent Events (SSE) keep an HTTP response open and separate events with blank lines. A chunk updates one artifact by ID: append means add to existing content, and lastChunk ends that artifact. It does not finish the task. A webhook reverses the connection: the vendor calls your receiver later. Authenticate deliveries and tolerate retries. Reconnecting with SubscribeToTask does not promise replay of every missed event.",
+    "objectives": [
+      "Read SSE frames",
+      "Assemble artifact chunks",
+      "Verify a push delivery"
+    ],
+    "analogy": "Streaming is watching a progress board; a webhook is a callback when you are away.",
+    "tier": 1
+  },
+  {
+    "id": "08",
+    "slug": "bindings",
+    "title": "Protocol bindings",
+    "labs": [
+      "jsonrpc",
+      "rest",
+      "grpc"
+    ],
+    "idea": "JSON-RPC, HTTP+JSON and gRPC map the same abstract operations onto different transports. ProtoJSON gives the JSON forms of protobuf messages. gRPC uses generated stubs and binary protobuf over HTTP/2. The offline service harness serializes and deserializes protobuf and calls the real SDK servicer; it does not test HTTP/2 framing. Select the advertised interface, not a URL guessed from another binding.",
+    "objectives": [
+      "Compare equivalent calls",
+      "Decode protobuf messages",
+      "Respect advertised interfaces"
+    ],
+    "analogy": "Three delivery services carry the same work order in different packaging.",
+    "tier": 1
+  },
+  {
+    "id": "09",
+    "slug": "llm_server",
+    "title": "Putting an LLM behind a server",
+    "labs": [
+      "fake_llm",
+      "tool_call",
+      "tool_budget"
+    ],
+    "idea": "A language model predicts output from context; it is not the protocol and should not calculate binding prices. A tool call asks application code to run a named function with validated arguments. The course first scripts model decisions, making failures repeatable and free. Provider configuration lives in one helper. Every tool loop has a step limit and every business action has validation.",
+    "objectives": [
+      "Replace model output with a script",
+      "Validate tool choices",
+      "Bound model work"
+    ],
+    "analogy": "A junior estimator suggests an action; the office's checked procedures decide what may happen.",
+    "tier": 2
+  },
+  {
+    "id": "10",
+    "slug": "orchestrator",
+    "title": "The orchestrator",
+    "labs": [
+      "delegate",
+      "orchestrate",
+      "minimize"
+    ],
+    "idea": "The Concierge is an A2A client of vendors and can also be an A2A server for callers. It delegates independent quotes concurrently and returns partial results when one vendor needs input. Remote context IDs are owned by each vendor; retain a mapping rather than assuming one global context works everywhere. Give each vendor its own service credential and only the brief fields it needs.",
+    "objectives": [
+      "Delegate concurrently",
+      "Aggregate validated quotes",
+      "Minimize data sent to partners"
+    ],
+    "analogy": "An event coordinator asks specialists for estimates while keeping a ledger of each conversation.",
+    "tier": 2
+  },
+  {
+    "id": "11",
+    "slug": "framework_integrations",
+    "title": "Framework integrations",
+    "labs": [
+      "delegate",
+      "grpc",
+      "eval"
+    ],
+    "idea": "A framework supplies internal agent execution; A2A supplies the external contract. A native adapter may lag the protocol, so inspect its dependency range and emitted card before using it. An official-SDK boundary can wrap a framework's public invocation API when its native adapter is incompatible. Test the combination, not just each package independently.",
+    "objectives": [
+      "Separate framework internals from the protocol",
+      "Evaluate adapter compatibility",
+      "Run an interop contract"
+    ],
+    "analogy": "Specialists may use different office software while sharing the same order form.",
+    "tier": 2
+  },
+  {
+    "id": "12",
+    "slug": "a2a_mcp",
+    "title": "A2A and MCP together",
+    "labs": [
+      "tool_call",
+      "delegate",
+      "parts"
+    ],
+    "idea": "MCP connects a host to tools and resources; A2A connects independently operated agents. Inventory lookup belongs inside Saffron Table as a tool, while menu quoting can remain a remote task. A bridge must decide how to represent task IDs, interruption, streaming and authorization. Turning every task into a single tool return can lose progress and continuation.",
+    "objectives": [
+      "Choose a tool versus a remote agent",
+      "Describe bridge information loss",
+      "Keep vendor inventory internal"
+    ],
+    "analogy": "The caterer's stockroom system is internal; its contract with the event planner is external.",
+    "tier": 2
+  },
+  {
+    "id": "13",
+    "slug": "authentication",
+    "title": "Authentication and authorization",
+    "labs": [
+      "auth",
+      "extended",
+      "pause"
+    ],
+    "idea": "Authentication proves identity; authorization decides what that identity may do. A card advertises schemes but does not issue credentials. Obtain API keys or OAuth tokens out of band. A JWT is signed claims, not proof until issuer, audience, signature and expiration are checked. OpenID Connect adds identity discovery to OAuth. TLS protects the connection; mutual TLS also verifies a client certificate.",
+    "objectives": [
+      "Reject missing credentials",
+      "Scope task access to a caller",
+      "Retrieve an extended card"
+    ],
+    "analogy": "A badge identifies a visitor; a room-access policy determines which doors it opens.",
+    "tier": 3
+  },
+  {
+    "id": "14",
+    "slug": "trust_tenants",
+    "title": "Trust, signed cards and multi-tenancy",
+    "labs": [
+      "sign",
+      "forgery",
+      "jwks"
+    ],
+    "idea": "A signature detects changes to a card and binds it to a key you already trust. Canonical JSON makes equivalent objects produce the same signed bytes. JWS specifies how headers and payload are signed. A JWKS is a set of public keys; a key URL advertised by an attacker is not automatically trusted. Tenant routing is separate from authenticated ownership.",
+    "objectives": [
+      "Sign canonical card bytes",
+      "Reject a forged card",
+      "Separate routing and ownership"
+    ],
+    "analogy": "A signed letter matters only if you know whose seal it bears.",
+    "tier": 3
+  },
+  {
+    "id": "15",
+    "slug": "security",
+    "title": "Security threats and defenses",
+    "labs": [
+      "ssrf",
+      "forgery",
+      "minimize"
+    ],
+    "idea": "Treat cards, messages and artifacts as untrusted inputs. Prompt injection attempts to turn those inputs into higher-priority instructions. Allow-list destinations, validate outputs, keep tokens scoped, and require human approval before spending. Private-address filtering alone does not prevent DNS rebinding; use a controlled egress path or inline files. Limit bytes, duration, concurrency and tool steps.",
+    "objectives": [
+      "Reject unsafe destinations",
+      "Prevent credential delegation",
+      "Explain layered defenses"
+    ],
+    "analogy": "A forged purchase order cannot override the company's approval policy.",
+    "tier": 3
+  },
+  {
+    "id": "16",
+    "slug": "testing_conformance",
+    "title": "Testing, conformance and debugging",
+    "labs": [
+      "errors",
+      "stream",
+      "grpc"
+    ],
+    "idea": "An offline contract test should observe actual routing and serialized responses. Conformance checks protocol behavior; evaluation checks business outcomes. The official TCK expects a reachable server and is a separate integration job. Course tests do not certify official compliance. Record and redact traffic, inject failures and assert the sequence that a client can observe.",
+    "objectives": [
+      "Run offline contracts",
+      "Diagnose a wire error",
+      "Distinguish course tests from official certification"
+    ],
+    "analogy": "Testing a form's format is different from checking that the quote satisfies the event.",
+    "tier": 4
+  },
+  {
+    "id": "17",
+    "slug": "observability",
+    "title": "Observability and evaluation",
+    "labs": [
+      "trace",
+      "eval",
+      "orchestrate"
+    ],
+    "idea": "A trace groups spans for one distributed request; a span records one operation. Propagate W3C trace context through transports and correlate task IDs without making them authorization credentials. Course attribute names are explicitly application conventions. Golden scenarios check delegations, states and artifacts, not whether prose sounds convincing. Never log tokens or entire sensitive briefs.",
+    "objectives": [
+      "Read related spans",
+      "Evaluate a golden event",
+      "Redact sensitive telemetry"
+    ],
+    "analogy": "A shipment's tracking history shows where time was spent across organizations.",
+    "tier": 4
+  },
+  {
+    "id": "18",
+    "slug": "extensions",
+    "title": "Extensions and versioning",
+    "labs": [
+      "extension",
+      "version",
+      "list"
+    ],
+    "idea": "An extension has a URI, a declaration in capabilities and request-time activation through A2A-Extensions. A required extension is a compatibility obligation. Version selection belongs to the advertised interface. The structured quote extension adds a schema for the deliverable; it must not redefine core task states. Preserve skill contracts or version them when behavior changes.",
+    "objectives": [
+      "Declare an extension",
+      "Activate it on a request",
+      "Reject unsupported protocol versions"
+    ],
+    "analogy": "An optional rider adds terms to an agreement without rewriting the basic contract.",
+    "tier": 4
+  },
+  {
+    "id": "19",
+    "slug": "deployment",
+    "title": "Deployment and scale",
+    "labs": [
+      "persist",
+      "stream",
+      "push"
+    ],
+    "idea": "A persistent task store survives process loss; an in-memory event queue does not coordinate multiple replicas. The current SDK offers a database event stream and versioned database store, which must be paired correctly. Proxies need streaming timeouts and buffering disabled. Webhook retry requires a durable outbox for crash recovery. Docker packages the process; it does not automatically provide trust or persistence.",
+    "objectives": [
+      "Persist and reload a task",
+      "Explain multi-replica event delivery",
+      "Identify deployment checks"
+    ],
+    "analogy": "Keeping a ledger is different from ensuring every office sees new entries immediately.",
+    "tier": 4
+  },
+  {
+    "id": "20",
+    "slug": "designing_agent_networks",
+    "title": "Designing agent networks",
+    "labs": [
+      "orchestrate",
+      "rejected",
+      "compensate"
+    ],
+    "idea": "Choose agent boundaries around ownership, independent deployment and durable responsibilities. An in-process function call is often simpler for tightly coupled work. Distributed requests can partially succeed. Compensating actions are new business operations, such as releasing a hold; they are not database rollback across organizations. Write an architecture decision record that states alternatives, failure handling and measurable tradeoffs.",
+    "objectives": [
+      "Choose useful agent boundaries",
+      "Design partial-failure handling",
+      "Write an architecture decision record"
+    ],
+    "analogy": "A coordinator can release a hotel hold, but cannot pretend the vendor never processed it.",
+    "tier": 4
+  },
+  {
+    "id": "B1",
+    "slug": "typescript",
+    "title": "A2A in TypeScript",
+    "labs": [
+      "jsonrpc",
+      "rest",
+      "grpc"
+    ],
+    "idea": "Language interoperability rests on wire contracts, not shared Python objects. The TypeScript track pins the official JavaScript SDK and uses the same synthetic briefs. A test must cross the language boundary to demonstrate interoperability; a Python-only simulation is preparation rather than evidence.",
+    "objectives": [
+      "Compare JSON representations",
+      "Identify transport boundaries",
+      "Plan cross-language validation"
+    ],
+    "analogy": "Two offices can use different languages while agreeing on the fields of an order.",
+    "tier": 5
+  },
+  {
+    "id": "B2",
+    "slug": "other_sdks",
+    "title": "Other official SDKs",
+    "labs": [
+      "grpc",
+      "discover",
+      "version"
+    ],
+    "idea": "Official SDK status does not guarantee that every language release supports the same protocol revision. Check Go, Java and .NET release notes and minimum runtimes before selecting versions. Run the same request and compare semantics, allowing generated IDs and timestamps to differ.",
+    "objectives": [
+      "Inspect language compatibility",
+      "Compare task semantics",
+      "Choose a migration boundary"
+    ],
+    "analogy": "An approved translation still needs checking against the edition of the contract in use.",
+    "tier": 5
+  },
+  {
+    "id": "B3",
+    "slug": "spec_contributing",
+    "title": "Reading the specification and contributing",
+    "labs": [
+      "parts",
+      "validate_card",
+      "errors"
+    ],
+    "idea": "Read the normative protobuf alongside binding rules and behavioral requirements. A field being parseable does not make a behavior conformant. Reduce a suspected bug to a captured request, observed response and specific requirement. Distinguish a documentation typo from a change to the protocol contract.",
+    "objectives": [
+      "Locate a protobuf field",
+      "Reduce a conformance report",
+      "Identify normative requirements"
+    ],
+    "analogy": "A building blueprint and an inspection checklist describe different aspects of the same building.",
+    "tier": 5
+  },
+  {
+    "id": "B4",
+    "slug": "recent_changes",
+    "title": "Recent changes",
+    "labs": [
+      "list",
+      "version",
+      "persist"
+    ],
+    "idea": "Package versions and protocol versions are separate. SDK 1.3 can implement protocol 1.0 while adding runtime features such as shared event delivery. Re-run compatibility tests after a dependency update and retain the lockfile. Prefer demonstrated behavior over copying examples from an overview that may contain stale field names.",
+    "objectives": [
+      "Separate SDK and protocol releases",
+      "Check pagination fields",
+      "Verify an upgrade"
+    ],
+    "analogy": "A newer printing of a handbook may add tools without changing the contract it describes.",
+    "tier": 5
+  }
+]

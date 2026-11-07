@@ -1,0 +1,39 @@
+{
+  "id": "08-04",
+  "module": "08",
+  "title": "Identify the captured transport boundaries",
+  "type": "trace",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "operation": "SendMessage"
+      },
+      "expected": [
+        "POST",
+        "/message:send"
+      ]
+    },
+    {
+      "input": {
+        "operation": "GetTask",
+        "id": "quote-2"
+      },
+      "expected": [
+        "GET",
+        "/tasks/quote-2"
+      ]
+    },
+    {
+      "input": {
+        "operation": "CancelTask",
+        "id": "quote-3"
+      },
+      "expected": [
+        "POST",
+        "/tasks/quote-3:cancel"
+      ]
+    }
+  ],
+  "feedback": "HTTP routes differ from JSON-RPC method strings; protobuf annotations define the mapping."
+}

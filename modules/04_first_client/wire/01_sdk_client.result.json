@@ -1,0 +1,85 @@
+[
+  {
+    "task": {
+      "id": "dccbb1bb-727a-47a2-acfd-e9011fb5d154",
+      "contextId": "324d4dd5-e72a-438c-8963-cbe533f79ebc",
+      "status": {
+        "state": "TASK_STATE_COMPLETED",
+        "message": {
+          "messageId": "9102a27e-e1ab-4237-aaec-fbedf551790c",
+          "contextId": "324d4dd5-e72a-438c-8963-cbe533f79ebc",
+          "taskId": "dccbb1bb-727a-47a2-acfd-e9011fb5d154",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "Quote ready; no money has been spent."
+            }
+          ]
+        }
+      },
+      "artifacts": [
+        {
+          "artifactId": "quote",
+          "name": "quote",
+          "parts": [
+            {
+              "data": {
+                "guests": 40.0,
+                "vendor": "venues",
+                "approved": false,
+                "selection": "room-1",
+                "total_cents": 80000.0,
+                "currency": "USD"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        }
+      ],
+      "history": [
+        {
+          "messageId": "d61db2a6-d30a-4718-8bec-249c97b3c0a0",
+          "contextId": "324d4dd5-e72a-438c-8963-cbe533f79ebc",
+          "taskId": "dccbb1bb-727a-47a2-acfd-e9011fb5d154",
+          "role": "ROLE_USER",
+          "parts": [
+            {
+              "data": {
+                "dietary": {
+                  "standard": 30.0,
+                  "vegan": 10.0
+                },
+                "guests": 40.0,
+                "budget_cents": 1000000.0,
+                "date": "2027-06-01"
+              },
+              "mediaType": "application/json"
+            }
+          ]
+        },
+        {
+          "messageId": "8c607311-4558-41fd-b3e5-fe189b21412d",
+          "contextId": "324d4dd5-e72a-438c-8963-cbe533f79ebc",
+          "taskId": "dccbb1bb-727a-47a2-acfd-e9011fb5d154",
+          "role": "ROLE_AGENT",
+          "parts": [
+            {
+              "text": "venues: checking the brief"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "brief": {
+          "guests": 40.0,
+          "dietary": {
+            "standard": 30.0,
+            "vegan": 10.0
+          },
+          "budget_cents": 1000000.0,
+          "date": "2027-06-01"
+        }
+      }
+    }
+  }
+]

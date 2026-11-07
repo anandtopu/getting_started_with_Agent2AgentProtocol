@@ -1,0 +1,36 @@
+{
+  "id": "B4-06",
+  "module": "B4",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "nextPageToken": "opaque-2"
+      },
+      "expected": "opaque-2"
+    },
+    {
+      "input": {
+        "nextPageToken": ""
+      },
+      "expected": null
+    },
+    {
+      "input": {
+        "tasks": []
+      },
+      "expected": null
+    }
+  ],
+  "feedback": "Use nextPageToken as the next request's pageToken; treat the token as opaque.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

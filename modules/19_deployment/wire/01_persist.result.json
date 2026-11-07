@@ -1,0 +1,7 @@
+{
+  "id": "persisted-quote",
+  "contextId": "offsite",
+  "status": {
+    "state": "TASK_STATE_COMPLETED"
+  }
+}

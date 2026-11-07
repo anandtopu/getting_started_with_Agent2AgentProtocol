@@ -1,0 +1,36 @@
+{
+  "id": "B1-04",
+  "module": "B1",
+  "title": "Identify the captured transport boundaries",
+  "type": "trace",
+  "level": "medium",
+  "cases": [
+    {
+      "input": {
+        "python": {
+          "total_cents": 100,
+          "currency": "USD"
+        },
+        "typescript": {
+          "total_cents": 100,
+          "currency": "EUR"
+        }
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "python": {
+          "total_cents": 100,
+          "currency": "USD"
+        },
+        "typescript": {
+          "total_cents": 100,
+          "currency": "USD"
+        }
+      },
+      "expected": true
+    }
+  ],
+  "feedback": "Compare semantic values, not generated identifiers or object implementations."
+}

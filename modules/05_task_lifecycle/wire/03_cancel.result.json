@@ -1,0 +1,61 @@
+{
+  "id": "36309a41-adf9-46f4-93b9-3c4cc4fc6ac7",
+  "contextId": "67bea16a-6451-461a-b3ea-a20de1a09dfa",
+  "status": {
+    "state": "TASK_STATE_CANCELED",
+    "message": {
+      "messageId": "4c874720-ff1d-42e2-bf09-61a95c1b7a1f",
+      "contextId": "67bea16a-6451-461a-b3ea-a20de1a09dfa",
+      "taskId": "36309a41-adf9-46f4-93b9-3c4cc4fc6ac7",
+      "role": "ROLE_AGENT",
+      "parts": [
+        {
+          "text": "Work canceled. No booking was made."
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "messageId": "ba19b902-7856-497d-afb0-b58c91eb6214",
+      "contextId": "67bea16a-6451-461a-b3ea-a20de1a09dfa",
+      "taskId": "36309a41-adf9-46f4-93b9-3c4cc4fc6ac7",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "data": {
+            "guests": 40.0
+          },
+          "mediaType": "application/json"
+        }
+      ]
+    },
+    {
+      "messageId": "dd0b7671-3ff2-44ff-8b2c-6fa8a5bcd738",
+      "contextId": "67bea16a-6451-461a-b3ea-a20de1a09dfa",
+      "taskId": "36309a41-adf9-46f4-93b9-3c4cc4fc6ac7",
+      "role": "ROLE_AGENT",
+      "parts": [
+        {
+          "text": "catering: checking the brief"
+        }
+      ]
+    },
+    {
+      "messageId": "4e310ef4-694f-467b-aa75-ecf3ac0f3fe1",
+      "contextId": "67bea16a-6451-461a-b3ea-a20de1a09dfa",
+      "taskId": "36309a41-adf9-46f4-93b9-3c4cc4fc6ac7",
+      "role": "ROLE_AGENT",
+      "parts": [
+        {
+          "text": "How many guests need each dietary option?"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brief": {
+      "guests": 40.0
+    }
+  }
+}

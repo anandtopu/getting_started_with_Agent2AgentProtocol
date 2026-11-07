@@ -1,0 +1,48 @@
+{
+  "id": "17-05",
+  "module": "17",
+  "title": "Enforce the contract across edge cases",
+  "type": "conformance",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "actual": [
+          "venues",
+          "catering"
+        ],
+        "expected": [
+          "catering",
+          "venues"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "actual": [
+          "venues",
+          "venues"
+        ],
+        "expected": [
+          "venues",
+          "catering"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "actual": [
+          "venues"
+        ],
+        "expected": [
+          "venues",
+          "av"
+        ]
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "Match identity and cardinality; equal list lengths do not prove correct delegation."
+}

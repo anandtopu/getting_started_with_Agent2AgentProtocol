@@ -1,0 +1,142 @@
+{
+  "delegations": [
+    {
+      "vendor": "venues",
+      "task_id": "350679b0-1670-4d47-802a-9722801bb0d1",
+      "context_id": "f2aecc4a-f8c3-4611-8236-cc2918f8dd3c",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "venues",
+          "approved": false,
+          "selection": "room-1",
+          "total_cents": 80000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "764f1d8a-5c3b-46bc-9769-151bbaf613f6",
+        "contextId": "f2aecc4a-f8c3-4611-8236-cc2918f8dd3c",
+        "taskId": "350679b0-1670-4d47-802a-9722801bb0d1",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "catering",
+      "task_id": "030d98c5-d554-496a-a1d3-3ca64c362c4c",
+      "context_id": "0194e2c1-0258-4332-82c8-57ee31957fed",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "catering",
+          "approved": false,
+          "selection": "garden",
+          "total_cents": 96000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "0cbbda20-9a5c-4401-bbc2-d7fe3eab0b0f",
+        "contextId": "0194e2c1-0258-4332-82c8-57ee31957fed",
+        "taskId": "030d98c5-d554-496a-a1d3-3ca64c362c4c",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "av",
+      "task_id": "6a4a9b9c-c520-4183-ac0a-d1017cd0095f",
+      "context_id": "07933445-297e-45b2-8bb3-c73e5140b011",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "av",
+          "approved": false,
+          "selection": "microphone, projector, speaker",
+          "total_cents": 28000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "b2966c92-d672-475e-a7c9-f1e9ad74f768",
+        "contextId": "07933445-297e-45b2-8bb3-c73e5140b011",
+        "taskId": "6a4a9b9c-c520-4183-ac0a-d1017cd0095f",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "travel",
+      "task_id": "94287db3-51cb-40ea-88e9-69a8e9650690",
+      "context_id": "527e0a8b-4cdd-4051-98d7-184f50273f18",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "travel",
+          "approved": false,
+          "selection": "cedar",
+          "total_cents": 360000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "0500a43a-a82d-4113-91ed-7f8447f45fe3",
+        "contextId": "527e0a8b-4cdd-4051-98d7-184f50273f18",
+        "taskId": "94287db3-51cb-40ea-88e9-69a8e9650690",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    },
+    {
+      "vendor": "print",
+      "task_id": "9e5a84cb-b31d-448d-9148-d95ab8d84be2",
+      "context_id": "906cb237-84b0-4891-8309-dd409d73ef9c",
+      "state": "TASK_STATE_COMPLETED",
+      "quotes": [
+        {
+          "guests": 40.0,
+          "vendor": "print",
+          "approved": false,
+          "selection": "badge",
+          "total_cents": 10000.0,
+          "currency": "USD"
+        }
+      ],
+      "question": {
+        "messageId": "0e076928-001e-4928-b2de-9738d7b808ef",
+        "contextId": "906cb237-84b0-4891-8309-dd409d73ef9c",
+        "taskId": "9e5a84cb-b31d-448d-9148-d95ab8d84be2",
+        "role": "ROLE_AGENT",
+        "parts": [
+          {
+            "text": "Quote ready; no money has been spent."
+          }
+        ]
+      }
+    }
+  ],
+  "total_cents": 574000.0,
+  "within_budget": true,
+  "approval_required": true
+}

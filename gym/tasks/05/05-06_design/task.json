@@ -1,0 +1,72 @@
+{
+  "id": "05-06",
+  "module": "05",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "state": "TASK_STATE_COMPLETED"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "state": "TASK_STATE_FAILED"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "state": "TASK_STATE_CANCELED"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "state": "TASK_STATE_REJECTED"
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "state": "TASK_STATE_INPUT_REQUIRED"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "state": "TASK_STATE_AUTH_REQUIRED"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "state": "TASK_STATE_SUBMITTED"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "state": "TASK_STATE_WORKING"
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "state": "TASK_STATE_UNSPECIFIED"
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "Input-required and auth-required are resumable; terminal states are not.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

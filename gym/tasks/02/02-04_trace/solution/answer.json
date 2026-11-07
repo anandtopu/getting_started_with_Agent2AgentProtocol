@@ -1,0 +1,7 @@
+{
+  "http_exchanges": 3,
+  "grpc_service_calls": 0,
+  "http_methods": [
+    "GET"
+  ]
+}

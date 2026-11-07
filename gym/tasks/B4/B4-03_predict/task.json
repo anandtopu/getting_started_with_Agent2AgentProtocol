@@ -1,0 +1,28 @@
+{
+  "id": "B4-03",
+  "module": "B4",
+  "title": "Predict the first experiment's observable result",
+  "type": "predict",
+  "level": "easy",
+  "cases": [
+    {
+      "input": {
+        "nextPageToken": "opaque-2"
+      },
+      "expected": "opaque-2"
+    },
+    {
+      "input": {
+        "nextPageToken": ""
+      },
+      "expected": null
+    },
+    {
+      "input": {
+        "tasks": []
+      },
+      "expected": null
+    }
+  ],
+  "feedback": "Use nextPageToken as the next request's pageToken; treat the token as opaque."
+}

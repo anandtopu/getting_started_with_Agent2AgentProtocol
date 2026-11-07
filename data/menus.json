@@ -1,0 +1,27 @@
+[
+  {
+    "id": "garden",
+    "name": "Garden buffet",
+    "dietary": [
+      "vegan",
+      "gluten-free"
+    ],
+    "price_cents": 2400
+  },
+  {
+    "id": "harvest",
+    "name": "Harvest supper",
+    "dietary": [
+      "vegetarian"
+    ],
+    "price_cents": 3200
+  },
+  {
+    "id": "banquet",
+    "name": "Celebration banquet",
+    "dietary": [
+      "standard"
+    ],
+    "price_cents": 4800
+  }
+]

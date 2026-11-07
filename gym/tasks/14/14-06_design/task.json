@@ -1,0 +1,57 @@
+{
+  "id": "14-06",
+  "module": "14",
+  "title": "Design a partner contract and failure policy",
+  "type": "design",
+  "level": "hard",
+  "cases": [
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "maplewood"
+        },
+        "principal": {
+          "subject": "bob",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": false
+    },
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "maplewood"
+        },
+        "principal": {
+          "subject": "alice",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": true
+    },
+    {
+      "input": {
+        "task": {
+          "owner": "alice",
+          "tenant": "other"
+        },
+        "principal": {
+          "subject": "alice",
+          "tenant": "maplewood"
+        }
+      },
+      "expected": false
+    }
+  ],
+  "feedback": "A matching tenant is not permission to read another caller's task.",
+  "sections": [
+    "Boundaries",
+    "Skills",
+    "Task flow",
+    "Trust",
+    "Failures",
+    "Tradeoffs"
+  ]
+}

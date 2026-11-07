@@ -1,0 +1,25 @@
+"""Transform one Maplewood input according to task.md; no services or model needed."""
+
+import json
+
+
+def solve(payload: object) -> object:
+    # YOUR CODE HERE: preserve the function interface used by the grader.
+    result = {}
+    for chunk in payload:
+        key = chunk["id"]
+        if chunk.get("append") and key not in result:
+            return {"error": "unknown artifact"}
+        result[key] = result.get(key, "") + chunk["text"] if chunk.get("append") else chunk["text"]
+    return result
+
+
+def main() -> None:
+    sample = json.loads(
+        '[{"id": "a", "text": "Mic "}, {"id": "b", "text": "Light"}, {"id": "a", "text": "check", "append": true}]'
+    )
+    print(json.dumps(solve(sample), indent=2))
+
+
+if __name__ == "__main__":
+    main()

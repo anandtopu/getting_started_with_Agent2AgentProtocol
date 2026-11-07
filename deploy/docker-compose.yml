@@ -1,0 +1,202 @@
+{
+  "services": {
+    "venues": {
+      "build": {
+        "context": "..",
+        "dockerfile": "deploy/Dockerfile"
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "venues",
+        "--host",
+        "0.0.0.0"
+      ],
+      "environment": {
+        "MAPLEWOOD_TOKEN": "${VENUES_TOKEN:?Run deploy/prepare.py}",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
+        "MAPLEWOOD_SIGNING_KEY": "${VENUES_SIGNING_KEY:?Run deploy/prepare.py}",
+        "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
+        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+      },
+      "ports": [
+        "127.0.0.1:8100:8100"
+      ]
+    },
+    "catering": {
+      "build": {
+        "context": "..",
+        "dockerfile": "deploy/Dockerfile"
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "catering",
+        "--host",
+        "0.0.0.0"
+      ],
+      "environment": {
+        "MAPLEWOOD_TOKEN": "${CATERING_TOKEN:?Run deploy/prepare.py}",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
+        "MAPLEWOOD_SIGNING_KEY": "${CATERING_SIGNING_KEY:?Run deploy/prepare.py}",
+        "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
+        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+      },
+      "ports": [
+        "127.0.0.1:8101:8101"
+      ]
+    },
+    "av": {
+      "build": {
+        "context": "..",
+        "dockerfile": "deploy/Dockerfile"
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "av",
+        "--host",
+        "0.0.0.0"
+      ],
+      "environment": {
+        "MAPLEWOOD_TOKEN": "${AV_TOKEN:?Run deploy/prepare.py}",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
+        "MAPLEWOOD_SIGNING_KEY": "${AV_SIGNING_KEY:?Run deploy/prepare.py}",
+        "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
+        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+      },
+      "ports": [
+        "127.0.0.1:8102:8102"
+      ]
+    },
+    "travel": {
+      "build": {
+        "context": "..",
+        "dockerfile": "deploy/Dockerfile"
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "travel",
+        "--host",
+        "0.0.0.0"
+      ],
+      "environment": {
+        "MAPLEWOOD_TOKEN": "${TRAVEL_TOKEN:?Run deploy/prepare.py}",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
+        "MAPLEWOOD_SIGNING_KEY": "${TRAVEL_SIGNING_KEY:?Run deploy/prepare.py}",
+        "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
+        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+      },
+      "ports": [
+        "127.0.0.1:8103:8103"
+      ]
+    },
+    "print": {
+      "build": {
+        "context": "..",
+        "dockerfile": "deploy/Dockerfile"
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "print",
+        "--host",
+        "0.0.0.0"
+      ],
+      "environment": {
+        "MAPLEWOOD_TOKEN": "${PRINT_TOKEN:?Run deploy/prepare.py}",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
+        "MAPLEWOOD_SIGNING_KEY": "${PRINT_SIGNING_KEY:?Run deploy/prepare.py}",
+        "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
+        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+      },
+      "ports": [
+        "127.0.0.1:8104:8104",
+        "127.0.0.1:8204:8204"
+      ]
+    },
+    "concierge": {
+      "build": {
+        "context": "..",
+        "dockerfile": "deploy/Dockerfile"
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "concierge",
+        "--host",
+        "0.0.0.0"
+      ],
+      "environment": {
+        "MAPLEWOOD_TOKEN": "${CONCIERGE_TOKEN:?Run deploy/prepare.py}",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\":\"http://venues:8100\",\"catering\":\"http://catering:8101\",\"av\":\"http://av:8102\",\"travel\":\"http://travel:8103\",\"print\":\"http://print:8104\"}",
+        "MAPLEWOOD_VENDOR_TOKENS": "${VENDOR_TOKENS:?Run deploy/prepare.py}",
+        "MAPLEWOOD_SIGNING_KEY": "${CONCIERGE_SIGNING_KEY:?Run deploy/prepare.py}",
+        "MAPLEWOOD_TRUSTED_KEYS": "${TRUSTED_KEYS:?Run deploy/prepare.py}",
+        "MAPLEWOOD_GRPC_TARGET": "print:8204"
+      },
+      "ports": [
+        "127.0.0.1:8105:8105"
+      ],
+      "depends_on": [
+        "venues",
+        "catering",
+        "av",
+        "travel",
+        "print"
+      ]
+    },
+    "postgres": {
+      "image": "postgres:17",
+      "environment": {
+        "POSTGRES_USER": "maplewood",
+        "POSTGRES_DB": "maplewood",
+        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD:?Run deploy/prepare.py}"
+      },
+      "volumes": [
+        "postgres_data:/var/lib/postgresql/data"
+      ]
+    },
+    "keycloak": {
+      "image": "quay.io/keycloak/keycloak:26.8.2",
+      "command": [
+        "start-dev"
+      ],
+      "environment": {
+        "KC_BOOTSTRAP_ADMIN_USERNAME": "admin",
+        "KC_BOOTSTRAP_ADMIN_PASSWORD": "${KEYCLOAK_PASSWORD:?Run deploy/prepare.py}"
+      },
+      "ports": [
+        "127.0.0.1:8080:8080"
+      ]
+    },
+    "jaeger": {
+      "image": "jaegertracing/jaeger:2.23.0",
+      "ports": [
+        "127.0.0.1:16686:16686"
+      ]
+    }
+  },
+  "volumes": {
+    "postgres_data": {}
+  }
+}

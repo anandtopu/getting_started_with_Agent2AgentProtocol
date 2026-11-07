@@ -1,0 +1,9 @@
+{
+  "id": "08-07",
+  "module": "08",
+  "title": "Connect the Concierge to a gRPC-only printer",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "binding"
+}
