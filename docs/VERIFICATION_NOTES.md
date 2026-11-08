@@ -92,7 +92,11 @@ Configured examples are documented as available, not live-tested account access:
 common/llm.py retains the introductory JSON decision method and adds provider-native
 streamed tool calls through common/model_streams.py. All four provider framings are
 validated with fragmented offline HTTP streams; the free Ollama model is also run
-in CI. Hosted account access is optional and is not claimed as live-tested.
+in CI. OpenAI gpt-4o-mini additionally passed an authorized local live acceptance
+run on 2026-11-08; [the evidence](evidence/openai-live-2026-11-08.json) covers native
+tool streaming, A2A/LangGraph/MCP and Concierge routing. Anthropic and Gemini live
+checks remain deferred without credentials. The model examples above are not
+claims of account-specific availability.
 See [the live guide](LIVE_MODELS.md) for commands, framing and bounds.
 
 ## Advanced implementation evidence
@@ -130,7 +134,8 @@ the course contracts and golden evaluations rather than the TCK fixture executor
 
 The official .NET SDK remains preview4. The implemented native lab is verified;
 a stable upstream release cannot be supplied by this repository. Hosted LLM calls
-need an account; only the free local provider is live-tested. The TCK has four
+need an account; OpenAI gpt-4o-mini is locally live-tested, while only the free
+Ollama provider is live-tested in CI. The TCK has four
 upstream contradictions described in its report. None is hidden by a claimed 100%
 compatibility score.
 

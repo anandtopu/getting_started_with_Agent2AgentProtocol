@@ -45,8 +45,8 @@ course or replace the operating responsibilities documented in the runbook.
 |---|---|---|
 | TCK exceptions | Upstream main remains at 104a7b4; only Python/dependency metadata changed after the course pin. Issue [202](https://github.com/a2aproject/a2a-tck/issues/202) and open proposals [203](https://github.com/a2aproject/a2a-tck/pull/203) and [238](https://github.com/a2aproject/a2a-tck/pull/238) cover the defects. Neither proposal is merged. | Review an integrated upstream revision retaining the 1.0.1 error mappings and strict validators, run the entire suite and independent wire controls, then remove only exceptions that genuinely pass. |
 | Stable .NET SDK | Official GitHub releases and the NuGet A2A.AspNetCore version index still provide 1.0.0-preview4; no stable package was found. | A stable compatible package is published; update the native lab and pass interoperability on Windows, Linux and macOS. |
-| OpenAI live check | An authorized attempt with gpt-5.6-luna on 2026-11-08 received HTTP 401 from the Responses endpoint on its first request. No model result or passing acceptance evidence was produced. The credential was held in process memory and not saved to repository files. | Configure a working replacement credential privately, then rerun the existing live checker and retain its acceptance evidence. |
-| Anthropic and Gemini live checks | Neither provider key was configured in the execution environment, project .env, persistent user environment or repository secrets. These live calls were not attempted. | Configure the provider keys privately, select accessible models, then run the existing live checker once per provider and retain each provider's evidence. |
+| OpenAI live check | Completed with the account-accessible gpt-4o-mini model on 2026-11-08: native tool selection, A2A/LangGraph/MCP completion and Concierge routing all passed. [Credential-free evidence](../evidence/openai-live-2026-11-08.json). | Closed for this model and acceptance scope. Revalidate when changing models or request/schema handling. |
+| Anthropic and Gemini live checks | Credentials are unavailable. The user explicitly deferred these checks on 2026-11-08; live calls were not attempted. | Pending until the user supplies private credentials and resumes these optional checks. |
 
 The TCK proposals are useful tracking references, not validated replacements for
 the pinned suite. PR 203's inspected regression fixture still uses the old HTTP
@@ -74,3 +74,14 @@ remove these exceptions until the upstream assertions are corrected and reviewed
 never accept unsupported media or change the recommended content type to manufacture
 a green official report. Independent controls remain mandatory even after an
 upstream correction.
+
+## Hosted OpenAI closure
+
+R26 (P2) is fixed: the real API rejected Concierge's `uniqueItems` schema keyword.
+`common/model_streams.py` now removes only that unsupported keyword from a copied
+OpenAI wire schema while retaining strict tool generation and full original-schema
+validation locally. Other provider schemas are unchanged. Regressions prove that
+duplicates, empty selections and untrusted vendors fail before delegation, and that
+schema property names, literal values and the original schema are preserved.
+The complete live checker then passed with gpt-4o-mini. TCK/.NET remain dependent
+on upstream releases; Anthropic/Gemini remain explicitly deferred.

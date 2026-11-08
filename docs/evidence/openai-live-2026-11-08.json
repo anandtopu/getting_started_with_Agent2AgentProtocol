@@ -1,0 +1,13 @@
+{
+  "checked_date": "2026-11-08",
+  "timezone": "America/Chicago",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "native_streamed_tool_call": {
+    "tool": "quote_menu"
+  },
+  "credentials_logged": false,
+  "a2a_langgraph_mcp_stream": "passed",
+  "model_selected_concierge_plan": "passed",
+  "scope": "One authorized local acceptance run using scripts/check_live_model.py; not a hosted-provider CI job or a claim about other models."
+}

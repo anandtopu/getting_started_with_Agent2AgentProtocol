@@ -5,6 +5,7 @@ deliver whole argument objects in streaming chunks; OpenAI and Claude emit delta
 """
 
 import asyncio
+import copy
 import json
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
@@ -13,6 +14,52 @@ import httpx
 from jsonschema import validate
 
 progress_sink = ContextVar("model_progress_sink", default=None)
+
+
+def openai_wire_schema(schema):
+    """Project unsupported uniqueness onto local validation, without mutating it.
+
+    OpenAI strict tools reject uniqueItems. The full original schema is still
+    applied to the completed arguments before tool_decision returns. Walk schema
+    locations only: property names and literal enum/default values are data.
+    """
+    result = copy.deepcopy(schema)
+
+    def visit(node):
+        if not isinstance(node, dict):
+            return
+        node.pop("uniqueItems", None)
+        for keyword in (
+            "properties",
+            "$defs",
+            "definitions",
+            "patternProperties",
+            "dependentSchemas",
+        ):
+            for child in node.get(keyword, {}).values():
+                visit(child)
+        for keyword in (
+            "items",
+            "additionalProperties",
+            "contains",
+            "not",
+            "if",
+            "then",
+            "else",
+            "propertyNames",
+        ):
+            child = node.get(keyword)
+            if isinstance(child, list):
+                for item in child:
+                    visit(item)
+            else:
+                visit(child)
+        for keyword in ("anyOf", "allOf", "oneOf", "prefixItems"):
+            for child in node.get(keyword, []):
+                visit(child)
+
+    visit(result)
+    return result
 
 
 @asynccontextmanager
@@ -76,7 +123,14 @@ def request_for(model, prompt, schema):
                 "input": message["content"],
                 "stream": True,
                 "max_output_tokens": 512,
-                "tools": [{"type": "function", **function, "strict": True}],
+                "tools": [
+                    {
+                        "type": "function",
+                        **function,
+                        "parameters": openai_wire_schema(schema),
+                        "strict": True,
+                    }
+                ],
                 "tool_choice": {"type": "function", "name": "select_action"},
                 "parallel_tool_calls": False,
             },

@@ -11,18 +11,18 @@ is evidence of the learning deployment, not an external production certification
 
 | Check | Evidence |
 |---|---|
-| Offline Python | 774 tests; application sockets disabled; A2A deprecations are errors |
+| Offline Python | 779 tests; application sockets disabled; A2A deprecations are errors |
 | Gym | 265 starters fail and 265 solutions pass; 25 modules, eight types, at least four types and three levels per module |
 | Examples and notebooks | 118 standalone commands (83 examples, 25 use cases, 10 capstone starter/reference commands) and all 25 notebooks |
 | Style | Ruff lint and formatting; no banned current-track legacy APIs |
-| Links | 1,688 local references and 79 external URLs checked after the TCK investigation |
+| Links | 1,697 local references and 83 external URLs checked after the hosted OpenAI acceptance review |
 | Protocol | All eleven operations captured for JSON-RPC, HTTP+JSON and protobuf service boundaries; real network gRPC separately checked |
 | Golden scenarios | All twenty fixtures check exact vendor states, chunks, artifact IDs and quotes; hardened framework deployment also checks every golden plan |
 | Persistence and replicas | SQLite/PostgreSQL CAS, atomic task/event/outbox rollback, publisher crash, second-handler stream reconnect, owner isolation |
 | Delivery | Durable signed inbox, lost acknowledgement, expired lease fencing, bounded retries, independent restart recovery and live Control Room lab |
 | Identity and TLS | Five vendor auth schemes; real Keycloak audience rejection; HTTPS CA/hostname validation; missing mTLS certificate rejected |
 | Signing keys | Encrypted shared SQL ring; rotation overlap, expiry, revocation, replica agreement and restart |
-| Models | Four provider-native stream parsers tested offline; real free Ollama qwen2.5:3b tool calls in CI |
+| Models | Four provider-native stream parsers tested offline; real free Ollama qwen2.5:3b tool calls in CI; authorized local OpenAI gpt-4o-mini acceptance passed with [retained evidence](evidence/openai-live-2026-11-08.json) |
 | Frameworks | LangGraph plus six isolated real runtimes; twelve Windows/Linux worker jobs and mixed-framework Docker deployment |
 | Languages | Native TypeScript, Go, Java and official .NET preview; authenticated Python interoperability on Windows, macOS and Linux |
 | Observability | HTTP/gRPC trace propagation, task/context span attributes, bounded vendor metric labels, all six services exported to Jaeger |
@@ -76,9 +76,9 @@ examples/notebooks, native languages, both Compose profiles, live Ollama and TCK
    Green CI does **not** mean 100% official TCK compatibility or certification.
 2. **.NET:** the official available SDK is 1.0.0-preview4. Its native lab passes;
    this repository cannot turn an upstream prerelease into a stable release.
-3. **Hosted models:** OpenAI, Anthropic and Gemini are verified against provider
-   framing with offline fixtures. Live account calls require the owner's account;
-   only the free Ollama provider is live-tested by CI.
+3. **Hosted models:** OpenAI gpt-4o-mini passed an authorized local live check;
+   Anthropic and Gemini have offline framing coverage and are explicitly deferred
+   without credentials. Only the free Ollama provider is live-tested by CI.
 4. **Operating environment:** local Docker was unavailable, so Linux CI supplies
    container evidence. The local CA and loopback lab are not a hosted public service.
    Certificate operation, backups, capacity and retention remain operator duties.

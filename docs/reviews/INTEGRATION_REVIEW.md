@@ -63,3 +63,15 @@ limitations and operator responsibilities remain listed in the validation report
 R22–R25 are closed in repository code and documentation. Two upstream defects
 still produce four official failures; these are external, explicitly retained
 outcomes, not waived protocol obligations or a conformance certification.
+
+## OpenAI request-to-delegation pass
+
+The actual account exposed gpt-4o-mini. Native tool selection and the catering
+A2A/LangGraph/MCP path passed, while Concierge initially received HTTP 400 for
+the unsupported uniqueItems schema keyword. R26 separates the provider's accepted
+schema subset from the application's full schema. The parser still validates the
+complete arguments against the original constraints before Concierge can delegate.
+Duplicate, empty and unknown vendor selections produce no vendor requests in the
+new boundary tests. Property names and literal data are preserved by the schema
+projection. All three live acceptance paths subsequently passed; see the
+[retained OpenAI evidence](../evidence/openai-live-2026-11-08.json).

@@ -52,12 +52,35 @@ uv run python scripts/check_live_model.py
 ~~~
 
 CI installs checksum-verified Ollama v0.40.15 and runs qwen2.5:3b on CPU. This proves
-actual free-model tool selection. Hosted provider acceptance remains unverified:
-the authorized OpenAI gpt-5.6-luna attempt on 2026-11-08 returned HTTP 401 on its
-first Responses request, before model output. Anthropic and Gemini credentials
-were unavailable. The same checker can run against a configured hosted provider.
-Costs and quotas belong to that account; no graded exercise calls it. The
-[backlog](reviews/ACTION_PLAN.md) records the credential blockers and next checks.
+actual free-model tool selection. An authorized local OpenAI run with gpt-4o-mini
+also passed all three acceptance scenarios on 2026-11-08: native streamed tool
+selection, A2A/LangGraph/MCP completion and Concierge routing. See the
+[credential-free evidence](evidence/openai-live-2026-11-08.json). This is a local
+account check, not a hosted-provider CI job or a claim that every OpenAI model is
+available to every account. Anthropic and Gemini live checks are deferred because
+credentials are unavailable. Costs and quotas belong to the account; no graded
+exercise calls it.
+
+For the same OpenAI check in PowerShell, place the key only in ignored `.env`
+(never the tracked `.env.example`) and run:
+
+~~~powershell
+$env:LLM_PROVIDER = "openai"
+$env:LLM_MODEL = "gpt-4o-mini"
+uv run --env-file .env --offline python scripts/check_live_model.py
+~~~
+
+`--env-file` explicitly loads the private key into this command's environment;
+`--offline` applies to dependency resolution, not the authorized API requests.
+The checker still uses its bounded calls and synthetic event brief. The
+[backlog](reviews/ACTION_PLAN.md) records remaining optional provider checks.
+
+The real OpenAI run exposed an unsupported `uniqueItems` schema keyword. The
+OpenAI request now uses a copied schema without that keyword, while the complete
+original schema still validates the returned arguments locally before any tool
+or vendor executes. Duplicate vendor choices remain invalid; strict tool generation,
+array limits, enum constraints and local validation are retained. This follows
+OpenAI's documented [supported schema subset](https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas).
 
 Official framing references: [OpenAI](https://developers.openai.com/api/docs/guides/function-calling),
 [Ollama](https://docs.ollama.com/capabilities/streaming),

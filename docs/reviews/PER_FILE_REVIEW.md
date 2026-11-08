@@ -113,8 +113,9 @@ their 64 KB limits while total wire bytes have a separate 512 KB bound. New test
 accept legitimate small frames above 64 KB total and reject an excessive total.
 
 No unresolved implementation blocker in the reviewed scope. The official .NET SDK
-is preview; the official TCK retains four reviewed contradictions; hosted provider
-accounts are not live-tested. These are disclosed external evidence limits.
+is preview; the official TCK retains four reviewed contradictions. OpenAI was
+subsequently live-validated in the hosted-model review below; Anthropic and Gemini
+remain deferred. These are disclosed external evidence limits.
 
 The expanded live gate also exposed model suitability: Qwen3 4B could exhaust the
 512-token allowance without a complete routing call. The configured default is now
@@ -172,3 +173,17 @@ recommended content type); `agents/app.py` (ordinary handlers also validate medi
 `tests/test_tck_gate.py` (negative mutation controls); `.github/workflows/ci.yml`
 (raw reports plus independent evidence and server log); validation and review docs.
 No production response was changed merely to satisfy an incorrect assertion.
+
+## Hosted-model acceptance review
+
+| ID | Severity | File | Line | Finding and correction |
+|---|---|---|---:|---|
+| R26 | P2 | [common/model_streams.py](../../common/model_streams.py) | 19 | The real OpenAI Responses endpoint rejected Concierge's uniqueItems keyword. Project only that unsupported keyword out of a copied wire schema; preserve strict mode and validate returned arguments against the complete original schema. |
+
+Reviewed `agents/concierge.py` for validation before side effects, the stream
+parser for validation after complete framing, and `tests/test_model_planning.py`
+for meaningful rejection tests. Five new cases cover real Concierge schema
+construction, duplicate/empty/untrusted selections, original-schema immutability,
+property names and literal data. The live OpenAI checker passed with gpt-4o-mini;
+the retained evidence contains no credentials. Anthropic/Gemini live checks were
+deferred explicitly by the user, and their request paths remain unchanged.
