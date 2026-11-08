@@ -83,6 +83,25 @@ async def main():
         )
         response.raise_for_status()
         assert response.json()["task"]["status"]["state"] == "TASK_STATE_COMPLETED", response.text
+        from common.data import load
+
+        scenarios = [
+            json.loads(line) for line in (ROOT / "data/eval/golden.jsonl").read_text().splitlines()
+        ]
+        for scenario in scenarios:
+            event_brief = load("events/" + scenario["brief"] + ".json")
+            event_brief["needs"] = scenario["delegations"]
+            result = await http.post(
+                "https://localhost:8105/message:send",
+                headers={"Authorization": "Bearer " + env["CONCIERGE_TOKEN"]},
+                json=as_dict(request(event_brief)),
+            )
+            result.raise_for_status()
+            plan = result.json()["task"]["artifacts"][0]["parts"][0]["data"]
+            for delegation in plan["delegations"]:
+                expected = scenario["vendors"][delegation["vendor"]]
+                assert delegation["state"] == expected["states"][-1], scenario["brief"]
+                assert delegation["quotes"] == expected["quotes"], scenario["brief"]
     credentials = grpc.ssl_channel_credentials(
         ca.read_bytes(),
         (folder / "client-key.pem").read_bytes(),
@@ -102,6 +121,7 @@ async def main():
                 "rotating_signed_cards": "passed",
                 "mtls_print": "passed",
                 "framework_profile": os.environ.get("CHECK_FRAMEWORKS", "0"),
+                "golden_plans": len(scenarios),
             }
         )
     )

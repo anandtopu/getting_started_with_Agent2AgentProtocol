@@ -21,6 +21,7 @@ from agents.catalog import card
 from common.binding_policy import ProtocolHeaders, VersionedGrpcContext
 from common.card_trust import published_card
 from common.config import GRPC_PORT, PORTS
+from common.observability import inbound_span
 from common.tls import grpc_credentials, server_options
 
 
@@ -43,10 +44,11 @@ class AuthenticatedContext(VersionedGrpcContext):
 class TokenInterceptor(grpc.aio.ServerInterceptor):
     """Reject missing tokens and cross-tenant requests before the SDK sees them."""
 
-    def __init__(self, token: str, tracer=None, mtls=False):
+    def __init__(self, token: str, tracer=None, mtls=False, rate_budget=None):
         self.token = token
         self.tracer = tracer or trace.get_tracer("maplewood")
         self.mtls = mtls
+        self.rate_budget = rate_budget
 
     async def intercept_service(self, continuation, details):
         handler = await continuation(details)
@@ -66,6 +68,8 @@ class TokenInterceptor(grpc.aio.ServerInterceptor):
                 await context.abort(grpc.StatusCode.UNAUTHENTICATED, "Bearer token required")
             if getattr(request, "tenant", "") not in ("", "maplewood"):
                 await context.abort(grpc.StatusCode.PERMISSION_DENIED, "Tenant not authorized")
+            if self.rate_budget and not await self.rate_budget.allow("maplewood:concierge"):
+                await context.abort(grpc.StatusCode.RESOURCE_EXHAUSTED, "Request budget exceeded")
 
         if handler.unary_unary:
 
@@ -73,8 +77,12 @@ class TokenInterceptor(grpc.aio.ServerInterceptor):
                 await check(request, context)
                 with self.tracer.start_as_current_span(
                     "print.rpc", context=parent, kind=trace.SpanKind.SERVER
-                ):
-                    return await handler.unary_unary(request, context)
+                ) as span:
+                    token = inbound_span.set(span)
+                    try:
+                        return await handler.unary_unary(request, context)
+                    finally:
+                        inbound_span.reset(token)
 
             return grpc.unary_unary_rpc_method_handler(
                 unary,
@@ -87,9 +95,13 @@ class TokenInterceptor(grpc.aio.ServerInterceptor):
                 await check(request, context)
                 with self.tracer.start_as_current_span(
                     "print.rpc", context=parent, kind=trace.SpanKind.SERVER
-                ):
-                    async for response in handler.unary_stream(request, context):
-                        yield response
+                ) as span:
+                    token = inbound_span.set(span)
+                    try:
+                        async for response in handler.unary_stream(request, context):
+                            yield response
+                    finally:
+                        inbound_span.reset(token)
 
             return grpc.unary_stream_rpc_method_handler(
                 stream,
@@ -103,7 +115,13 @@ async def serve(token: str, host: str = "127.0.0.1", *, handler=None, engine=Non
     handler = handler or make_handler("print")
     credentials = grpc_credentials(server=True)
     server = grpc.aio.server(
-        interceptors=[TokenInterceptor(token, mtls=bool(credentials))],
+        interceptors=[
+            TokenInterceptor(
+                token,
+                mtls=bool(credentials),
+                rate_budget=handler.task_store if hasattr(handler.task_store, "allow") else None,
+            )
+        ],
         options=[("grpc.max_receive_message_length", 1_000_000)],
     )
     add_A2AServiceServicer_to_server(GrpcHandler(handler, AuthenticatedContext()), server)
@@ -116,9 +134,15 @@ async def serve(token: str, host: str = "127.0.0.1", *, handler=None, engine=Non
         raise RuntimeError("Inkwell gRPC port is busy. Run scripts/check_env.py.")
     identity = card("print", grpc_only=True)
     if os.environ.get("MAPLEWOOD_HARDENED") == "1":
-        from common.key_rotation import RotatingCardKeys
+        from common.key_rotation import RotatingCardKeys, SharedCardKeys
+        from common.security import unb64
 
-        routes = RotatingCardKeys(identity).routes()
+        keys = (
+            SharedCardKeys(identity, engine, "print", unb64(os.environ["MAPLEWOOD_SIGNING_KEY"]))
+            if engine
+            else RotatingCardKeys(identity)
+        )
+        routes = keys.routes()
     else:
         routes = create_agent_card_routes(published_card(identity, "print"))
     app = FastAPI(routes=routes)

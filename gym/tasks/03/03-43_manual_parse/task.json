@@ -1,0 +1,10 @@
+{
+  "id": "03-43",
+  "module": "03",
+  "title": "Inspect the hand-built server: parse",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:manual:parse",
+  "feature": "manual"
+}

@@ -9,12 +9,32 @@ from common.testing import client
 
 
 async def reserve_pair(travel, venue, request_id="introductory-hold") -> dict:
-    hotel = (
-        await travel.post(
+    try:
+        hotel_response = await travel.post(
             "/message:send",
             json=as_dict(request({"action": "hold", "request_id": request_id + ":hotel"})),
         )
-    ).json()["task"]
+        hotel_response.raise_for_status()
+        hotel = hotel_response.json()["task"]
+    except (httpx.HTTPError, KeyError, ValueError):
+        recovered = False
+        try:
+            cleanup = await travel.post(
+                "/message:send",
+                json=as_dict(
+                    request({"action": "release_request", "request_id": request_id + ":hotel"})
+                ),
+            )
+            cleanup.raise_for_status()
+            recovered = cleanup.json()["task"]["status"]["state"] == "TASK_STATE_COMPLETED"
+        except (httpx.HTTPError, KeyError, ValueError):
+            pass
+        return {
+            "reserved": False,
+            "compensated": recovered,
+            "manual_followup_required": not recovered,
+            "charged_cents": 0,
+        }
     if hotel["status"]["state"] != "TASK_STATE_COMPLETED":
         return {"reserved": False, "reason": "hotel unavailable", "compensated": False}
     hold_id = hotel["artifacts"][0]["parts"][0]["data"]["hold_id"]
@@ -46,12 +66,16 @@ async def reserve_pair(travel, venue, request_id="introductory-hold") -> dict:
             uncertain_cleanup = cleanup.json()["task"]["status"]["state"] == "TASK_STATE_COMPLETED"
         except (httpx.HTTPError, KeyError, ValueError):
             uncertain_cleanup = False
-    released = (
-        await travel.post(
+    compensated = False
+    try:
+        released_response = await travel.post(
             "/message:send", json=as_dict(request({"action": "release", "hold_id": hold_id}))
         )
-    ).json()["task"]
-    compensated = released["status"]["state"] == "TASK_STATE_COMPLETED" and uncertain_cleanup
+        released_response.raise_for_status()
+        released = released_response.json()["task"]
+        compensated = released["status"]["state"] == "TASK_STATE_COMPLETED" and uncertain_cleanup
+    except (httpx.HTTPError, KeyError, ValueError):
+        pass
     return {
         "reserved": False,
         "compensated": compensated,

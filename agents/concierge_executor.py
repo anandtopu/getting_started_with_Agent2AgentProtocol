@@ -13,6 +13,8 @@ from agents.executor import VendorExecutor
 from common.auth_profiles import vendor_headers
 from common.card_trust import verify_discovered
 from common.config import url
+from common.model_streams import report_progress
+from common.observability import record_task
 from common.protocol import brief_from, data_part
 from common.remote import GrpcRemote
 from common.tls import client_context
@@ -25,6 +27,7 @@ class ConciergeExecutor(AgentExecutor):
 
     async def execute(self, context, event_queue):
         task = context.current_task or new_task_from_user_message(context.message)
+        record_task(task, "concierge", context)
         brief = MessageToDict(task.metadata).get("brief", {})
         brief.update(brief_from(context.message))
         ParseDict({"brief": brief}, task.metadata)
@@ -61,9 +64,10 @@ class ConciergeExecutor(AgentExecutor):
                 for vendor, token in self.tokens.items()
             }
             try:
-                result = await Concierge(clients, model=self.model, skills=skills).plan(
-                    brief, previous
-                )
+                async with report_progress(event_queue, task):
+                    result = await Concierge(clients, model=self.model, skills=skills).plan(
+                        brief, previous
+                    )
             except (ValueError, TypeError, KeyError):
                 await event_queue.enqueue_event(
                     new_text_status_update_event(

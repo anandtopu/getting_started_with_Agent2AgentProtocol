@@ -63,10 +63,36 @@ if right.button("Send brief"):
     except (httpx.HTTPError, grpc.RpcError, ValueError) as exc:
         st.error(f"Unable to complete the request: {exc}. Check scripts/check_env.py.")
 
-with st.expander("Recorded webhook deliveries"):
-    path = ROOT / "modules/07_streaming_push/wire/03_push.result.json"
-    if path.exists():
-        st.json(json.loads(path.read_text())["verified_deliveries"])
-    st.caption(
-        "This panel shows the authenticated offline lab capture, not a live webhook subscription."
-    )
+with st.expander("Live verified webhook deliveries", expanded=True):
+    st.caption("Start: uv run python scripts/webhook_lab.py. This inbox persists across restarts.")
+    folder = ROOT / "workspace/webhook-lab"
+    if (folder / "credentials.json").exists():
+        if st.button("Request a catering quote with push updates"):
+            settings = json.loads((folder / "credentials.json").read_text())
+            payload = as_dict(request(json.loads(brief)))
+            payload["configuration"] = {
+                "taskPushNotificationConfig": {
+                    "id": "control-room",
+                    "url": "http://127.0.0.1:8190/notifications",
+                }
+            }
+            try:
+                response = httpx.post(
+                    "http://127.0.0.1:8161/message:send",
+                    json=payload,
+                    headers={"Authorization": "Bearer " + settings["token"], "A2A-Version": "1.0"},
+                    timeout=30,
+                )
+                response.raise_for_status()
+                st.json(response.json())
+            except httpx.HTTPError:
+                st.error("The callback lab is not reachable. Start it in another terminal.")
+        st.button("Refresh verified inbox")
+        if (folder / "inbox.sqlite").exists():
+            import sqlite3
+
+            with sqlite3.connect(
+                (folder / "inbox.sqlite").as_uri() + "?mode=ro", uri=True
+            ) as database:
+                for row in database.execute("SELECT body FROM inbox ORDER BY rowid DESC LIMIT 30"):
+                    st.json(json.loads(row[0]))

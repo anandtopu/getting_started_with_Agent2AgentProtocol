@@ -1,0 +1,10 @@
+{
+  "id": "03-45",
+  "module": "03",
+  "title": "Inspect the hand-built server: rejected",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:manual:rejected",
+  "feature": "manual"
+}

@@ -7,6 +7,7 @@ deletion so a slow subscriber can read the terminal event after its publisher ex
 
 import asyncio
 import json
+import re
 import time
 from functools import lru_cache
 from uuid import uuid4
@@ -67,6 +68,8 @@ def task_model(namespace):
 
 class ClusterStore(VersionedTaskStore, TaskEventStream):
     def __init__(self, engine, namespace="cluster", *, destinations=(), callbacks=None):
+        if not re.fullmatch(r"[a-z][a-z0-9_]{0,23}", namespace):
+            raise ValueError("Database namespace must be a lowercase identifier of 1–24 characters")
         self.engine = engine
         self.legacy = DatabaseTaskStore(engine, create_table=False)
         self.legacy.task_model = task_model(namespace)
@@ -146,21 +149,25 @@ class ClusterStore(VersionedTaskStore, TaskEventStream):
                         raise ConcurrentTaskModificationError(task.id)
                     if not cancel and TaskVersion(row["version"]) != prev_version:
                         raise ConcurrentTaskModificationError(task.id)
-                    version = row["version"] + 1
                     # The CAS is in SQL: two independently connected processes cannot win.
                     changed = await session.execute(
                         update(self.revisions)
                         .where(
                             self.revisions.c.id == task.id,
-                            self.revisions.c.version == row["version"],
+                            self.revisions.c.owner == owner,
+                            self.revisions.c.state.not_in(TERMINAL)
+                            if cancel
+                            else self.revisions.c.version == row["version"],
                         )
                         .values(
-                            version=version,
+                            version=self.revisions.c.version + 1,
                             state=task.status.state,
                             snapshot=task.SerializeToString(),
                         )
+                        .returning(self.revisions.c.version)
                     )
-                    if changed.rowcount != 1:
+                    version = changed.scalar_one_or_none()
+                    if version is None:
                         raise ConcurrentTaskModificationError(task.id)
                 else:
                     if cancel or not prev_version.is_missing:

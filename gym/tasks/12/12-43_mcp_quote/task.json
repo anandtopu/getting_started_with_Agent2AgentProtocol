@@ -1,0 +1,10 @@
+{
+  "id": "12-43",
+  "module": "12",
+  "title": "Keep kitchen tools inside the vendor: quote",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:mcp:quote",
+  "feature": "mcp"
+}

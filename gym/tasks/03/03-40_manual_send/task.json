@@ -1,0 +1,10 @@
+{
+  "id": "03-40",
+  "module": "03",
+  "title": "Inspect the hand-built server: send",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:manual:send",
+  "feature": "manual"
+}

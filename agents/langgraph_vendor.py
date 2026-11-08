@@ -11,6 +11,8 @@ from langgraph.graph import END, START, StateGraph
 from agents.business import quote
 from agents.executor import VendorExecutor
 from agents.kitchen import check_kitchen
+from common.model_streams import report_progress
+from common.observability import record_task
 from common.protocol import brief_from, data_part
 
 
@@ -68,6 +70,7 @@ class LangGraphCatering(AgentExecutor):
 
     async def execute(self, context, event_queue):
         task = context.current_task or new_task_from_user_message(context.message)
+        record_task(task, "catering", context)
         brief = MessageToDict(task.metadata).get("brief", {})
         brief.update(brief_from(context.message))
         ParseDict({"brief": brief}, task.metadata)
@@ -82,7 +85,8 @@ class LangGraphCatering(AgentExecutor):
             )
         )
         try:
-            state = await self.graph.ainvoke({"brief": brief}, config={"recursion_limit": 4})
+            async with report_progress(event_queue, task):
+                state = await self.graph.ainvoke({"brief": brief}, config={"recursion_limit": 4})
             result = state["result"]
             if "quote" in result:
                 await event_queue.enqueue_event(

@@ -2,6 +2,9 @@
 
 from a2a.server.request_handlers.grpc_handler import DefaultGrpcServerCallContextBuilder
 from a2a.utils.errors import VersionNotSupportedError
+from opentelemetry import trace
+
+from common.observability import inbound_span
 
 
 class VersionedGrpcContext(DefaultGrpcServerCallContextBuilder):
@@ -11,7 +14,9 @@ class VersionedGrpcContext(DefaultGrpcServerCallContextBuilder):
         ]
         if versions and (len(versions) != 1 or versions[0] != "1.0"):
             raise VersionNotSupportedError()
-        return super().build(context)
+        result = super().build(context)
+        result.state["trace_span"] = inbound_span.get() or trace.get_current_span()
+        return result
 
 
 class ProtocolHeaders:

@@ -1,12 +1,15 @@
 """W3C trace context crosses HTTP calls; prompts and credentials are never attributes."""
 
 import os
+from contextvars import ContextVar
 
-from opentelemetry import trace
+from opentelemetry import metrics, trace
 from opentelemetry.propagators.textmap import Getter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+
+inbound_span = ContextVar("maplewood_inbound_span", default=None)
 
 
 class HeaderGetter(Getter):
@@ -32,7 +35,8 @@ class TraceMiddleware:
             context=parent,
             kind=trace.SpanKind.SERVER,
             attributes={"maplewood.vendor": self.vendor, "http.request.method": scope["method"]},
-        ):
+        ) as span:
+            scope.setdefault("state", {})["trace_span"] = span
             await self.app(scope, receive, send)
 
 
@@ -40,6 +44,23 @@ def outgoing_headers() -> dict[str, str]:
     headers = {}
     TraceContextTextMapPropagator().inject(headers)
     return headers
+
+
+def record_task(task, vendor, context=None):
+    """Course-specific correlation names; IDs are not metric labels (unbounded cardinality)."""
+    span = (
+        context.call_context.state.get("trace_span") if context and context.call_context else None
+    )
+    (span or trace.get_current_span()).set_attributes(
+        {
+            "maplewood.task.id": task.id,
+            "maplewood.context.id": task.context_id,
+            "maplewood.vendor": vendor,
+        }
+    )
+    metrics.get_meter("maplewood").create_counter("maplewood.task.requests").add(
+        1, {"vendor": vendor}
+    )
 
 
 def configure_tracing():

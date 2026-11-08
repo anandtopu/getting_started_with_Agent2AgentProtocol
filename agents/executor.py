@@ -15,6 +15,7 @@ from google.protobuf.json_format import MessageToDict, ParseDict
 from agents.business import quote
 from agents.catalog import QUOTE_EXTENSION
 from common.artifact_files import quote_pdf
+from common.observability import record_task
 from common.protocol import brief_from, data_part
 
 
@@ -22,8 +23,12 @@ class VendorExecutor(AgentExecutor):
     def __init__(self, vendor: str):
         self.vendor = vendor
 
+    async def produce_quote(self, brief, *, partner=False):
+        return quote(self.vendor, brief, partner=partner)
+
     async def execute(self, context: RequestContext, event_queue: EventQueue) -> None:
         task = context.current_task or new_task_from_user_message(context.message)
+        record_task(task, self.vendor, context)
         brief = MessageToDict(task.metadata).get("brief", {})
         brief.update(brief_from(context.message))
         ParseDict({"brief": brief}, task.metadata)
@@ -56,9 +61,14 @@ class VendorExecutor(AgentExecutor):
         if brief.get("wait_for_confirmation"):
             await asyncio.sleep(min(float(brief.get("delay_seconds", 0.05)), 2.0))
         try:
-            result = quote(
-                self.vendor, brief, partner=context.call_context.state.get("partner", False)
+            result = await self.produce_quote(
+                brief, partner=context.call_context.state.get("partner", False)
             )
+        except TimeoutError:
+            await state(
+                TaskState.TASK_STATE_FAILED, "Vendor workflow timed out; no booking was made."
+            )
+            return
         except (ValueError, TypeError) as exc:
             await state(TaskState.TASK_STATE_REJECTED, str(exc))
             return

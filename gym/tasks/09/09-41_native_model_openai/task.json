@@ -1,0 +1,10 @@
+{
+  "id": "09-41",
+  "module": "09",
+  "title": "Validate native tool frames: openai",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:native_model:openai",
+  "feature": "native_model"
+}

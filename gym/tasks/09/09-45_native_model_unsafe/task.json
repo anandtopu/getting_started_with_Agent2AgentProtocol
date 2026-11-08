@@ -1,0 +1,10 @@
+{
+  "id": "09-45",
+  "module": "09",
+  "title": "Validate native tool frames: unsafe",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:native_model:unsafe",
+  "feature": "native_model"
+}

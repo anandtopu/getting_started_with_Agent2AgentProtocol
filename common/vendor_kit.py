@@ -1,5 +1,6 @@
 """A configurable vendor bundle: durable tasks, signed card, streaming and verified push."""
 
+import asyncio
 from contextlib import asynccontextmanager
 
 import httpx
@@ -14,19 +15,24 @@ from agents.app import make_app
 from agents.catalog import card
 from agents.executor import VendorExecutor
 from common.cluster import ClusterStore, OutboxSender
+from common.delivery import DeliveryStore, durable_receiver
 from common.protocol import as_dict, request
 from common.security import Principal, sign_card, verify_card
-from common.webhooks import receiver
 from common.wire import Recorder
 
 
 @asynccontextmanager
-async def vendor_kit(database_url: str, tokens: dict, private_key, callback_client, destinations):
+async def vendor_kit(
+    database_url: str, tokens: dict, private_key, callback_client, destinations, *, endpoint=None
+):
     engine = create_async_engine(database_url)
     callbacks = DatabasePushNotificationConfigStore(engine)
     store = ClusterStore(engine, callbacks=callbacks)
     await store.initialize()
     identity = card("catering")
+    if endpoint:
+        for interface in identity.supported_interfaces:
+            interface.url = endpoint + ("/rpc" if interface.protocol_binding == "JSONRPC" else "")
     identity.capabilities.push_notifications = True
     identity = ParseDict(sign_card(as_dict(identity), private_key, "saffron-kit"), AgentCard())
 
@@ -42,17 +48,27 @@ async def vendor_kit(database_url: str, tokens: dict, private_key, callback_clie
         push_url_validator=permitted,
         event_stream=store,
     )
+
+    async def recover():
+        while True:
+            await store.dispatch(callback_client, destinations)
+            await asyncio.sleep(1)
+
+    worker = asyncio.create_task(recover())
     try:
         yield make_app("catering", tokens=tokens, handler=handler, agent_card=identity), handler
     finally:
+        worker.cancel()
+        await asyncio.gather(worker, return_exceptions=True)
         await handler.aclose()
         await engine.dispose()
 
 
-async def kit_lab(database_url="sqlite+aiosqlite:///:memory:"):
+async def kit_lab(database_url="sqlite+aiosqlite:///:memory:", inbox_path=":memory:"):
     key = Ed25519PrivateKey.generate()
     secret, endpoint = b"synthetic-kit-callback-secret", "http://receiver.test/notifications"
-    sink = receiver(secret)
+    inbox = DeliveryStore(inbox_path)
+    sink = durable_receiver(secret, inbox)
     recorder = Recorder(httpx.ASGITransport(app=sink))
     async with httpx.AsyncClient(transport=recorder) as callback:
         async with vendor_kit(
@@ -83,10 +99,12 @@ async def kit_lab(database_url="sqlite+aiosqlite:///:memory:"):
 
                 stream = events(second)
                 await handler.aclose()
-    return {
+    result = {
         "signature_verified": True,
         "unauthorized_status": unauthorized.status_code,
         "before": first["status"]["state"],
         "stream": stream,
         "verified_push_deliveries": sink.state.deliveries,
     }
+    inbox.close()
+    return result

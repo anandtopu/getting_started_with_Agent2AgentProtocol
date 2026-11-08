@@ -1,0 +1,10 @@
+{
+  "id": "15-41",
+  "module": "15",
+  "title": "Defend a real I/O boundary: unlisted",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:egress:unlisted",
+  "feature": "egress"
+}

@@ -22,6 +22,10 @@ from common.testing import InProcessGrpc, client
 
 async def check(kind, learner):
     family, action = kind.split(":")
+    if family in {"manual", "native_model", "orchestration", "framework", "mcp", "egress"}:
+        from gym.workflow_checks import check as workflow_check
+
+        return await workflow_check(kind, learner)
     if family == "trust":
         key, rogue = Ed25519PrivateKey.generate(), Ed25519PrivateKey.generate()
         original = as_dict(card("venues"))

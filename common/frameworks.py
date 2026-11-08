@@ -9,7 +9,7 @@ from common.config import ROOT
 FRAMEWORKS = ("adk", "strands", "pydantic", "crewai", "microsoft", "beeai")
 
 
-async def framework_quote(framework: str, vendor: str, brief: dict) -> dict:
+async def framework_quote(framework: str, vendor: str, brief: dict, *, partner=False) -> dict:
     if framework not in FRAMEWORKS:
         raise ValueError("Unknown framework")
     folder = ROOT / "integrations" / framework / ".venv"
@@ -38,7 +38,9 @@ async def framework_quote(framework: str, vendor: str, brief: dict) -> dict:
     try:
         stdout, stderr = await asyncio.wait_for(
             process.communicate(
-                json.dumps({"framework": framework, "vendor": vendor, "brief": brief}).encode()
+                json.dumps(
+                    {"framework": framework, "vendor": vendor, "brief": brief, "partner": partner}
+                ).encode()
             ),
             timeout=90,
         )

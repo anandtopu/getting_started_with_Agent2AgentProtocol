@@ -21,7 +21,11 @@ class GrpcRemote:
             else grpc.aio.insecure_channel(grpc_target())
         )
         self.stub = A2AServiceStub(self.channel)
-        self.metadata = (("authorization", f"Bearer {token}"), ("a2a-version", "1.0"))
+        self.metadata = (
+            (("a2a-version", "1.0"),)
+            if credentials
+            else (("authorization", f"Bearer {token}"), ("a2a-version", "1.0"))
+        )
 
     async def __aenter__(self):
         return self

@@ -76,6 +76,7 @@ jobs:
       - run: uv run --offline python scripts/check_network.py --module 5
       - run: uv run --offline python scripts/check_network.py --module 8
       - run: uv run --offline python scripts/check_tls.py
+      - run: uv run --offline python scripts/check_webhook_lab.py
   tck:
     runs-on: ubuntu-latest
     timeout-minutes: 15

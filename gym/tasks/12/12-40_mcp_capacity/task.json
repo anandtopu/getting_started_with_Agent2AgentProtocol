@@ -1,0 +1,10 @@
+{
+  "id": "12-40",
+  "module": "12",
+  "title": "Keep kitchen tools inside the vendor: capacity",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:mcp:capacity",
+  "feature": "mcp"
+}

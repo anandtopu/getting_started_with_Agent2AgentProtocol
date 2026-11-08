@@ -24,6 +24,19 @@ KNOWN_FAILURES = {
 }
 
 
+def is_known_failure(case):
+    name = case.attrib["name"]
+    failure = case.find("failure")
+    message = failure.attrib.get("message", "") if failure is not None else ""
+    if name == "test_error_uses_aip193_format":
+        return "Error Content-Type must be application/json, got: 'application/a2a+json'" in message
+    return (
+        name in KNOWN_FAILURES
+        and "CORE-SEND-003" in message
+        and "Media type application/x-unsupported-tck-type is not supported." in message
+    )
+
+
 def main():
     folder = ROOT / "workspace/a2a-tck"
     if not folder.exists():
@@ -103,10 +116,19 @@ def main():
                 for case in root.iter("testcase")
                 if case.find("error") is not None
             ]
+            unexpected = {
+                case.attrib["name"]
+                for case in root.iter("testcase")
+                if case.find("failure") is not None and not is_known_failure(case)
+            }
             summary = {
                 "revision": REVISION,
                 "upstream_exit": result.returncode,
-                "unexpected_failures": sorted(failures - KNOWN_FAILURES.keys()),
+                "unexpected_failures": sorted(unexpected),
+                "counts": {
+                    key: sum(int(s.attrib.get(key, 0)) for s in root.iter("testsuite"))
+                    for key in ("tests", "failures", "errors", "skipped")
+                },
                 "errors": errors,
                 "known_upstream_failures": {
                     name: KNOWN_FAILURES[name] for name in sorted(failures & KNOWN_FAILURES.keys())

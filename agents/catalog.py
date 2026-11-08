@@ -79,6 +79,16 @@ def card(
         result.security_requirements.append(
             SecurityRequirement(schemes={"vendor_token": StringList()})
         )
+    if os.environ.get("DATABASE_URL") and vendor in {"venues", "travel"}:
+        result.skills.extend(
+            AgentSkill(
+                id=f"{vendor}.{action}",
+                name=f"{action} a tentative hold",
+                description="Idempotent 15-minute no-charge hold or compensating release; request_id is required.",
+                tags=["reservations", "no-charge"],
+            )
+            for action in ("hold", "release", "release_request")
+        )
     if extended:
         result.skills.append(
             AgentSkill(

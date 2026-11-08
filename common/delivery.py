@@ -59,6 +59,14 @@ class DeliveryStore:
     def accepted_count(self) -> int:
         return self.database.execute("SELECT COUNT(*) FROM inbox").fetchone()[0]
 
+    def deliveries(self, limit=50):
+        return [
+            json.loads(row[0])
+            for row in self.database.execute(
+                "SELECT body FROM inbox ORDER BY rowid DESC LIMIT ?", (limit,)
+            ).fetchall()
+        ]
+
     async def dispatch(
         self, client: httpx.AsyncClient, destinations: dict[str, bytes], *, now: float | None = None
     ) -> int:
@@ -90,6 +98,8 @@ class DeliveryStore:
 
 def durable_receiver(secret: bytes, store: DeliveryStore):
     app = FastAPI()
+    app.state.store = store
+    app.state.deliveries = store.deliveries()
 
     @app.post("/notifications")
     async def notification(request: Request):
@@ -107,6 +117,8 @@ def durable_receiver(secret: bytes, store: DeliveryStore):
             fresh = store.accept(request.headers["x-maplewood-nonce"], bytes(body))
         except (ValueError, TypeError, KeyError):
             return JSONResponse({"error": "Unverified notification"}, 401)
+        if fresh:
+            app.state.deliveries.append(json.loads(body))
         return {"accepted": True, "duplicate": not fresh}
 
     return app

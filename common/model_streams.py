@@ -6,9 +6,36 @@ deliver whole argument objects in streaming chunks; OpenAI and Claude emit delta
 
 import asyncio
 import json
+from contextlib import asynccontextmanager
+from contextvars import ContextVar
 
 import httpx
 from jsonschema import validate
+
+progress_sink = ContextVar("model_progress_sink", default=None)
+
+
+@asynccontextmanager
+async def report_progress(queue, task):
+    """Forward bounded progress counts, never private reasoning or partial tool arguments."""
+    from a2a.helpers import new_text_status_update_event
+    from a2a.types import TaskState
+
+    async def report(count):
+        await queue.enqueue_event(
+            new_text_status_update_event(
+                task.id,
+                task.context_id,
+                TaskState.TASK_STATE_WORKING,
+                f"Receiving model response ({count} frames); validating the complete tool call.",
+            )
+        )
+
+    token = progress_sink.set(report)
+    try:
+        yield
+    finally:
+        progress_sink.reset(token)
 
 
 def request_for(model, prompt, schema):
@@ -117,11 +144,15 @@ async def tool_decision(model, prompt, schema):
     endpoint, headers, body = request_for(model, prompt, schema)
     provider = model.settings.llm_provider
     calls, finished, stop_reason = {}, False, None
+    count = 0
     async with asyncio.timeout(90):
         async with httpx.AsyncClient(transport=model.transport, timeout=60) as client:
             async with client.stream("POST", endpoint, headers=headers, json=body) as response:
                 response.raise_for_status()
                 async for packet in packets(response, provider):
+                    count += 1
+                    if count in (1, 8, 32, 128) and progress_sink.get():
+                        await progress_sink.get()(count)
                     if finished:
                         raise ValueError("Data after final model event")
                     if "error" in packet or packet.get("type") == "error":

@@ -1,0 +1,10 @@
+{
+  "id": "03-42",
+  "module": "03",
+  "title": "Inspect the hand-built server: missing",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:manual:missing",
+  "feature": "manual"
+}

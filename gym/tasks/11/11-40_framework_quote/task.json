@@ -1,0 +1,10 @@
+{
+  "id": "11-40",
+  "module": "11",
+  "title": "Wrap a real LangGraph workflow: quote",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:framework:quote",
+  "feature": "framework"
+}

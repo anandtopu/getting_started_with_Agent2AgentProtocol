@@ -1,0 +1,10 @@
+{
+  "id": "09-40",
+  "module": "09",
+  "title": "Validate native tool frames: ollama",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:native_model:ollama",
+  "feature": "native_model"
+}

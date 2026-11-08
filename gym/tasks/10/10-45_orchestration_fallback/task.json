@@ -1,0 +1,10 @@
+{
+  "id": "10-45",
+  "module": "10",
+  "title": "Coordinate vendor work: fallback",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:orchestration:fallback",
+  "feature": "orchestration"
+}

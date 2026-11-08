@@ -51,7 +51,9 @@ async def replicas(tmp_path):
         or "sqlite+aiosqlite:///" + (tmp_path / "cluster.db").as_posix()
     )
     engines = [create_async_engine(url), create_async_engine(url)]
-    namespace = "cluster" if "MAPLEWOOD_TEST_DATABASE" not in os.environ else "test_" + uuid4().hex
+    namespace = (
+        "cluster" if "MAPLEWOOD_TEST_DATABASE" not in os.environ else "test_" + uuid4().hex[:16]
+    )
     stores = [
         ClusterStore(e, namespace, destinations=["https://receiver.test/notifications"])
         for e in engines

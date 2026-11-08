@@ -21,6 +21,8 @@ async def test_trace_crosses_http_boundary():
     spans = exporter.get_finished_spans()
     remote = next(s for s in spans if s.name == "venues.request")
     assert remote.parent.span_id == root_id
+    assert remote.attributes["maplewood.task.id"]
+    assert remote.attributes["maplewood.context.id"]
     assert len({s.context.trace_id for s in spans}) == 1
     assert "traceparent" in records[0]["request"]["headers"]
     provider.shutdown()

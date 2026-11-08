@@ -1,0 +1,10 @@
+{
+  "id": "15-43",
+  "module": "15",
+  "title": "Defend a real I/O boundary: oversize",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:egress:oversize",
+  "feature": "egress"
+}

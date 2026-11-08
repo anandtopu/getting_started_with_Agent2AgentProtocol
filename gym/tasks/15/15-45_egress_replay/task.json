@@ -1,0 +1,10 @@
+{
+  "id": "15-45",
+  "module": "15",
+  "title": "Defend a real I/O boundary: replay",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:egress:replay",
+  "feature": "egress"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "12-45",
+  "module": "12",
+  "title": "Keep kitchen tools inside the vendor: reject",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:mcp:reject",
+  "feature": "mcp"
+}

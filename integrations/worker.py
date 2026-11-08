@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import sys
+from contextvars import ContextVar
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -12,7 +13,13 @@ os.environ["CREWAI_TELEMETRY_ENABLED"] = "false"
 os.environ["ANONYMIZED_TELEMETRY"] = "false"
 os.environ["DO_NOT_TRACK"] = "1"
 
-from agents.business import quote  # noqa: E402
+from agents.business import quote as inventory_quote  # noqa: E402
+
+partner_scope = ContextVar("authorized_partner", default=False)
+
+
+def quote(vendor, brief):
+    return inventory_quote(vendor, brief, partner=partner_scope.get())
 
 
 async def adk(vendor, brief):
@@ -157,6 +164,7 @@ async def beeai(vendor, brief):
 
 async def main():
     payload = json.loads(sys.stdin.readline())
+    partner_scope.set(bool(payload.get("partner", False)))
     runtimes = {
         "adk": adk,
         "pydantic": pydantic,
