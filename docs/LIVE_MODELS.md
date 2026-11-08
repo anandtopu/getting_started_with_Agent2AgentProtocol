@@ -66,3 +66,9 @@ The earlier Qwen3 4B passed a direct call but exhausted the bounded token allowa
 in the expanded end-to-end check. The course keeps its limits and rejects incomplete
 output rather than treating truncation as a successful action. LLM_MODEL remains
 configurable; changing it requires rerunning the live acceptance check.
+
+Missing or extra argument keys permit one repair request within the same 90-second
+deadline. The repair prompt identifies only the required structure; it does not
+forward the model's rejected text as instructions. Unknown enum values, unsafe tool
+names, incomplete streams and a second invalid structure still fail. No tool is
+executed before validation, and unexpected fields are never silently discarded.

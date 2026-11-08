@@ -1,9 +1,11 @@
 """Provider-independent, bounded JSON decisions. Only Tier 2 imports this module."""
 
+import asyncio
 import json
 import os
 
 import httpx
+from jsonschema import ValidationError
 
 from common.config import Settings
 
@@ -96,7 +98,20 @@ class Model:
         from common.model_streams import tool_decision
 
         try:
-            return await tool_decision(self, prompt, schema)
+            # Both attempts share one deadline. No tool runs during schema repair.
+            async with asyncio.timeout(90):
+                try:
+                    return await tool_decision(self, prompt, schema)
+                except ValidationError as exc:
+                    if exc.validator not in {"additionalProperties", "required"}:
+                        raise
+                    correction = (
+                        "\nThe previous response did not match the argument structure. "
+                        "Call select_action again using exactly these top-level argument keys: "
+                        + ", ".join(schema["properties"])
+                        + ". Do not add nested tool parameters or event fields."
+                    )
+                    return await tool_decision(self, prompt + correction, schema)
         except (httpx.HTTPError, TimeoutError, KeyError, TypeError) as exc:
             raise ValueError("Model tool stream unavailable or malformed") from exc
 

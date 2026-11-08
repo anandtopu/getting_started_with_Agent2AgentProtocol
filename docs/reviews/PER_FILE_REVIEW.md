@@ -121,3 +121,9 @@ The expanded live gate also exposed model suitability: Qwen3 4B could exhaust th
 the publisher-listed tool-capable Qwen2.5 3B non-reasoning model. The gate still
 requires actual native tools, a completed A2A/LangGraph/MCP workflow and a model-selected
 Concierge plan; no incomplete-response assertion was weakened.
+
+The live small-model test additionally produced a valid function name with an
+unexpected tool_args object. Arguments remain strictly validated. A structural
+schema error permits one correction request inside the original overall deadline;
+unknown tools/enum values and repeated structural errors still fail. Regression
+tests prove that no extra fields are silently dropped and no unbounded retry occurs.

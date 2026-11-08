@@ -155,3 +155,28 @@ async def test_stream_envelopes_have_separate_total_and_frame_budgets(oversized)
         assert await model.tool_decide("Choose the next menu action.", SCHEMA) == {
             "tool": "quote_menu"
         }
+
+
+@pytest.mark.parametrize("repair_succeeds", [True, False])
+async def test_structural_schema_repair_is_bounded_and_never_ignores_extra_fields(repair_succeeds):
+    calls = []
+
+    def respond(request):
+        calls.append(json.loads(request.content))
+        packets = frames("ollama")
+        if len(calls) == 1 or not repair_succeeds:
+            packets[0]["message"]["tool_calls"][0]["function"]["arguments"]["tool_args"] = {
+                "guests": 40
+            }
+        return httpx.Response(200, text="".join(json.dumps(packet) + "\n" for packet in packets))
+
+    model = Model(
+        Settings(llm_provider="ollama", llm_model="fixture"), httpx.MockTransport(respond)
+    )
+    if repair_succeeds:
+        assert await model.tool_decide("Select the menu action.", SCHEMA) == {"tool": "quote_menu"}
+    else:
+        with pytest.raises(ValidationError):
+            await model.tool_decide("Select the menu action.", SCHEMA)
+    assert len(calls) == 2
+    assert "previous response did not match" in calls[-1]["messages"][-1]["content"]
