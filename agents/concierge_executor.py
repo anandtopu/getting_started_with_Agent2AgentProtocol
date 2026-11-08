@@ -10,10 +10,12 @@ from google.protobuf.json_format import MessageToDict, ParseDict
 
 from agents.concierge import Concierge
 from agents.executor import VendorExecutor
-from common.card_trust import verify_vendor
+from common.auth_profiles import vendor_headers
+from common.card_trust import verify_discovered
 from common.config import url
 from common.protocol import brief_from, data_part
 from common.remote import GrpcRemote
+from common.tls import client_context
 
 
 class ConciergeExecutor(AgentExecutor):
@@ -40,11 +42,11 @@ class ConciergeExecutor(AgentExecutor):
         async with AsyncExitStack() as stack:
             skills = {}
             # Discovery is read from a configured URL; only its pinned vendor key is accepted.
-            async with httpx.AsyncClient(timeout=5) as discovery:
+            async with httpx.AsyncClient(timeout=5, verify=client_context()) as discovery:
                 for vendor in self.tokens:
                     response = await discovery.get(url(vendor) + "/.well-known/agent-card.json")
                     response.raise_for_status()
-                    verify_vendor(response.json(), vendor)
+                    await verify_discovered(response.json(), vendor, discovery)
                     skills[vendor] = [skill["id"] for skill in response.json()["skills"]]
             clients = {
                 vendor: await stack.enter_async_context(
@@ -52,7 +54,8 @@ class ConciergeExecutor(AgentExecutor):
                     if vendor == "print"
                     else httpx.AsyncClient(
                         base_url=url(vendor),
-                        headers={"Authorization": f"Bearer {token}", "A2A-Version": "1.0"},
+                        headers=await vendor_headers(vendor, token),
+                        verify=client_context(),
                     )
                 )
                 for vendor, token in self.tokens.items()

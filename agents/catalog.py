@@ -1,5 +1,7 @@
 """Explicit skill contracts, not instructions inferred from untrusted descriptions."""
 
+import os
+
 from a2a.types import (
     AgentCapabilities,
     AgentCard,
@@ -86,4 +88,8 @@ def card(
                 tags=["partner"],
             )
         )
+    if secure and os.environ.get("MAPLEWOOD_HARDENED") == "1":
+        from common.auth_profiles import secured_card
+
+        return secured_card(result, vendor)
     return result

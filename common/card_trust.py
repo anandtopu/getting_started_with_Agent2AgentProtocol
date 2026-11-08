@@ -50,3 +50,18 @@ def verify_vendor(card: dict, vendor: str) -> dict:
     if vendor not in trust:
         raise ValueError("No out-of-band card key configured for vendor")
     return verify_card(card, trusted_jwks(trust[vendor]))
+
+
+async def verify_discovered(card: dict, vendor: str, client):
+    if os.environ.get("MAPLEWOOD_HARDENED") != "1":
+        return verify_vendor(card, vendor)
+    from common.config import url
+
+    endpoint = url(vendor)
+    if not endpoint.startswith("https://"):
+        raise ValueError("Rotating card trust requires a configured HTTPS vendor endpoint")
+    response = await client.get(
+        endpoint + "/.well-known/jwks.json", follow_redirects=False, timeout=3
+    )
+    response.raise_for_status()
+    return verify_card(card, trusted_jwks(response.json()))

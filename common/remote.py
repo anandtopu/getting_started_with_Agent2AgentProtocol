@@ -9,11 +9,17 @@ from a2a.types.a2a_pb2_grpc import A2AServiceStub
 from common.config import grpc_target
 from common.observability import outgoing_headers
 from common.protocol import as_dict
+from common.tls import grpc_credentials
 
 
 class GrpcRemote:
     def __init__(self, token: str):
-        self.channel = grpc.aio.insecure_channel(grpc_target())
+        credentials = grpc_credentials()
+        self.channel = (
+            grpc.aio.secure_channel(grpc_target(), credentials)
+            if credentials
+            else grpc.aio.insecure_channel(grpc_target())
+        )
         self.stub = A2AServiceStub(self.channel)
         self.metadata = (("authorization", f"Bearer {token}"), ("a2a-version", "1.0"))
 

@@ -5,14 +5,16 @@ import json
 import os
 
 import uvicorn
-from a2a.server.tasks import DatabaseTaskStore
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from agents.app import make_app, make_handler
 from agents.concierge_executor import ConciergeExecutor
+from common.auth_profiles import server_auth
+from common.cluster import ClusterStore
 from common.config import PORTS, Settings
 from common.observability import configure_tracing
 from common.security import Principal
+from common.tls import server_options
 
 
 def main() -> None:
@@ -48,7 +50,7 @@ def main() -> None:
         )
     tracing = configure_tracing()
     engine = create_async_engine(settings.database_url) if settings.database_url else None
-    store = DatabaseTaskStore(engine, table_name=args.vendor + "_tasks") if engine else None
+    store = ClusterStore(engine, namespace=args.vendor) if engine else None
     handler = make_handler(args.vendor, secure=not args.demo, task_store=store)
     if model and args.vendor == "catering":
         from agents.langgraph_vendor import LangGraphCatering
@@ -79,8 +81,10 @@ def main() -> None:
         tokens={settings.maplewood_token: Principal("concierge")},
         handler=handler,
         engine=engine,
+        rate_budget=store,
+        **(server_auth(args.vendor) if os.environ.get("MAPLEWOOD_HARDENED") == "1" else {}),
     )
-    uvicorn.run(app, host=args.host, port=PORTS[args.vendor], log_level="info")
+    uvicorn.run(app, host=args.host, port=PORTS[args.vendor], log_level="info", **server_options())
     if tracing:
         tracing.shutdown()
 

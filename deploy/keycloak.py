@@ -2,7 +2,7 @@
 
 
 def realm(secret: str) -> dict:
-    return {
+    result = {
         "realm": "maplewood",
         "enabled": True,
         "sslRequired": "none",
@@ -52,3 +52,19 @@ def realm(secret: str) -> dict:
             }
         ],
     }
+    import copy
+
+    for vendor in ("av", "travel"):
+        client = copy.deepcopy(result["clients"][0])
+        client["clientId"] = "concierge-" + vendor
+        client["secret"] = "${MAPLEWOOD_" + vendor.upper() + "_SECRET}"
+        client["protocolMappers"].append(
+            {
+                "name": vendor + "-audience",
+                "protocol": "openid-connect",
+                "protocolMapper": "oidc-audience-mapper",
+                "config": {"included.custom.audience": vendor, "access.token.claim": "true"},
+            }
+        )
+        result["clients"].append(client)
+    return result

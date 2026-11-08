@@ -1,5 +1,9 @@
 """Validate OIDC access tokens against an operator-pinned issuer, audience and JWKS."""
 
+import asyncio
+import time
+
+import httpx
 import jwt
 
 from common.security import Principal
@@ -39,3 +43,52 @@ class OIDCVerifier:
             )
         except (jwt.PyJWTError, KeyError, TypeError, ValueError):
             return None
+
+
+class RefreshingOIDCVerifier:
+    """Refresh only an operator-pinned JWKS URL, never token-supplied discovery.
+
+    A bounded cache allows overlapping keys during rotation. Expired cache entries
+    fail closed if refresh fails; unknown kids cannot trigger a fetch per request.
+    """
+
+    def __init__(
+        self, client, jwks_url, issuer, audience, *, ttl=60, cooldown=5, clock=time.monotonic
+    ):
+        if not jwks_url.startswith("https://") and not jwks_url.startswith("http://keycloak:"):
+            raise ValueError("JWKS requires HTTPS (the private Keycloak lab is the only exception)")
+        self.client, self.url, self.issuer, self.audience = client, jwks_url, issuer, audience
+        self.ttl, self.cooldown, self.clock = ttl, cooldown, clock
+        self.verifier, self.updated, self.attempted = None, float("-inf"), float("-inf")
+        self.lock = asyncio.Lock()
+
+    async def __call__(self, token):
+        try:
+            header = jwt.get_unverified_header(token)
+            if header.get("alg") != "RS256" or any(
+                k in header for k in ("jku", "jwk", "x5u", "crit")
+            ):
+                return None
+        except jwt.PyJWTError:
+            return None
+        now = self.clock()
+        known = self.verifier and any(
+            key.key_id == header.get("kid") for key in self.verifier.keys.keys
+        )
+        if not known or now - self.updated >= self.ttl:
+            async with self.lock:
+                now = self.clock()
+                if now - self.attempted >= self.cooldown:
+                    self.attempted = now
+                    try:
+                        response = await self.client.get(
+                            self.url, follow_redirects=False, timeout=3
+                        )
+                        response.raise_for_status()
+                        self.verifier = OIDCVerifier(response.json(), self.issuer, self.audience)
+                        self.updated = now
+                    except (httpx.HTTPError, ValueError):
+                        pass
+        if self.verifier is None or self.clock() - self.updated >= self.ttl:
+            return None
+        return self.verifier(token)

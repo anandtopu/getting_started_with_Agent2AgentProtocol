@@ -92,6 +92,14 @@ class Model:
             )
         return value
 
+    async def tool_decide(self, prompt: str, schema: dict) -> dict:
+        from common.model_streams import tool_decision
+
+        try:
+            return await tool_decision(self, prompt, schema)
+        except (httpx.HTTPError, TimeoutError, KeyError, TypeError) as exc:
+            raise ValueError("Model tool stream unavailable or malformed") from exc
+
 
 def create_model() -> Model:
     return Model()

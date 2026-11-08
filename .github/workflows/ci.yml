@@ -75,6 +75,79 @@ jobs:
       - run: uv run --offline python scripts/check_network.py --module 0
       - run: uv run --offline python scripts/check_network.py --module 5
       - run: uv run --offline python scripts/check_network.py --module 8
+      - run: uv run --offline python scripts/check_tls.py
+  tck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+      - run: uv sync --locked
+      - run: uv run python scripts/check_tck.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: official-tck-evidence
+          path: |
+            workspace/a2a-tck/reports/
+            workspace/tck-summary.json
+            workspace/tck-results.log
+  live-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      LLM_PROVIDER: ollama
+      LLM_MODEL: qwen3:4b
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+      - run: uv sync --locked
+      - name: Install pinned Ollama and run the free model
+        shell: bash
+        run: |
+          mkdir -p workspace/ollama
+          curl --fail --location https://github.com/ollama/ollama/releases/download/v0.40.15/ollama-linux-amd64.tar.zst -o workspace/ollama.tar.zst
+          curl --fail --location https://github.com/ollama/ollama/releases/download/v0.40.15/sha256sum.txt -o workspace/sha256sum.txt
+          cd workspace
+          grep 'ollama-linux-amd64.tar.zst' sha256sum.txt | sed 's|ollama-linux-amd64.tar.zst|ollama.tar.zst|' | sha256sum --check
+          tar --zstd -xf ollama.tar.zst -C ollama
+          cd ..
+          workspace/ollama/bin/ollama serve > workspace/ollama.log 2>&1 &
+          OLLAMA_PID=$!
+          trap 'kill "$OLLAMA_PID"' EXIT
+          for n in $(seq 1 30); do curl -fsS http://127.0.0.1:11434/api/version && break; sleep 1; done
+          workspace/ollama/bin/ollama pull "$LLM_MODEL"
+          uv run python scripts/check_live_model.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-ollama-evidence
+          path: |
+            workspace/live-model.json
+            workspace/ollama.log
+  hardened-frameworks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+      - run: uv sync --locked --extra production
+      - run: uv run python deploy/prepare.py
+      - run: uv run python deploy/certificates.py
+      - run: docker compose --env-file deploy/secrets/network.env -f deploy/docker-compose.yml -f deploy/hardened.yml -f deploy/frameworks.yml up --build -d
+      - run: uv run python scripts/check_hardened.py
+        env:
+          CHECK_FRAMEWORKS: "1"
+      - if: failure()
+        run: docker compose --env-file deploy/secrets/network.env -f deploy/docker-compose.yml -f deploy/hardened.yml -f deploy/frameworks.yml logs --tail 100
+      - if: always()
+        run: docker compose --env-file deploy/secrets/network.env -f deploy/docker-compose.yml -f deploy/hardened.yml -f deploy/frameworks.yml down --volumes
   compose:
     runs-on: ubuntu-latest
     timeout-minutes: 20

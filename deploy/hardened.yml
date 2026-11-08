@@ -1,0 +1,131 @@
+{
+  "services": {
+    "venues": {
+      "environment": {
+        "MAPLEWOOD_HARDENED": "1",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\": \"https://venues:8100\", \"catering\": \"https://catering:8101\", \"av\": \"https://av:8102\", \"travel\": \"https://travel:8103\", \"print\": \"https://print:8104\", \"concierge\": \"https://concierge:8105\"}",
+        "MAPLEWOOD_TLS_CERT": "/course/deploy/secrets/tls/venues.pem",
+        "MAPLEWOOD_TLS_KEY": "/course/deploy/secrets/tls/venues-key.pem",
+        "MAPLEWOOD_TLS_CA": "/course/deploy/secrets/tls/ca.pem",
+        "OIDC_ISSUER": "https://localhost:8443/realms/maplewood",
+        "OIDC_JWKS_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/certs",
+        "OIDC_TOKEN_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/token"
+      },
+      "volumes": [
+        "./secrets/tls/ca.pem:/course/deploy/secrets/tls/ca.pem:ro",
+        "./secrets/tls/venues.pem:/course/deploy/secrets/tls/venues.pem:ro",
+        "./secrets/tls/venues-key.pem:/course/deploy/secrets/tls/venues-key.pem:ro"
+      ]
+    },
+    "catering": {
+      "environment": {
+        "MAPLEWOOD_HARDENED": "1",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\": \"https://venues:8100\", \"catering\": \"https://catering:8101\", \"av\": \"https://av:8102\", \"travel\": \"https://travel:8103\", \"print\": \"https://print:8104\", \"concierge\": \"https://concierge:8105\"}",
+        "MAPLEWOOD_TLS_CERT": "/course/deploy/secrets/tls/catering.pem",
+        "MAPLEWOOD_TLS_KEY": "/course/deploy/secrets/tls/catering-key.pem",
+        "MAPLEWOOD_TLS_CA": "/course/deploy/secrets/tls/ca.pem",
+        "OIDC_ISSUER": "https://localhost:8443/realms/maplewood",
+        "OIDC_JWKS_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/certs",
+        "OIDC_TOKEN_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/token"
+      },
+      "volumes": [
+        "./secrets/tls/ca.pem:/course/deploy/secrets/tls/ca.pem:ro",
+        "./secrets/tls/catering.pem:/course/deploy/secrets/tls/catering.pem:ro",
+        "./secrets/tls/catering-key.pem:/course/deploy/secrets/tls/catering-key.pem:ro"
+      ]
+    },
+    "av": {
+      "environment": {
+        "MAPLEWOOD_HARDENED": "1",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\": \"https://venues:8100\", \"catering\": \"https://catering:8101\", \"av\": \"https://av:8102\", \"travel\": \"https://travel:8103\", \"print\": \"https://print:8104\", \"concierge\": \"https://concierge:8105\"}",
+        "MAPLEWOOD_TLS_CERT": "/course/deploy/secrets/tls/av.pem",
+        "MAPLEWOOD_TLS_KEY": "/course/deploy/secrets/tls/av-key.pem",
+        "MAPLEWOOD_TLS_CA": "/course/deploy/secrets/tls/ca.pem",
+        "OIDC_ISSUER": "https://localhost:8443/realms/maplewood",
+        "OIDC_JWKS_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/certs",
+        "OIDC_TOKEN_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/token"
+      },
+      "volumes": [
+        "./secrets/tls/ca.pem:/course/deploy/secrets/tls/ca.pem:ro",
+        "./secrets/tls/av.pem:/course/deploy/secrets/tls/av.pem:ro",
+        "./secrets/tls/av-key.pem:/course/deploy/secrets/tls/av-key.pem:ro"
+      ]
+    },
+    "travel": {
+      "environment": {
+        "MAPLEWOOD_HARDENED": "1",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\": \"https://venues:8100\", \"catering\": \"https://catering:8101\", \"av\": \"https://av:8102\", \"travel\": \"https://travel:8103\", \"print\": \"https://print:8104\", \"concierge\": \"https://concierge:8105\"}",
+        "MAPLEWOOD_TLS_CERT": "/course/deploy/secrets/tls/travel.pem",
+        "MAPLEWOOD_TLS_KEY": "/course/deploy/secrets/tls/travel-key.pem",
+        "MAPLEWOOD_TLS_CA": "/course/deploy/secrets/tls/ca.pem",
+        "OIDC_ISSUER": "https://localhost:8443/realms/maplewood",
+        "OIDC_JWKS_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/certs",
+        "OIDC_TOKEN_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/token"
+      },
+      "volumes": [
+        "./secrets/tls/ca.pem:/course/deploy/secrets/tls/ca.pem:ro",
+        "./secrets/tls/travel.pem:/course/deploy/secrets/tls/travel.pem:ro",
+        "./secrets/tls/travel-key.pem:/course/deploy/secrets/tls/travel-key.pem:ro"
+      ]
+    },
+    "print": {
+      "environment": {
+        "MAPLEWOOD_HARDENED": "1",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\": \"https://venues:8100\", \"catering\": \"https://catering:8101\", \"av\": \"https://av:8102\", \"travel\": \"https://travel:8103\", \"print\": \"https://print:8104\", \"concierge\": \"https://concierge:8105\"}",
+        "MAPLEWOOD_TLS_CERT": "/course/deploy/secrets/tls/print.pem",
+        "MAPLEWOOD_TLS_KEY": "/course/deploy/secrets/tls/print-key.pem",
+        "MAPLEWOOD_TLS_CA": "/course/deploy/secrets/tls/ca.pem",
+        "OIDC_ISSUER": "https://localhost:8443/realms/maplewood",
+        "OIDC_JWKS_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/certs",
+        "OIDC_TOKEN_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/token"
+      },
+      "volumes": [
+        "./secrets/tls/ca.pem:/course/deploy/secrets/tls/ca.pem:ro",
+        "./secrets/tls/print.pem:/course/deploy/secrets/tls/print.pem:ro",
+        "./secrets/tls/print-key.pem:/course/deploy/secrets/tls/print-key.pem:ro"
+      ]
+    },
+    "concierge": {
+      "environment": {
+        "MAPLEWOOD_HARDENED": "1",
+        "MAPLEWOOD_VENDOR_URLS": "{\"venues\": \"https://venues:8100\", \"catering\": \"https://catering:8101\", \"av\": \"https://av:8102\", \"travel\": \"https://travel:8103\", \"print\": \"https://print:8104\", \"concierge\": \"https://concierge:8105\"}",
+        "MAPLEWOOD_TLS_CERT": "/course/deploy/secrets/tls/concierge.pem",
+        "MAPLEWOOD_TLS_KEY": "/course/deploy/secrets/tls/concierge-key.pem",
+        "MAPLEWOOD_TLS_CA": "/course/deploy/secrets/tls/ca.pem",
+        "OIDC_ISSUER": "https://localhost:8443/realms/maplewood",
+        "OIDC_JWKS_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/certs",
+        "OIDC_TOKEN_URL": "https://keycloak:8443/realms/maplewood/protocol/openid-connect/token",
+        "MAPLEWOOD_CLIENT_CERT": "/course/deploy/secrets/tls/client.pem",
+        "MAPLEWOOD_CLIENT_KEY": "/course/deploy/secrets/tls/client-key.pem",
+        "OIDC_CLIENT_SECRET": "${OIDC_CLIENT_SECRET}"
+      },
+      "volumes": [
+        "./secrets/tls/ca.pem:/course/deploy/secrets/tls/ca.pem:ro",
+        "./secrets/tls/concierge.pem:/course/deploy/secrets/tls/concierge.pem:ro",
+        "./secrets/tls/concierge-key.pem:/course/deploy/secrets/tls/concierge-key.pem:ro",
+        "./secrets/tls/client.pem:/course/deploy/secrets/tls/client.pem:ro",
+        "./secrets/tls/client-key.pem:/course/deploy/secrets/tls/client-key.pem:ro"
+      ]
+    },
+    "keycloak": {
+      "environment": {
+        "KC_HOSTNAME": "https://localhost:8443",
+        "KC_HTTP_ENABLED": "false",
+        "KC_HTTPS_CERTIFICATE_FILE": "/opt/keycloak/conf/tls/keycloak.pem",
+        "KC_HTTPS_CERTIFICATE_KEY_FILE": "/opt/keycloak/conf/tls/keycloak-key.pem"
+      },
+      "ports": [
+        "127.0.0.1:8443:8443"
+      ],
+      "volumes": [
+        "./secrets/tls/keycloak.pem:/opt/keycloak/conf/tls/keycloak.pem:ro",
+        "./secrets/tls/keycloak-key.pem:/opt/keycloak/conf/tls/keycloak-key.pem:ro"
+      ]
+    },
+    "oidc-venue": {
+      "profiles": [
+        "legacy-oidc-lab"
+      ]
+    }
+  }
+}

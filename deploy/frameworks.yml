@@ -1,0 +1,119 @@
+{
+  "services": {
+    "venues": {
+      "build": {
+        "args": {
+          "FRAMEWORK": "adk"
+        }
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "venues",
+        "--host",
+        "0.0.0.0",
+        "--framework",
+        "adk"
+      ],
+      "environment": {
+        "MAPLEWOOD_VENDOR_TIMEOUT": "90"
+      }
+    },
+    "catering": {
+      "build": {
+        "args": {
+          "FRAMEWORK": "strands"
+        }
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "catering",
+        "--host",
+        "0.0.0.0",
+        "--framework",
+        "strands"
+      ],
+      "environment": {
+        "MAPLEWOOD_VENDOR_TIMEOUT": "90"
+      }
+    },
+    "av": {
+      "build": {
+        "args": {
+          "FRAMEWORK": "pydantic"
+        }
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "av",
+        "--host",
+        "0.0.0.0",
+        "--framework",
+        "pydantic"
+      ],
+      "environment": {
+        "MAPLEWOOD_VENDOR_TIMEOUT": "90"
+      }
+    },
+    "travel": {
+      "build": {
+        "args": {
+          "FRAMEWORK": "crewai"
+        }
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "travel",
+        "--host",
+        "0.0.0.0",
+        "--framework",
+        "crewai"
+      ],
+      "environment": {
+        "MAPLEWOOD_VENDOR_TIMEOUT": "90"
+      }
+    },
+    "print": {
+      "build": {
+        "args": {
+          "FRAMEWORK": "beeai"
+        }
+      },
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "maplewood",
+        "--vendor",
+        "print",
+        "--host",
+        "0.0.0.0",
+        "--framework",
+        "beeai"
+      ],
+      "environment": {
+        "MAPLEWOOD_VENDOR_TIMEOUT": "90"
+      }
+    },
+    "concierge": {
+      "environment": {
+        "MAPLEWOOD_VENDOR_TIMEOUT": "90"
+      }
+    }
+  }
+}

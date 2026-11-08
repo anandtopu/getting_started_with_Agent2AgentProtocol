@@ -3,6 +3,7 @@
 import base64
 import hashlib
 import hmac
+import inspect
 import ipaddress
 import json
 import time
@@ -36,26 +37,36 @@ class BearerGate:
         max_bytes: int = 1_000_000,
         verifier=None,
         rate_budget=None,
+        api_key_header=None,
     ):
         self.app, self.tokens, self.max_bytes = app, tokens, max_bytes
         if any(not secret for secret in tokens):
             raise ValueError("Authentication tokens must not be empty.")
         self.verifier = verifier
+        self.api_key_header = api_key_header
         self.rate_budget = rate_budget or RateBudget()
 
     async def __call__(self, scope, receive, send) -> None:
-        if scope["type"] != "http" or scope["path"] in ("/.well-known/agent-card.json", "/health"):
+        if scope["type"] != "http" or scope["path"] in (
+            "/.well-known/agent-card.json",
+            "/.well-known/jwks.json",
+            "/health",
+        ):
             await self.app(scope, receive, send)
             return
         headers = {k.decode().lower(): v.decode() for k, v in scope["headers"]}
         scheme, _, token = headers.get("authorization", "").partition(" ")
         if scheme.lower() != "bearer":
             token = ""
+        if self.api_key_header:
+            token = headers.get(self.api_key_header.lower(), "")
         principal = next(
             (p for secret, p in self.tokens.items() if hmac.compare_digest(secret, token)), None
         )
         if self.verifier:
             principal = self.verifier(token)
+            if inspect.isawaitable(principal):
+                principal = await principal
         if not principal:
             await JSONResponse(
                 {"error": "Authentication required"}, 401, headers={"WWW-Authenticate": "Bearer"}
@@ -64,7 +75,10 @@ class BearerGate:
         if headers.get("x-tenant", principal.tenant) != principal.tenant:
             await JSONResponse({"error": "Tenant not authorized"}, 403)(scope, receive, send)
             return
-        if not self.rate_budget.allow(f"{principal.tenant}:{principal.subject}"):
+        allowed = self.rate_budget.allow(f"{principal.tenant}:{principal.subject}")
+        if inspect.isawaitable(allowed):
+            allowed = await allowed
+        if not allowed:
             await JSONResponse(
                 {"error": "Request budget exceeded"}, 429, headers={"Retry-After": "60"}
             )(scope, receive, send)

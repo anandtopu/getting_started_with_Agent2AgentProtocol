@@ -2,12 +2,12 @@
 
 import asyncio
 import hmac
+import os
 
 import grpc
 import uvicorn
 from a2a.auth.user import User
 from a2a.server.request_handlers.grpc_handler import (
-    DefaultGrpcServerCallContextBuilder,
     GrpcHandler,
 )
 from a2a.server.routes import create_agent_card_routes
@@ -18,8 +18,10 @@ from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapProp
 
 from agents.app import make_handler
 from agents.catalog import card
+from common.binding_policy import ProtocolHeaders, VersionedGrpcContext
 from common.card_trust import published_card
 from common.config import GRPC_PORT, PORTS
+from common.tls import grpc_credentials, server_options
 
 
 class GrpcUser(User):
@@ -32,7 +34,7 @@ class GrpcUser(User):
         return "maplewood:concierge"
 
 
-class AuthenticatedContext(DefaultGrpcServerCallContextBuilder):
+class AuthenticatedContext(VersionedGrpcContext):
     def build_user(self, context):
         # This builder is used only behind TokenInterceptor.
         return GrpcUser()
@@ -41,9 +43,10 @@ class AuthenticatedContext(DefaultGrpcServerCallContextBuilder):
 class TokenInterceptor(grpc.aio.ServerInterceptor):
     """Reject missing tokens and cross-tenant requests before the SDK sees them."""
 
-    def __init__(self, token: str, tracer=None):
+    def __init__(self, token: str, tracer=None, mtls=False):
         self.token = token
         self.tracer = tracer or trace.get_tracer("maplewood")
+        self.mtls = mtls
 
     async def intercept_service(self, continuation, details):
         handler = await continuation(details)
@@ -54,7 +57,12 @@ class TokenInterceptor(grpc.aio.ServerInterceptor):
         authorized = hmac.compare_digest(headers.get("authorization", ""), f"Bearer {self.token}")
 
         async def check(request, context):
-            if not authorized:
+            if self.mtls:
+                if b"maplewood-concierge" not in context.auth_context().get("x509_common_name", []):
+                    await context.abort(
+                        grpc.StatusCode.PERMISSION_DENIED, "Unrecognized client certificate"
+                    )
+            elif not authorized:
                 await context.abort(grpc.StatusCode.UNAUTHENTICATED, "Bearer token required")
             if getattr(request, "tenant", "") not in ("", "maplewood"):
                 await context.abort(grpc.StatusCode.PERMISSION_DENIED, "Tenant not authorized")
@@ -93,16 +101,27 @@ class TokenInterceptor(grpc.aio.ServerInterceptor):
 
 async def serve(token: str, host: str = "127.0.0.1", *, handler=None, engine=None) -> None:
     handler = handler or make_handler("print")
+    credentials = grpc_credentials(server=True)
     server = grpc.aio.server(
-        interceptors=[TokenInterceptor(token)],
+        interceptors=[TokenInterceptor(token, mtls=bool(credentials))],
         options=[("grpc.max_receive_message_length", 1_000_000)],
     )
     add_A2AServiceServicer_to_server(GrpcHandler(handler, AuthenticatedContext()), server)
-    if not server.add_insecure_port(f"{host}:{GRPC_PORT}"):
-        raise RuntimeError("Inkwell gRPC port is busy. Run scripts/check_env.py.")
-    app = FastAPI(
-        routes=create_agent_card_routes(published_card(card("print", grpc_only=True), "print"))
+    port = (
+        server.add_secure_port(f"{host}:{GRPC_PORT}", credentials)
+        if credentials
+        else server.add_insecure_port(f"{host}:{GRPC_PORT}")
     )
+    if not port:
+        raise RuntimeError("Inkwell gRPC port is busy. Run scripts/check_env.py.")
+    identity = card("print", grpc_only=True)
+    if os.environ.get("MAPLEWOOD_HARDENED") == "1":
+        from common.key_rotation import RotatingCardKeys
+
+        routes = RotatingCardKeys(identity).routes()
+    else:
+        routes = create_agent_card_routes(published_card(identity, "print"))
+    app = FastAPI(routes=routes)
 
     @app.get("/health")
     async def health():
@@ -112,7 +131,13 @@ async def serve(token: str, host: str = "127.0.0.1", *, handler=None, engine=Non
     await server.start()
     try:
         await uvicorn.Server(
-            uvicorn.Config(app, host=host, port=PORTS["print"], log_level="info")
+            uvicorn.Config(
+                ProtocolHeaders(app),
+                host=host,
+                port=PORTS["print"],
+                log_level="info",
+                **server_options(),
+            )
         ).serve()
     finally:
         await server.stop(grace=2)

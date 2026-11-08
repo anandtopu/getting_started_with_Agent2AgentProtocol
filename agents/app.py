@@ -1,5 +1,6 @@
 """Compose confirmed SDK route factories into a regular FastAPI application."""
 
+import os
 from contextlib import asynccontextmanager
 
 from a2a.server.request_handlers import DefaultRequestHandler
@@ -11,6 +12,7 @@ from starlette.requests import Request
 
 from agents.catalog import card
 from agents.executor import VendorExecutor
+from common.binding_policy import ProtocolHeaders
 from common.card_trust import published_card
 from common.observability import TraceMiddleware
 from common.security import BearerGate, Principal
@@ -27,6 +29,8 @@ class CallContext(DefaultServerCallContextBuilder):
 
 
 def make_handler(vendor: str, *, secure: bool = True, task_store=None, executor=None):
+    from a2a.server.cluster.event_stream import TaskEventStream
+
     return DefaultRequestHandler(
         agent_executor=executor or VendorExecutor(vendor),
         task_store=task_store or InMemoryTaskStore(),
@@ -35,6 +39,7 @@ def make_handler(vendor: str, *, secure: bool = True, task_store=None, executor=
         if vendor == "travel"
         else None,
         validate_input_modes=True,
+        event_stream=task_store if isinstance(task_store, TaskEventStream) else None,
     )
 
 
@@ -48,6 +53,9 @@ def make_app(
     verifier=None,
     engine=None,
     agent_card=None,
+    rate_budget=None,
+    api_key_header=None,
+    auth_client=None,
 ):
     if not demo and not tokens and not verifier:
         raise ValueError("Set MAPLEWOOD_TOKEN or start the network with scripts/network.py.")
@@ -55,7 +63,12 @@ def make_app(
     advertised = (
         agent_card or getattr(handler, "course_card", None) or card(vendor, secure=not demo)
     )
-    routes = create_agent_card_routes(published_card(advertised, vendor))
+    if os.environ.get("MAPLEWOOD_HARDENED") == "1":
+        from common.key_rotation import RotatingCardKeys
+
+        routes = RotatingCardKeys(advertised).routes()
+    else:
+        routes = create_agent_card_routes(published_card(advertised, vendor))
     routes += create_jsonrpc_routes(handler, rpc_url="/rpc", context_builder=CallContext())
     routes += create_rest_routes(handler, context_builder=CallContext())
 
@@ -67,6 +80,8 @@ def make_app(
             await handler.aclose()
             if engine:
                 await engine.dispose()
+            if auth_client:
+                await auth_client.aclose()
 
     app = FastAPI(routes=routes, lifespan=lifespan)
 
@@ -75,5 +90,15 @@ def make_app(
         return {"status": "ready", "vendor": vendor}
 
     app.state.handler = handler
-    traced = TraceMiddleware(app, vendor, tracer)
-    return traced if demo else BearerGate(traced, tokens or {}, verifier=verifier)
+    traced = TraceMiddleware(ProtocolHeaders(app), vendor, tracer)
+    return (
+        traced
+        if demo
+        else BearerGate(
+            traced,
+            tokens or {},
+            verifier=verifier,
+            rate_budget=rate_budget,
+            api_key_header=api_key_header,
+        )
+    )

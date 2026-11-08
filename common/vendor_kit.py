@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 import httpx
 from a2a.server.request_handlers import DefaultRequestHandler
-from a2a.server.tasks import DatabasePushNotificationConfigStore, DatabaseTaskStore
+from a2a.server.tasks import DatabasePushNotificationConfigStore
 from a2a.types import AgentCard
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from google.protobuf.json_format import ParseDict
@@ -13,17 +13,19 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from agents.app import make_app
 from agents.catalog import card
 from agents.executor import VendorExecutor
+from common.cluster import ClusterStore, OutboxSender
 from common.protocol import as_dict, request
 from common.security import Principal, sign_card, verify_card
-from common.webhooks import SignedPushSender, receiver
+from common.webhooks import receiver
 from common.wire import Recorder
 
 
 @asynccontextmanager
 async def vendor_kit(database_url: str, tokens: dict, private_key, callback_client, destinations):
     engine = create_async_engine(database_url)
-    store = DatabaseTaskStore(engine)
     callbacks = DatabasePushNotificationConfigStore(engine)
+    store = ClusterStore(engine, callbacks=callbacks)
+    await store.initialize()
     identity = card("catering")
     identity.capabilities.push_notifications = True
     identity = ParseDict(sign_card(as_dict(identity), private_key, "saffron-kit"), AgentCard())
@@ -36,8 +38,9 @@ async def vendor_kit(database_url: str, tokens: dict, private_key, callback_clie
         store,
         identity,
         push_config_store=callbacks,
-        push_sender=SignedPushSender(callback_client, callbacks, destinations),
+        push_sender=OutboxSender(store, callback_client, destinations),
         push_url_validator=permitted,
+        event_stream=store,
     )
     try:
         yield make_app("catering", tokens=tokens, handler=handler, agent_card=identity), handler
