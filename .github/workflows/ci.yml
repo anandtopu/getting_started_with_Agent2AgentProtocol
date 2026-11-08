@@ -93,6 +93,8 @@ jobs:
             workspace/a2a-tck/reports/
             workspace/tck-summary.json
             workspace/tck-results.log
+            workspace/tck-wire-evidence.json
+            workspace/tck-server.log
   postgres-cluster:
     runs-on: ubuntu-latest
     services:

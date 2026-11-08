@@ -49,3 +49,17 @@ and no real financial or hiring effect is enabled by this learning repository.
 No additional blocking finding remains in these reviewed boundaries after the fixes.
 The current pushed revision must still pass the complete 26-job CI matrix. External
 limitations and operator responsibilities remain listed in the validation report.
+
+## TCK exception cross-file pass
+
+| Boundary traced | Result | Evidence |
+|---|---|---|
+| Requirement sample to SDK input validation to binding error | Unsupported media rejects consistently: HTTP 400, JSON-RPC -32005, gRPC INVALID_ARGUMENT; rich identity is preserved | Ordinary-vendor HTTP/servicer tests and four independent loopback wire controls |
+| Recommended HTTP content type to official error assertion | Correct recommended type triggers the known assertion before its body check | Pinned source lines and independent 404/400 body validation in the TCK report |
+| CORE-SEND-003 definition to generic TCK validator | Missing expected_error selects a success-only check across all three transports | Pinned requirement line 99 and validator line 100; no upstream patch applied |
+| Frozen setup to generated fixture to official report | Committed dependencies, clean tracked tree, bounded readiness, fresh JUnit, complete case accounting | Repeated local official runs and the TCK CI job |
+| Raw official results to regression gate to published artifact | Four failures remain failures; exact exceptions require independent valid wire responses; incomplete/error/extra-skip runs fail | Gate mutation tests, raw JUnit, summary and tck-wire-evidence.json |
+
+R22–R25 are closed in repository code and documentation. Two upstream defects
+still produce four official failures; these are external, explicitly retained
+outcomes, not waived protocol obligations or a conformance certification.

@@ -11,11 +11,11 @@ is evidence of the learning deployment, not an external production certification
 
 | Check | Evidence |
 |---|---|
-| Offline Python | 721 tests; application sockets disabled; A2A deprecations are errors |
+| Offline Python | 774 tests; application sockets disabled; A2A deprecations are errors |
 | Gym | 265 starters fail and 265 solutions pass; 25 modules, eight types, at least four types and three levels per module |
 | Examples and notebooks | 118 standalone commands (83 examples, 25 use cases, 10 capstone starter/reference commands) and all 25 notebooks |
 | Style | Ruff lint and formatting; no banned current-track legacy APIs |
-| Links | 1,679 local references and 75 external URLs checked after the final lesson review |
+| Links | 1,688 local references and 79 external URLs checked after the TCK investigation |
 | Protocol | All eleven operations captured for JSON-RPC, HTTP+JSON and protobuf service boundaries; real network gRPC separately checked |
 | Golden scenarios | All twenty fixtures check exact vendor states, chunks, artifact IDs and quotes; hardened framework deployment also checks every golden plan |
 | Persistence and replicas | SQLite/PostgreSQL CAS, atomic task/event/outbox rollback, publisher crash, second-handler stream reconnect, owner isolation |
@@ -29,6 +29,7 @@ is evidence of the learning deployment, not an external production certification
 | Business recovery | Idempotent no-charge hotel/venue holds, uncertain-response cleanup, compensating release and explicit manual follow-up |
 | Review | [Per-file](reviews/PER_FILE_REVIEW.md), [cross-file](reviews/INTEGRATION_REVIEW.md) and [closed action plan](reviews/ACTION_PLAN.md) |
 | Final brief review | [Fresh requirements and adversarial review](reviews/FINAL_BRIEF_REVIEW.md); ten additional findings fixed, 25 lesson rewrites, every core module's network lifecycle checked |
+| TCK exception investigation | Two upstream defects account for four failures; exact exception gate, complete report checks, frozen upstream dependencies and independent HTTP/JSON-RPC/gRPC error evidence; [diagnosis](TCK_REPORT.md) |
 
 The [expanded implementation run](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42438012884)
 at 55fb956 passed **all 26 jobs**, including PostgreSQL and all twenty hardened-network
@@ -69,7 +70,9 @@ examples/notebooks, native languages, both Compose profiles, live Ollama and TCK
 
 1. **TCK:** the pinned suite reports 202 passes, 57 skips and four failures out of
    263 cases (79.6% automated requirement score). Four documented upstream
-   contradictions are matched by exact case and diagnostic in the regression gate.
+   exceptions are matched by exact class, case and complete diagnostic in the
+   regression gate. Four additional real-wire controls verify the obscured protocol
+   obligations; incomplete reports, extra skips and incorrect error identities fail.
    Green CI does **not** mean 100% official TCK compatibility or certification.
 2. **.NET:** the official available SDK is 1.0.0-preview4. Its native lab passes;
    this repository cannot turn an upstream prerelease into a stable release.

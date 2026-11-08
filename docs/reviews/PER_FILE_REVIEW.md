@@ -150,3 +150,25 @@ release still requires the full CI gate described in [the brief review](FINAL_BR
 | R19 | [scripts/check_env.py](../../scripts/check_env.py) | 14 | Probe local model readiness and report hosted-key presence without values. |
 | R20 | [modules/13_authentication/README.md](../../modules/13_authentication/README.md) | 28 | Representative of 25 individually authored module flow/quiz/bug/API/use-case replacements. |
 | R21 | [scripts/check_network.py](../../scripts/check_network.py) | 18 | Exercise every module including authentication and listener shutdown. |
+
+## Focused TCK exception review of 59f2324
+
+Scope: the four exceptions, official pinned requirement/validator sources, SDK
+error mapping, fixture and ordinary vendor adapters, runner and CI evidence.
+Generated official scenarios and tests remain unmodified. Source-level diagnosis
+and normative references are in [the TCK report](../TCK_REPORT.md).
+
+| ID | Severity | File | Line | Finding and implemented correction |
+|---|---|---|---:|---|
+| R22 | P2 | [scripts/check_tck.py](../../scripts/check_tck.py) | 56 | Substring matching could hide an additional diagnostic; the gate also accepted partial reports. Require exact class/name/message, distinct case count, consistent counters/exit, bounded skips and execution of affected cases. |
+| R23 | P2 | [scripts/tck_evidence.py](../../scripts/tck_evidence.py) | 103 | Exception text alone could not prove correct error identity or validate the body bypassed by the HTTP assertion. Add independent real-wire checks of status, content type, code, message and structured details before any exception is permitted. |
+| R24 | P2 | [scripts/check_tck.py](../../scripts/check_tck.py) | 131 | Plain dependency sync rewrote the upstream lock; readiness exhaustion fell through and stale evidence could survive. Install the exact frozen lock, fail readiness explicitly, clear generated evidence before setup, and verify the tracked tree after execution. |
+| R25 | P3 | [docs/TCK_REPORT.md](../TCK_REPORT.md) | 1 | The earlier report called the recommended media type required. State SHOULD accurately, identify missing expected_error as the shared cause of three failures, and document why the latest upstream revision does not fix them. |
+
+Additional files individually reviewed: `scripts/tck_server.py` (all three SDK
+bindings and media validation enabled); `common/binding_policy.py` (retained
+recommended content type); `agents/app.py` (ordinary handlers also validate media);
+`tests/test_binding_policy.py` (full ordinary-vendor errors);
+`tests/test_tck_gate.py` (negative mutation controls); `.github/workflows/ci.yml`
+(raw reports plus independent evidence and server log); validation and review docs.
+No production response was changed merely to satisfy an incorrect assertion.
