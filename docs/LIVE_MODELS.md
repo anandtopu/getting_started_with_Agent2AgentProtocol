@@ -34,7 +34,8 @@ When a task pauses, continuation retains the original vendor choices and task ID
 
 All four native tool-stream formats are tested with fragmented HTTP responses:
 Ollama NDJSON, OpenAI Responses SSE, Anthropic tool-use SSE and Gemini streaming
-function calls. Partial arguments are accumulated with a 64 KB budget and a
+function calls. Frames and partial arguments have separate 64 KB limits; repeated
+provider envelopes have a 512 KB total wire limit. Calls have a
 90-second deadline; only a complete schema-valid select_action call is accepted.
 The executor emits bounded A2A progress updates and final artifacts without exposing
 private model reasoning. Provider-native streaming and A2A streaming remain separate

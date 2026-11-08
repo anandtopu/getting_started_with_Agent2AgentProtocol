@@ -134,3 +134,24 @@ async def test_tool_streams(provider, failure, monkeypatch):
         assert await model.tool_decide("Select a safe catering action.", SCHEMA) == {
             "tool": "quote_menu"
         }
+
+
+@pytest.mark.parametrize("oversized", [False, True])
+async def test_stream_envelopes_have_separate_total_and_frame_budgets(oversized):
+    # Many small legitimate frames can exceed 64 KB of wire overhead while the
+    # only eventual tool argument remains a few bytes. Total bytes are bounded too.
+    padding = {"model": "fixture", "message": {"content": "synthetic-progress" * 15}}
+    packets = [padding] * (2500 if oversized else 300) + frames("ollama")
+    body = "".join(json.dumps(packet) + "\n" for packet in packets).encode()
+    assert len(body) > 64_000
+    model = Model(
+        Settings(llm_provider="ollama", llm_model="fixture"),
+        httpx.MockTransport(lambda req: httpx.Response(200, content=body)),
+    )
+    if oversized:
+        with pytest.raises(ValueError, match="byte budget"):
+            await model.tool_decide("Choose the next menu action.", SCHEMA)
+    else:
+        assert await model.tool_decide("Choose the next menu action.", SCHEMA) == {
+            "tool": "quote_menu"
+        }

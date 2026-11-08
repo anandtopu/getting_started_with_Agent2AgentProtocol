@@ -11,7 +11,7 @@ is evidence of the learning deployment, not an external production certification
 
 | Check | Evidence |
 |---|---|
-| Offline Python | 692 tests; application sockets disabled; A2A deprecations are errors |
+| Offline Python | 694 tests; application sockets disabled; A2A deprecations are errors |
 | Gym | 265 starters fail and 265 solutions pass; 25 modules, eight types, at least four types and three levels per module |
 | Examples and notebooks | 118 standalone commands (83 examples, 25 use cases, 10 capstone starter/reference commands) and all 25 notebooks |
 | Style | Ruff lint and formatting; no banned current-track legacy APIs |

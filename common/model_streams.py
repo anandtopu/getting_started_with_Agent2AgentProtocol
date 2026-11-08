@@ -125,22 +125,30 @@ async def packets(response, provider, limit=64_000):
     buffer, size, data = "", 0, []
     async for chunk in response.aiter_text():
         size += len(chunk.encode())
-        if size > limit:
+        # Repeated timestamps/model names make wire envelopes much larger than
+        # the eventual tool arguments. Bound both, without conflating the two.
+        if size > limit * 8:
             raise ValueError("Model stream exceeded byte budget")
         buffer += chunk
         while "\n" in buffer:
             line, buffer = buffer.split("\n", 1)
+            if len(line.encode()) > limit:
+                raise ValueError("Model stream frame exceeded byte budget")
             line = line.rstrip("\r")
             if provider == "ollama":
                 if line:
                     yield json.loads(line)
             elif line.startswith("data:"):
                 data.append(line[5:].lstrip())
+                if sum(len(part.encode()) for part in data) > limit:
+                    raise ValueError("Model stream frame exceeded byte budget")
             elif not line and data:
                 value = "\n".join(data)
                 data = []
                 if value != "[DONE]":
                     yield json.loads(value)
+        if len(buffer.encode()) > limit:
+            raise ValueError("Model stream frame exceeded byte budget")
     if buffer.strip() or data:
         raise ValueError("Model stream ended inside a frame")
 
@@ -212,6 +220,8 @@ async def tool_decision(model, prompt, schema):
                             finished = candidate.get("finishReason") == "STOP"
                     if len(calls) > 1:
                         raise ValueError("Only one bounded tool decision is permitted")
+                    if sum(len(call[1].encode()) for call in calls.values()) > 64_000:
+                        raise ValueError("Model tool arguments exceeded byte budget")
     if not finished or len(calls) != 1:
         raise ValueError("Incomplete model tool stream")
     name, arguments = next(iter(calls.values()))

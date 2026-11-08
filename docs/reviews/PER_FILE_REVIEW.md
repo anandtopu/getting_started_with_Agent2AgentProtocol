@@ -107,6 +107,11 @@ using a 120-second live vendor-call budget, and requesting exactly one native to
 call. The 50 affected offline checks pass; the main CI job repeats the actual
 Ollama-to-A2A-to-LangGraph/MCP path and model-selected Concierge plan.
 
+R11 (P2): real Ollama token frames repeat model/timestamp metadata, so a 64 KB total
+wire cap could reject a legitimate small tool argument. Frames and arguments retain
+their 64 KB limits while total wire bytes have a separate 512 KB bound. New tests
+accept legitimate small frames above 64 KB total and reject an excessive total.
+
 No unresolved implementation blocker in the reviewed scope. The official .NET SDK
 is preview; the official TCK retains four reviewed contradictions; hosted provider
 accounts are not live-tested. These are disclosed external evidence limits.
