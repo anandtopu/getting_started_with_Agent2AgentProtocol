@@ -22,7 +22,7 @@ is evidence of the learning deployment, not an external production certification
 | Delivery | Durable signed inbox, lost acknowledgement, expired lease fencing, bounded retries, independent restart recovery and live Control Room lab |
 | Identity and TLS | Five vendor auth schemes; real Keycloak audience rejection; HTTPS CA/hostname validation; missing mTLS certificate rejected |
 | Signing keys | Encrypted shared SQL ring; rotation overlap, expiry, revocation, replica agreement and restart |
-| Models | Four provider-native stream parsers tested offline; real free Ollama qwen3:4b tool calls in CI |
+| Models | Four provider-native stream parsers tested offline; real free Ollama qwen2.5:3b tool calls in CI |
 | Frameworks | LangGraph plus six isolated real runtimes; twelve Windows/Linux worker jobs and mixed-framework Docker deployment |
 | Languages | Native TypeScript, Go, Java and official .NET preview; authenticated Python interoperability on Windows, macOS and Linux |
 | Observability | HTTP/gRPC trace propagation, task/context span attributes, bounded vendor metric labels, all six services exported to Jaeger |

@@ -78,7 +78,7 @@ No stable .NET SDK release is claimed.
 
 Configured examples are documented as available, not live-tested account access:
 
-- [Ollama qwen3:4b](https://ollama.com/library/qwen3:4b), local and tool-capable.
+- [Ollama qwen2.5:3b](https://ollama.com/library/qwen2.5:3b), local and tool-capable.
 - [OpenAI gpt-5.6-luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna).
 - [Anthropic Haiku 4.5](https://docs.anthropic.com/en/docs/about-claude/model-deprecations).
 - [Gemini 3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite).

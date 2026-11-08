@@ -120,7 +120,7 @@ jobs:
     timeout-minutes: 20
     env:
       LLM_PROVIDER: ollama
-      LLM_MODEL: qwen3:4b
+      LLM_MODEL: qwen2.5:3b
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6

@@ -1,4 +1,4 @@
-# Release review — per-file pass
+# Release review â€” per-file pass
 
 ## Scope
 
@@ -115,3 +115,9 @@ accept legitimate small frames above 64 KB total and reject an excessive total.
 No unresolved implementation blocker in the reviewed scope. The official .NET SDK
 is preview; the official TCK retains four reviewed contradictions; hosted provider
 accounts are not live-tested. These are disclosed external evidence limits.
+
+The expanded live gate also exposed model suitability: Qwen3 4B could exhaust the
+512-token allowance without a complete routing call. The configured default is now
+the publisher-listed tool-capable Qwen2.5 3B non-reasoning model. The gate still
+requires actual native tools, a completed A2A/LangGraph/MCP workflow and a model-selected
+Concierge plan; no incomplete-response assertion was weakened.

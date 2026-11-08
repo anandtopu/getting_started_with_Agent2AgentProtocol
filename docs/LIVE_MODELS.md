@@ -51,7 +51,7 @@ budget. The bound is still enforced; incomplete output never becomes a tool invo
 uv run python scripts/check_live_model.py
 ~~~
 
-CI installs checksum-verified Ollama v0.40.15 and runs qwen3:4b on CPU. This proves
+CI installs checksum-verified Ollama v0.40.15 and runs qwen2.5:3b on CPU. This proves
 actual free-model tool selection; hosted provider account calls remain optional and
 were not made with user credentials. The same checker can run against a configured
 hosted provider. Costs and quotas belong to that account; no graded exercise calls it.
@@ -59,3 +59,10 @@ hosted provider. Costs and quotas belong to that account; no graded exercise cal
 Official framing references: [OpenAI](https://developers.openai.com/api/docs/guides/function-calling),
 [Ollama](https://docs.ollama.com/capabilities/streaming),
 [Anthropic](https://platform.claude.com/docs/en/build-with-claude/streaming).
+
+The default is [Qwen2.5 3B](https://ollama.com/library/qwen2.5:3b), listed by Ollama
+as tool-capable. It is a non-reasoning model suited to these small routing decisions.
+The earlier Qwen3 4B passed a direct call but exhausted the bounded token allowance
+in the expanded end-to-end check. The course keeps its limits and rejects incomplete
+output rather than treating truncation as a successful action. LLM_MODEL remains
+configurable; changing it requires rerunning the live acceptance check.
