@@ -52,9 +52,12 @@ uv run python scripts/check_live_model.py
 ~~~
 
 CI installs checksum-verified Ollama v0.40.15 and runs qwen2.5:3b on CPU. This proves
-actual free-model tool selection; hosted provider account calls remain optional and
-were not made with user credentials. The same checker can run against a configured
-hosted provider. Costs and quotas belong to that account; no graded exercise calls it.
+actual free-model tool selection. Hosted provider acceptance remains unverified:
+the authorized OpenAI gpt-5.6-luna attempt on 2026-11-08 returned HTTP 401 on its
+first Responses request, before model output. Anthropic and Gemini credentials
+were unavailable. The same checker can run against a configured hosted provider.
+Costs and quotas belong to that account; no graded exercise calls it. The
+[backlog](reviews/ACTION_PLAN.md) records the credential blockers and next checks.
 
 Official framing references: [OpenAI](https://developers.openai.com/api/docs/guides/function-calling),
 [Ollama](https://docs.ollama.com/capabilities/streaming),
