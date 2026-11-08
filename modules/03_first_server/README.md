@@ -1,10 +1,10 @@
-**Network and Concierge version 03:** what's new â€” your first a2a server.
+**Network and Concierge version 03:** what's new — your first a2a server.
 
 # Module 03: Your first A2A server
 > After this module you can compose sdk routes.
 
-**Time:** ~90 min Â· **Level:** Beginner Â· **LLM needed:** No for examples and grading Â· **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 03
-**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
+**Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 03
+**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
 
 ## Prerequisites
 
@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Routes: SendMessage
+    Routes->>Executor: RequestContext and EventQueue
+    Executor-->>Routes: Task, working, artifact, completed
+    Routes-->>Concierge: Stored task result
 ```
 
-Under the hood: The SDK route factories and request handler; the executor performs the business workflow. Compare that behavior with the captured requests and responses below.
+Under the hood: Route factories adapt transport messages to the handler. The executor emits one new Task followed by updates. When work resumes, the SDK already owns the snapshot. A direct Message response is the alternative pattern, not an extra event after a task stream.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| a2a.server.agent_execution.AgentExecutor | Execution boundary | Implements execute and cancel | Wrap vendor work |
+| a2a.server.routes.create_rest_routes | HTTP+JSON binding | Adds routes to a normal ASGI app | Expose the handler |
 
 ## Walkthrough
 
@@ -226,16 +220,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/03_first_server/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Granite exposes its venue inventory through an SDK handler and returns a tracked quote with an explicit final status.
+
+Run:
+
+```console
+uv run python modules/03_first_server/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_rest.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "name": "quote",
+  "vendor": "venues",
+  "total_cents": 80000.0,
+  "currency": "USD"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/03/03-02_fix/task.md) |
+| Task stays working | Executor returned without final or paused update | Emit a valid final or interrupted state; [practice 03-02](../../gym/tasks/03/03-02_fix/task.md) |
+| Invalid event sequence | Direct reply mixed with task updates | Choose one streaming pattern; [practice 03-02](../../gym/tasks/03/03-02_fix/task.md) |
+| Resumption conflicts with stored task | Executor reintroduces the Task snapshot | Emit updates for the existing task; [practice 03-02](../../gym/tasks/03/03-02_fix/task.md) |
+| Business rejection becomes an HTTP crash | Inventory failure not translated | Emit TASK_STATE_REJECTED for impossible work; [practice 03-02](../../gym/tasks/03/03-02_fix/task.md) |
 
 ## Practice
 
@@ -262,35 +276,35 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. What does execute receive?
+<details><summary>Answer</summary>The request context and event queue used to publish task events.</details>
 
-2. How would you demonstrate: compose sdk routes?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Who stores the task snapshot?
+<details><summary>Answer</summary>The SDK handler and its configured task store.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Can an executor mix a direct Message with task updates?
+<details><summary>Answer</summary>No. Choose one of the mutually exclusive response patterns.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. What must happen before execute returns?
+<details><summary>Answer</summary>Tracked work must reach a terminal or paused state.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Should a resumed task emit its original Task again?
+<details><summary>Answer</summary>No. Continue with updates; the SDK owns the resumed snapshot.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Why first build a server without the SDK?
+<details><summary>Answer</summary>To see routing and envelope mechanics before the SDK manages the full protocol.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- The request context and event queue used to publish task events.
+- The SDK handler and its configured task store.
+- No. Choose one of the mutually exclusive response patterns.
+- Tracked work must reach a terminal or paused state.
+- No. Continue with updates; the SDK owns the resumed snapshot.
 
 ## Go deeper
 
-[Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) Â· [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
+[Specification](https://a2a-protocol.org/v1.0.1/specification/) · [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) · [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
 
 ## Next: Module 04
 

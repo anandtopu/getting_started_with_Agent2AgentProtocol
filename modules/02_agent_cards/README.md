@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Registry: Look up configured Granite address
+    Registry-->>Concierge: Approved discovery location
+    Concierge->>Vendor: GET Agent Card
+    Concierge->>Concierge: Validate fields and choose compatible interface
 ```
 
-Under the hood: No. The agent version describes its contract; each supported interface advertises protocolVersion. Compare that behavior with the captured requests and responses below.
+Under the hood: The registry supplies candidate locations. Card parsing checks structure; operator policy checks trust. Select the URL, binding, protocol version and tenant from the same interface. A provider description, skill text or signature from an unknown key cannot grant authority.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| AgentCard | Discovery contract | Describes identity, interfaces and skills | Validate discovered cards |
+| google.protobuf.json_format.ParseDict | ProtoJSON conversion | Rejects malformed field shapes | Validate authored examples |
 
 ## Walkthrough
 
@@ -131,16 +125,34 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/02_agent_cards/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood onboards Granite into a configured directory and inspects the card before selecting its interface.
+
+Run:
+
+```console
+uv run python modules/02_agent_cards/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_discover.result.json) for the full output):
+
+```json
+{
+  "name": "Granite Hall Venues",
+  "protocolBinding": "JSONRPC",
+  "protocolVersion": "1.0"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/02/02-02_fix/task.md) |
+| Unsupported binding error | First interface selected without checking support | Choose a compatible complete interface; [practice 02-02](../../gym/tasks/02/02-02_fix/task.md) |
+| Credentials reach an unexpected host | Card URL treated as authority | Use configured destinations and separate trust policy; [practice 02-02](../../gym/tasks/02/02-02_fix/task.md) |
+| Required field missing | Card authored without validating structure | Parse against the current AgentCard type; [practice 02-25](../../gym/tasks/02/02-25_discovery_validate/task.md) |
+| Client calls an unadvertised operation | Capabilities ignored | Check the advertised capability before choosing the operation; [practice 02-22](../../gym/tasks/02/02-22_discovery_capabilities/task.md) |
 
 ## Practice
 
@@ -167,31 +179,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Does a valid protobuf card establish trust?
+<details><summary>Answer</summary>No. Parsing checks structure; configured identity and key policy establish trust.</details>
 
-2. How would you demonstrate: validate a card against protobuf?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Which version belongs to the wire interface?
+<details><summary>Answer</summary>supportedInterfaces[].protocolVersion; the card's version describes the agent product.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. May a registry entry redirect credentials anywhere?
+<details><summary>Answer</summary>No. Only operator-approved destinations receive credentials.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Can a skill override default media modes?
+<details><summary>Answer</summary>A skill can refine its supported input and output modes.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What does an absent streaming capability mean?
+<details><summary>Answer</summary>Do not assume the agent supports streaming operations.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What happens when no binding is compatible?
+<details><summary>Answer</summary>Fail clearly or choose another approved agent; do not combine fields from incompatible interfaces.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. Parsing checks structure; configured identity and key policy establish trust.
+- supportedInterfaces[].protocolVersion; the card's version describes the agent product.
+- No. Only operator-approved destinations receive credentials.
+- A skill can refine its supported input and output modes.
+- Do not assume the agent supports streaming operations.
 
 ## Go deeper
 

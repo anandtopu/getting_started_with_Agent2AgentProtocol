@@ -149,5 +149,8 @@ async def audit_lab() -> dict:
     return {
         "findings": findings,
         "all_attacks_blocked": all(item["blocked"] for item in findings),
-        "remaining_work": ["durable replay storage", "production identity and egress operations"],
+        "remaining_work": [
+            "operate durable inbox retention",
+            "production identity and egress operations",
+        ],
     }

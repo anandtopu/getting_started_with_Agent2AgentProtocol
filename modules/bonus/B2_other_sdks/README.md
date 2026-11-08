@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Harness->>Native: Start Go, Java or .NET vendor
+    Python->>Native: Authenticated A2A request
+    Native-->>Python: Task and structured quote
+    Harness->>Harness: Compare shared semantic expectations
 ```
 
-Under the hood: The SDK Vert.x router. A Jakarta REST filter alone does not protect that router. Compare that behavior with the captured requests and responses below.
+Under the hood: Official SDKs have independent release schedules and runtime requirements. Their version numbers need not match one another or the protocol. Native subprocess checks run on Windows, macOS and Linux. The .NET dependency remains explicitly labeled preview rather than promoted to stable by the course.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| scripts/check_go_interop.py (course) | Native Go verification | Runs authenticated cross-language requests | Check the Go implementation |
+| scripts/check_java_interop.py / check_dotnet_interop.py (course) | Native JVM/.NET verification | Exercises real official SDK processes | Check other language boundaries |
 
 ## Walkthrough
 
@@ -209,16 +203,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/bonus/B2_other_sdks/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood inspects protobuf semantics before comparing the real Go, Java and .NET vendor implementations.
+
+Run:
+
+```console
+uv run python modules/bonus/B2_other_sdks/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_grpc.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "name": "quote",
+  "vendor": "print",
+  "total_cents": 10000.0,
+  "currency": "USD"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../../gym/tasks/B2/B2-02_fix/task.md) |
+| Native process fails before serving | Required runtime missing | Run environment checks and install the documented runtime; [practice B2-02](../../../gym/tasks/B2/B2-02_fix/task.md) |
+| Authenticated Python call rejected | Header or metadata omitted | Send the vendor-specific credential; [practice B2-02](../../../gym/tasks/B2/B2-02_fix/task.md) |
+| Preview API breaks after update | Version floated | Use the pinned .NET dependency; [practice B2-05](../../../gym/tasks/B2/B2-05_conformance/task.md) |
+| Equivalent quotes compare unequal | Numeric representation differs | Validate whole-number cents and semantic values; [practice B2-02](../../../gym/tasks/B2/B2-02_fix/task.md) |
 
 ## Practice
 
@@ -233,31 +247,31 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/bonus/
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Do SDK version numbers have to match across languages?
+<details><summary>Answer</summary>No. The implemented protocol contract must be compatible.</details>
 
-2. How would you demonstrate: inspect language compatibility?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. What does the .NET preview label imply?
+<details><summary>Answer</summary>Its upstream API may change; pin it and retain interoperability tests.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Does protobuf alone guarantee correct business behavior?
+<details><summary>Answer</summary>No. State transitions, authorization and artifacts still need checks.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Why run the same scenario in all languages?
+<details><summary>Answer</summary>It reveals semantic differences hidden by language-specific types.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What differs across operating systems?
+<details><summary>Answer</summary>Runtime installation, process startup and filesystem or shell behavior can differ.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What should an SDK migration preserve?
+<details><summary>Answer</summary>Advertised interfaces, authorization rules and observable task semantics.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. The implemented protocol contract must be compatible.
+- Its upstream API may change; pin it and retain interoperability tests.
+- No. State transitions, authorization and artifacts still need checks.
+- It reveals semantic differences hidden by language-specific types.
+- Runtime installation, process startup and filesystem or shell behavior can differ.
 
 ## Go deeper
 

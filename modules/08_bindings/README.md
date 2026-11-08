@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Card: Read ordered interfaces
+    Card-->>Concierge: Binding, URL and version
+    Concierge->>HTTP: SendMessage as JSON-RPC or HTTP+JSON
+    Concierge->>Inkwell: SendMessage as protobuf over gRPC
 ```
 
-Under the hood: The A2AService methods in the normative versioned a2a.proto. Compare that behavior with the captured requests and responses below.
+Under the hood: The protobuf service names define the common operation vocabulary. JSON-RPC wraps an operation in an envelope; HTTP+JSON maps it to an HTTP route; gRPC uses typed RPC methods. Inkwell's HTTP listener serves discovery only. Its task operations must go through gRPC.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| a2a.types.a2a_pb2_grpc.A2AServiceStub | gRPC service client | Calls typed A2A operations | Talk to Inkwell |
+| a2a.server.request_handlers.grpc_handler.GrpcHandler | gRPC adapter | Maps protobuf RPCs to the handler | Serve the same task contract |
 
 ## Walkthrough
 
@@ -328,16 +322,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/08_bindings/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood compares binding representations before connecting its HTTP vendors to the gRPC-only print service.
+
+Run:
+
+```console
+uv run python modules/08_bindings/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_jsonrpc.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "name": "quote",
+  "vendor": "venues",
+  "total_cents": 80000.0,
+  "currency": "USD"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/08/08-02_fix/task.md) |
+| HTTP 404 from Inkwell | HTTP used for a gRPC-only task endpoint | Use its GRPC interface; [practice 08-07](../../gym/tasks/08/08-07_binding/task.md) |
+| Wrong port receives protobuf traffic | Discovery port confused with gRPC port | Use the configured gRPC target; [practice 08-02](../../gym/tasks/08/08-02_fix/task.md) |
+| Version error on one binding | Version omitted or inconsistent | Carry the advertised version in headers or metadata; [practice 08-45](../../gym/tasks/08/08-45_grpc_version/task.md) |
+| Same operation returns different business data | Adapters implement divergent business rules | Compare semantic results using shared fixtures; [practice 08-02](../../gym/tasks/08/08-02_fix/task.md) |
 
 ## Practice
 
@@ -365,31 +379,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Does changing binding change task meaning?
+<details><summary>Answer</summary>No. It changes transport representation, not the lifecycle contract.</details>
 
-2. How would you demonstrate: compare equivalent calls?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Where are operation names defined?
+<details><summary>Answer</summary>The normative a2a.proto service definition.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Does Inkwell's discovery HTTP port accept SendMessage?
+<details><summary>Answer</summary>No. Its advertised task binding is gRPC only.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. How does gRPC carry credentials and trace context?
+<details><summary>Answer</summary>In request metadata, or client identity through mTLS where configured.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Is a service-boundary capture a network packet trace?
+<details><summary>Answer</summary>No. It proves protobuf serialization and handler behavior; socket tests prove network interoperability separately.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What should a client do with unsupported bindings?
+<details><summary>Answer</summary>Choose another compatible advertised interface or fail clearly.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. It changes transport representation, not the lifecycle contract.
+- The normative a2a.proto service definition.
+- No. Its advertised task binding is gRPC only.
+- In request metadata, or client identity through mTLS where configured.
+- No. It proves protobuf serialization and handler behavior; socket tests prove network interoperability separately.
 
 ## Go deeper
 

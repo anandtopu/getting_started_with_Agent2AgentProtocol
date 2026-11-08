@@ -10,6 +10,14 @@ from a2a.types.a2a_pb2_grpc import A2AServiceStub
 from common.config import ROOT, VENDORS, grpc_target, url
 from common.protocol import as_dict, request
 
+
+def event_brief(text):
+    value = json.loads(text)
+    if not isinstance(value, dict):
+        raise ValueError('The event brief must be a JSON object, for example {"guests":40}.')
+    return value
+
+
 st.set_page_config(page_title="Maplewood Control Room", page_icon="🍁", layout="wide")
 st.title("Maplewood Events")
 st.caption("Discover vendors, inspect their contracts and watch work arrive.")
@@ -27,22 +35,22 @@ if left.button("Discover"):
     try:
         response = httpx.get(url(vendor) + "/.well-known/agent-card.json", timeout=5)
         response.raise_for_status()
-        st.session_state["card"] = response.json()
+        st.session_state.setdefault("cards", {})[vendor] = response.json()
     except httpx.HTTPError:
         st.error("Start the local network: uv run python scripts/network.py up --module 08")
-if "card" in st.session_state:
+if vendor in st.session_state.get("cards", {}):
     with st.expander("Agent Card", expanded=True):
-        st.json(st.session_state["card"])
+        st.json(st.session_state["cards"][vendor])
 
 if right.button("Send brief"):
     try:
-        payload = as_dict(request(json.loads(brief)))
+        payload = as_dict(request(event_brief(brief)))
         with httpx.Client(base_url=url(vendor), headers=headers, timeout=30) as client:
             if vendor == "print":
                 with grpc.insecure_channel(grpc_target()) as channel:
                     stub = A2AServiceStub(channel)
                     metadata = (("authorization", headers["Authorization"]), ("a2a-version", "1.0"))
-                    message = request(json.loads(brief))
+                    message = request(event_brief(brief))
                     if streaming:
                         for event in stub.SendStreamingMessage(
                             message, metadata=metadata, timeout=30
@@ -69,14 +77,14 @@ with st.expander("Live verified webhook deliveries", expanded=True):
     if (folder / "credentials.json").exists():
         if st.button("Request a catering quote with push updates"):
             settings = json.loads((folder / "credentials.json").read_text())
-            payload = as_dict(request(json.loads(brief)))
-            payload["configuration"] = {
-                "taskPushNotificationConfig": {
-                    "id": "control-room",
-                    "url": "http://127.0.0.1:8190/notifications",
-                }
-            }
             try:
+                payload = as_dict(request(event_brief(brief)))
+                payload["configuration"] = {
+                    "taskPushNotificationConfig": {
+                        "id": "control-room",
+                        "url": "http://127.0.0.1:8190/notifications",
+                    }
+                }
                 response = httpx.post(
                     "http://127.0.0.1:8161/message:send",
                     json=payload,
@@ -87,6 +95,8 @@ with st.expander("Live verified webhook deliveries", expanded=True):
                 st.json(response.json())
             except httpx.HTTPError:
                 st.error("The callback lab is not reachable. Start it in another terminal.")
+            except ValueError as exc:
+                st.error(f"Check the event brief: {exc}")
         st.button("Refresh verified inbox")
         if (folder / "inbox.sqlite").exists():
             import sqlite3

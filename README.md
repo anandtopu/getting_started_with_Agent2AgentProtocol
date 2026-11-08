@@ -37,7 +37,7 @@ All names, events and inventory in the course data are fictional.
 ## Five-minute quick start
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and Git.
-Python 3.11Ã¢â‚¬â€œ3.13 is supported. Node is optional until the TypeScript bonus.
+Python 3.11–3.13 is supported. Node is optional until the TypeScript bonus.
 These commands work in **Windows PowerShell, macOS and Linux**:
 
 ~~~console
@@ -84,11 +84,11 @@ files. Real deployments need TLS and managed credentials.
 
 ~~~mermaid
 flowchart LR
-    A["00Ã¢â‚¬â€œ08: Protocol foundations"] --> B["09Ã¢â‚¬â€œ12: Models and orchestration"]
-    B --> C["13Ã¢â‚¬â€œ15: Trust and security"]
-    C --> D["16Ã¢â‚¬â€œ20: Testing and production"]
+    A["00–08: Protocol foundations"] --> B["09–12: Models and orchestration"]
+    B --> C["13–15: Trust and security"]
+    C --> D["16–20: Testing and production"]
     D --> E["Bonuses and capstones"]
-    G["Predict Ã¢â€ â€™ Run Ã¢â€ â€™ Explain Ã¢â€ â€™ Practice"] --- A
+    G["Predict → Run → Explain → Practice"] --- A
     G --- B
     G --- C
     G --- D
@@ -96,11 +96,11 @@ flowchart LR
 
 | Tier | Reading and labs | Suggested additional practice |
 |---|---:|---:|
-| 1: Foundations | 12 hours | 6Ã¢â‚¬â€œ10 hours |
-| 2: Intelligent agents | 10 hours | 5Ã¢â‚¬â€œ8 hours |
-| 3: Security | 10 hours | 5Ã¢â‚¬â€œ8 hours |
-| 4: Production and design | 12 hours | 6Ã¢â‚¬â€œ10 hours |
-| Bonuses and capstones | Variable | 10Ã¢â‚¬â€œ30 hours |
+| 1: Foundations | 12 hours | 6–10 hours |
+| 2: Intelligent agents | 10 hours | 5–8 hours |
+| 3: Security | 10 hours | 5–8 hours |
+| 4: Production and design | 12 hours | 6–10 hours |
+| Bonuses and capstones | Variable | 10–30 hours |
 
 ## Watch the network
 

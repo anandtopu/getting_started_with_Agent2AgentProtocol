@@ -1,19 +1,19 @@
 # Quiz
 
-1. Who calls the kitchen MCP tool?
-<details><summary>Answer</summary>Saffron calls it internally. The Concierge communicates with Saffron through A2A.</details>
+1. Which protocol connects Saffron to its kitchen tool?
+<details><summary>Answer</summary>MCP.</details>
 
-2. What is lost by flattening a task into a tool string?
-<details><summary>Answer</summary>Continuation, cancellation, ownership, status history and artifact structure unless explicitly mapped.</details>
+2. Which protocol connects Maplewood to Saffron?
+<details><summary>Answer</summary>A2A.</details>
 
-3. Does an in-memory MCP transport use the real SDK?
-<details><summary>Answer</summary>Yes. The course runs the actual server/client APIs without opening a network socket.</details>
+3. Does an MCP result automatically include an A2A task lifecycle?
+<details><summary>Answer</summary>No. The vendor supplies that lifecycle at its boundary.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Choose a tool versus a remote agent: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. Should kitchen credentials appear in an A2A brief?
+<details><summary>Answer</summary>No. The vendor provisions its own internal tool access.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>MCP connects a host to tools and resources; A2A connects independently operated agents. Inventory lookup belongs inside Saffron Table as a tool, while menu quoting can remain a remote task. A bridge must decide how to represent task IDs, interruption, streaming and authorization. Turning every task into a single tool return can lose progress and continuation.</details>
+5. What happens above kitchen capacity?
+<details><summary>Answer</summary>The vendor rejects the request instead of inventing inventory.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. What can be lost in an automatic MCP-to-A2A bridge?
+<details><summary>Answer</summary>Task identity, interruption, cancellation, authorization and artifact semantics need explicit mapping.</details>

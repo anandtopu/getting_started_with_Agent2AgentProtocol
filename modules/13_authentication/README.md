@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Identity: Obtain vendor-specific credential
+    Identity-->>Concierge: Scoped token
+    Concierge->>Vendor: Credential in header or TLS handshake
+    Vendor->>Vendor: Verify identity then skill scope
+    Vendor-->>Concierge: Quote, auth-required, or access denial
 ```
 
-Under the hood: Outside A2A messages through the configured identity mechanism; send them in the appropriate headers or TLS handshake. Compare that behavior with the captured requests and responses below.
+Under the hood: Authentication happens before protocol routing. Authorization then checks the caller's tenant and partner scope. A readable JWT payload proves nothing until signature, issuer, audience and expiry are validated. A2A advertises the requirements but does not issue the credentials.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| SecurityScheme | Advertised authentication | Describes supported credential mechanisms | Publish access requirements |
+| ServerCallContext | Authenticated request context | Carries identity and authorization state | Scope task access |
 
 ## Walkthrough
 
@@ -231,16 +226,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/13_authentication/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+A caller requests a venue quote first without a token and then with a properly provisioned vendor credential.
+
+Run:
+
+```console
+uv run python modules/13_authentication/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_auth.result.json) for the full output):
+
+```json
+{
+  "unauthorized_status": 401,
+  "state": "TASK_STATE_COMPLETED",
+  "name": "quote",
+  "vendor": "venues",
+  "total_cents": 80000.0
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/13/13-02_fix/task.md) |
+| HTTP 401 despite readable JWT claims | Signature, audience or expiry invalid | Validate the whole token against pinned issuer policy; [practice 13-20](../../gym/tasks/13/13-20_security_anonymous/task.md) |
+| Partner prices visible to ordinary caller | Authentication confused with authorization | Check partner scope separately; [practice 13-02](../../gym/tasks/13/13-02_fix/task.md) |
+| Another tenant's task is visible | Caller-controlled tenant accepted | Derive ownership from authenticated identity; [practice 13-22](../../gym/tasks/13/13-22_security_tenant/task.md) |
+| Body credential bypasses login | Message data treated as identity | Accept credentials only through configured auth mechanisms; [practice 13-25](../../gym/tasks/13/13-25_security_body_secret/task.md) |
 
 ## Practice
 
@@ -268,31 +283,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Does an authenticated caller automatically get partner pricing?
+<details><summary>Answer</summary>No. The partner skill requires its own authorization scope.</details>
 
-2. How would you demonstrate: reject missing credentials?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Where should bearer credentials travel?
+<details><summary>Answer</summary>In the Authorization header, not message Parts.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. What does a wrong JWT audience mean?
+<details><summary>Answer</summary>The token was issued for another service and must be rejected.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. How does mutual TLS identify a client?
+<details><summary>Answer</summary>The TLS handshake verifies a client certificate under the configured trust policy.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. When is auth-required useful?
+<details><summary>Answer</summary>When valid tracked work needs additional authorization obtained outside the conversation.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Can a public Agent Card contain service secrets?
+<details><summary>Answer</summary>No. It advertises mechanisms and requirements, not reusable credentials.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. The partner skill requires its own authorization scope.
+- In the Authorization header, not message Parts.
+- The token was issued for another service and must be rejected.
+- The TLS handshake verifies a client certificate under the configured trust policy.
+- When valid tracked work needs additional authorization obtained outside the conversation.
 
 ## Go deeper
 

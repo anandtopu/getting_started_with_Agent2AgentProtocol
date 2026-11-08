@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Vendor: Discover supported interface
+    Concierge->>Vendor: SendMessage
+    Vendor-->>Concierge: Task T or direct Message
+    Concierge->>Vendor: GetTask T when tracked work exists
 ```
 
-Under the hood: No. taskId identifies the paused task; contextId groups related work. Compare that behavior with the captured requests and responses below.
+Under the hood: An SDK client selects a binding from the card. Manual httpx clients must construct the same wire contract themselves. Always distinguish task results from direct messages. A timeout is an unknown outcome, so only retry operations whose business effects can be reconciled.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| a2a.client.create_client | Client construction | Selects an advertised transport | Use the official client |
+| a2a.client.ClientConfig | Client configuration | Controls client transport behavior | Supply the in-process HTTP client |
 
 ## Walkthrough
 
@@ -270,16 +264,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/04_first_client/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood replaces its manual HTTP caller with the official client while preserving the same quote contract.
+
+Run:
+
+```console
+uv run python modules/04_first_client/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_sdk_client.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "name": "quote",
+  "vendor": "venues",
+  "total_cents": 80000.0,
+  "currency": "USD"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/04/04-02_fix/task.md) |
+| KeyError reading task | Server returned a direct Message | Branch on the response payload type; [practice 04-02](../../gym/tasks/04/04-02_fix/task.md) |
+| Duplicate business effect after timeout | Blind retry of a side effect | Use application idempotency and reconciliation; [practice 04-02](../../gym/tasks/04/04-02_fix/task.md) |
+| Unknown task at fallback | Original task ID sent to another server | Resume only on the original vendor; [practice 04-02](../../gym/tasks/04/04-02_fix/task.md) |
+| Version not supported | Wrong interface version selected | Use its advertised protocol version; [practice 04-02](../../gym/tasks/04/04-02_fix/task.md) |
 
 ## Practice
 
@@ -306,31 +320,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. What should a client do with a direct Message result?
+<details><summary>Answer</summary>Read the message; do not invent a task ID and poll it.</details>
 
-2. How would you demonstrate: create an sdk client?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Does a timeout prove the vendor did nothing?
+<details><summary>Answer</summary>No. The request may have committed before its response was lost.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Which header selects the current protocol?
+<details><summary>Answer</summary>A2A-Version: 1.0 for these pinned interfaces.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Can an interrupted task move to a backup server?
+<details><summary>Answer</summary>No. Its identity and state belong to the original server.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. When is retrying a quote reasonable?
+<details><summary>Answer</summary>When it is a read-only operation under a bounded deadline and retry policy.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What should TaskNotFound change in the UI?
+<details><summary>Answer</summary>Show that the referenced work cannot be retrieved; do not report a successful quote.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- Read the message; do not invent a task ID and poll it.
+- No. The request may have committed before its response was lost.
+- A2A-Version: 1.0 for these pinned interfaces.
+- No. Its identity and state belong to the original server.
+- When it is a read-only operation under a bounded deadline and retry policy.
 
 ## Go deeper
 

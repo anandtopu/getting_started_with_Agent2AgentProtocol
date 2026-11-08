@@ -1,4 +1,11 @@
-"""Read bounded request counters; task IDs remain in traces, never metric labels."""
+"""Read bounded request counters; task IDs remain in traces, never metric labels.
+
+Concepts: request metrics, bounded label cardinality and task correlation.
+Spec: https://a2a-protocol.org/v1.0.1/specification/
+Run: uv run python modules/17_observability/examples/04_metrics.py
+Agents: in-process; no separate services or LLM.
+Expected: count 2, labels {"vendor": "venues"} for maplewood.task.requests.
+"""
 
 import asyncio
 import json
@@ -11,7 +18,7 @@ from common.protocol import as_dict, request
 from common.testing import client
 
 
-async def main():
+async def main() -> None:
     reader = InMemoryMetricReader()
     provider = MeterProvider(metric_readers=[reader])
     metrics.set_meter_provider(provider)
@@ -28,6 +35,7 @@ async def main():
         ]
         counter = next(metric for metric in values if metric.name == "maplewood.task.requests")
         point = counter.data.data_points[0]
+        # KEY IDEA: IDs belong in traces; a bounded vendor label keeps metrics usable.
         assert point.value == 2 and dict(point.attributes) == {"vendor": "venues"}
         print(
             json.dumps(

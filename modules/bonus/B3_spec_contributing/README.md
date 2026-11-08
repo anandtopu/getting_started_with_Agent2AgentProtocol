@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Reader->>Proto: Locate message or service symbol
+    Reader->>Specification: Read behavioral requirement
+    Reader->>SDK: Reproduce with pinned version
+    SDK-->>Reader: Captured observed result
+    Reader->>Issue: Minimal evidence and expected behavior
 ```
 
-Under the hood: Capture the smallest request/response, identify the exact requirement and test revision, and retain the raw result. Compare that behavior with the captured requests and responses below.
+Under the hood: A field descriptor tells you the legal structure, while normative prose explains behavioral obligations. Compare both before calling a result a bug. Preserve the version, request and response in a minimal reproduction. Governance and proposal processes decide changes to the standard; a local workaround does not change it.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| a2a.types.a2a_pb2.DESCRIPTOR | Schema reflection | Locates messages, fields and services | Navigate the normative model |
+| google.protobuf.json_format.ParseDict | Wire validation | Checks a reproduction against generated types | Separate shape from behavior |
 
 ## Walkthrough
 
@@ -148,16 +143,32 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/bonus/B3_spec_contributing/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+A contributor locates concrete Part alternatives in the generated schema before writing a minimal protocol reproduction.
+
+Run:
+
+```console
+uv run python modules/bonus/B3_spec_contributing/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_parts.result.json) for the full output):
+
+```json
+{
+  "total_cents": 96000.0
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../../gym/tasks/B3/B3-02_fix/task.md) |
+| Bug report cannot be reproduced | Versions and request omitted | Include a minimal pinned reproduction; [practice B3-02](../../../gym/tasks/B3/B3-02_fix/task.md) |
+| Field absence treated as behavioral permission | Only schema was read | Check the normative operation rules too; [practice B3-05](../../../gym/tasks/B3/B3-05_conformance/task.md) |
+| Secret published in issue attachment | Raw traffic copied | Redact credentials before sharing; [practice B3-02](../../../gym/tasks/B3/B3-02_fix/task.md) |
+| Local convention presented as standard | Course policy not distinguished | Label HMAC and business rules as application policy; [practice B3-02](../../../gym/tasks/B3/B3-02_fix/task.md) |
 
 ## Practice
 
@@ -172,31 +183,31 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/bonus/
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Which source defines protocol messages and services?
+<details><summary>Answer</summary>The normative a2a.proto definition.</details>
 
-2. How would you demonstrate: locate a protobuf field?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Does a parseable message necessarily conform?
+<details><summary>Answer</summary>No. Behavioral requirements can still be violated.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Why cite an exact requirement in a bug report?
+<details><summary>Answer</summary>It makes expected behavior independently reviewable.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. What should be removed from reproduction logs?
+<details><summary>Answer</summary>Credentials, personal information and unrelated application data.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. How is a documentation typo different from a protocol change?
+<details><summary>Answer</summary>A typo corrects explanation; a protocol change alters the agreed contract and follows governance review.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Why pin the failing version?
+<details><summary>Answer</summary>Otherwise reviewers may reproduce against different behavior.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- The normative a2a.proto definition.
+- No. Behavioral requirements can still be violated.
+- It makes expected behavior independently reviewable.
+- Credentials, personal information and unrelated application data.
+- A typo corrects explanation; a protocol change alters the agreed contract and follows governance review.
 
 ## Go deeper
 

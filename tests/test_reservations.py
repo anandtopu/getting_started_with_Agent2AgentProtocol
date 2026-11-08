@@ -140,3 +140,47 @@ async def test_unreachable_cleanup_requires_manual_followup():
         "manual_followup_required": True,
         "charged_cents": 0,
     }
+
+
+@pytest.mark.parametrize("vendor", ["travel", "venues"])
+async def test_malformed_confirmation_after_commit_is_compensated(tmp_path, vendor):
+    engine = create_async_engine("sqlite+aiosqlite:///" + (tmp_path / "malformed.db").as_posix())
+    hotel, venue = ReservationStore(engine, "travel"), ReservationStore(engine, "venues")
+    try:
+        async with (
+            client(
+                "travel",
+                handler=make_handler("travel", executor=ReservationExecutor("travel", hotel)),
+            ) as travel,
+            client(
+                "venues",
+                handler=make_handler("venues", executor=ReservationExecutor("venues", venue)),
+            ) as venues,
+        ):
+
+            class MalformedReply:
+                async def post(self, path, **kwargs):
+                    original = travel if vendor == "travel" else venues
+                    response = await original.post(path, **kwargs)
+                    if kwargs["json"]["message"]["parts"][0]["data"]["action"] == "hold":
+                        data = response.json()
+                        data["task"]["artifacts"] = []
+                        return httpx.Response(200, json=data, request=response.request)
+                    return response
+
+            result = await reserve_pair(
+                MalformedReply() if vendor == "travel" else travel,
+                MalformedReply() if vendor == "venues" else venues,
+                "malformed-confirmation",
+            )
+            assert result["compensated"] and not result["manual_followup_required"]
+            async with engine.connect() as connection:
+                assert (await connection.execute(select(hotel.holds.c.state))).scalars().all() == [
+                    "released"
+                ]
+                if vendor == "venues":
+                    assert (
+                        await connection.execute(select(venue.holds.c.state))
+                    ).scalars().all() == ["released"]
+    finally:
+        await engine.dispose()

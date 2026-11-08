@@ -1,19 +1,19 @@
 # Quiz
 
-1. Does an offline exercise need Ollama?
-<details><summary>Answer</summary>No. The deterministic agents and scripted models require neither a provider nor API keys.</details>
+1. Which command installs the locked Python environment?
+<details><summary>Answer</summary>Run uv sync from the repository root; later offline runs reuse the installed dependencies.</details>
 
-2. What changes when you switch vendors?
-<details><summary>Answer</summary>The skill and endpoint change; messages, tasks and artifacts retain the protocol contract.</details>
+2. Does reading a card create a task?
+<details><summary>Answer</summary>No. Discovery describes the service; SendMessage requests work.</details>
 
-3. What does HTTP carry here?
-<details><summary>Answer</summary>A request and response containing JSON-RPC, HTTP+JSON or an SSE stream; gRPC uses its own HTTP/2 framing.</details>
+3. Why can Tier 1 run without model keys?
+<details><summary>Answer</summary>Its inventory checks and quotes are deterministic Python.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Discover a vendor: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. What does 127.0.0.1 mean?
+<details><summary>Answer</summary>The local computer's loopback interface, reachable only from that computer.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>A2A gives independently operated agents a shared contract. A vendor can change its internal code without changing how Maplewood discovers its skills or requests a quote. HTTP is a request and response exchange; JSON is the text format used for structured values. Start with a ready-made deterministic agent so that networking and model behavior do not become tangled.</details>
+5. Where should you edit a gym attempt?
+<details><summary>Answer</summary>In workspace after gym start, leaving the trusted task tests unchanged.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. Is the kitchen inventory lookup A2A or MCP?
+<details><summary>Answer</summary>An internal tool lookup belongs to MCP; delegation to the independent caterer belongs to A2A.</details>

@@ -25,6 +25,11 @@ class MenuState(TypedDict):
 
 def menu_graph(model):
     async def select(state: MenuState):
+        model_brief = {
+            key: state["brief"][key]
+            for key in ("guests", "date", "dietary")
+            if key in state["brief"]
+        }
         routing = (
             "Dietary counts are complete. Choose quote_menu."
             if "dietary" in state["brief"]
@@ -33,7 +38,7 @@ def menu_graph(model):
         prompt = (
             "Use select_action. Maplewood needs a catering menu. " + routing + " "
             "The kitchen validates the quote. "
-            "Event data (JSON): " + json.dumps(state["brief"], sort_keys=True)
+            "Event data (JSON): " + json.dumps(model_brief, sort_keys=True)
         )
         schema = {
             "type": "object",

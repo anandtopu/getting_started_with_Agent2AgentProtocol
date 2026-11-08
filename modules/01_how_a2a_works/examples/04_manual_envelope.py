@@ -6,7 +6,6 @@ No running agents or model. Expected: matching RPC id, completed task, quote.
 """
 
 import asyncio
-import json
 
 import httpx
 
@@ -16,7 +15,7 @@ from common.pretty import show
 from common.wire import Recorder
 
 
-async def main():
+async def main() -> None:
     transport = Recorder(httpx.ASGITransport(app=manual_app()))
     async with httpx.AsyncClient(transport=transport, base_url="http://manual.test") as client:
         response = await client.post(
@@ -35,9 +34,8 @@ async def main():
             },
         )
         show(response.json())
-    (ROOT / "modules/01_how_a2a_works/wire/manual.jsonl").write_text(
-        "".join(json.dumps(row) + "\n" for row in transport.records), encoding="utf-8"
-    )
+    # KEY IDEA: learner captures belong in workspace, not the committed reference.
+    transport.save(ROOT / "workspace/wire/manual.jsonl")
 
 
 if __name__ == "__main__":

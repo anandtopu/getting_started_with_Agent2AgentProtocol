@@ -72,9 +72,7 @@ jobs:
         with:
           dotnet-version: "10.0.x"
       - run: uv run --offline python scripts/check_dotnet_interop.py
-      - run: uv run --offline python scripts/check_network.py --module 0
-      - run: uv run --offline python scripts/check_network.py --module 5
-      - run: uv run --offline python scripts/check_network.py --module 8
+      - run: uv run --offline python scripts/check_network.py --all
       - run: uv run --offline python scripts/check_tls.py
       - run: uv run --offline python scripts/check_webhook_lab.py
   tck:

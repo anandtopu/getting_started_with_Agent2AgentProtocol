@@ -16,7 +16,12 @@ async def reserve_pair(travel, venue, request_id="introductory-hold") -> dict:
         )
         hotel_response.raise_for_status()
         hotel = hotel_response.json()["task"]
-    except (httpx.HTTPError, KeyError, ValueError):
+        if hotel["status"]["state"] != "TASK_STATE_COMPLETED":
+            return {"reserved": False, "reason": "hotel unavailable", "compensated": False}
+        hold_id = hotel["artifacts"][0]["parts"][0]["data"]["hold_id"]
+        if not isinstance(hold_id, str) or not hold_id:
+            raise ValueError("Hotel confirmation has no hold identifier")
+    except (httpx.HTTPError, KeyError, ValueError, TypeError, IndexError):
         recovered = False
         try:
             cleanup = await travel.post(
@@ -27,7 +32,7 @@ async def reserve_pair(travel, venue, request_id="introductory-hold") -> dict:
             )
             cleanup.raise_for_status()
             recovered = cleanup.json()["task"]["status"]["state"] == "TASK_STATE_COMPLETED"
-        except (httpx.HTTPError, KeyError, ValueError):
+        except (httpx.HTTPError, KeyError, ValueError, TypeError, IndexError):
             pass
         return {
             "reserved": False,
@@ -35,9 +40,6 @@ async def reserve_pair(travel, venue, request_id="introductory-hold") -> dict:
             "manual_followup_required": not recovered,
             "charged_cents": 0,
         }
-    if hotel["status"]["state"] != "TASK_STATE_COMPLETED":
-        return {"reserved": False, "reason": "hotel unavailable", "compensated": False}
-    hold_id = hotel["artifacts"][0]["parts"][0]["data"]["hold_id"]
     uncertain_cleanup = True
     try:
         room_response = await venue.post(
@@ -47,13 +49,16 @@ async def reserve_pair(travel, venue, request_id="introductory-hold") -> dict:
         room_response.raise_for_status()
         room = room_response.json()["task"]
         if room["status"]["state"] == "TASK_STATE_COMPLETED":
+            venue_hold = room["artifacts"][0]["parts"][0]["data"]["hold_id"]
+            if not isinstance(venue_hold, str) or not venue_hold or not room.get("id"):
+                raise ValueError("Venue confirmation has no hold identifier")
             return {
                 "reserved": True,
                 "hotel_hold": hold_id,
                 "venue": room["id"],
                 "charged_cents": 0,
             }
-    except (httpx.HTTPError, KeyError, ValueError):
+    except (httpx.HTTPError, KeyError, ValueError, TypeError, IndexError):
         # The venue may have committed before the response was lost. Cancel by
         # idempotency key, creating a tombstone that also fences a late retry.
         try:
@@ -63,8 +68,9 @@ async def reserve_pair(travel, venue, request_id="introductory-hold") -> dict:
                     request({"action": "release_request", "request_id": request_id + ":venue"})
                 ),
             )
+            cleanup.raise_for_status()
             uncertain_cleanup = cleanup.json()["task"]["status"]["state"] == "TASK_STATE_COMPLETED"
-        except (httpx.HTTPError, KeyError, ValueError):
+        except (httpx.HTTPError, KeyError, ValueError, TypeError, IndexError):
             uncertain_cleanup = False
     compensated = False
     try:
@@ -74,7 +80,7 @@ async def reserve_pair(travel, venue, request_id="introductory-hold") -> dict:
         released_response.raise_for_status()
         released = released_response.json()["task"]
         compensated = released["status"]["state"] == "TASK_STATE_COMPLETED" and uncertain_cleanup
-    except (httpx.HTTPError, KeyError, ValueError):
+    except (httpx.HTTPError, KeyError, ValueError, TypeError, IndexError):
         pass
     return {
         "reserved": False,

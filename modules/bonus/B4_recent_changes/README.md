@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Maintainer->>ReleaseNotes: Read pinned SDK and spec changes
+    Maintainer->>Lockfile: Propose compatible versions
+    Maintainer->>Tests: Run protocol, security and lifecycle regressions
+    Tests-->>Maintainer: Evidence or incompatibility
+    Maintainer->>Docs: Record verified behavior and limitations
 ```
 
-Under the hood: Review release/migration notes, update the lock intentionally, and rerun contracts, golden, native and recovery checks. Compare that behavior with the captured requests and responses below.
+Under the hood: A newer SDK can add runtime behavior without changing protocol version 1.0. Upgrade evidence must cover behavior, not just successful imports. Pagination, interrupted-task parking and shared storage are independently testable features. The lockfile and verification notes record what the course actually executed.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| ListTasksRequest | Pagination request | Carries filters and opaque page token | Inspect stored work |
+| VersionedTaskStore | Revision-aware persistence | Supports safe shared state | Validate runtime upgrades |
 
 ## Walkthrough
 
@@ -136,16 +131,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/bonus/B4_recent_changes/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood checks task listing and pagination as observable behavior before adopting a newer SDK release.
+
+Run:
+
+```console
+uv run python modules/bonus/B4_recent_changes/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_list.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "name": "quote",
+  "vendor": "venues",
+  "total_cents": 80000.0,
+  "currency": "USD"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../../gym/tasks/B4/B4-02_fix/task.md) |
+| SDK version sent as protocol header | Package and protocol versions conflated | Use the advertised protocol version; [practice B4-02](../../../gym/tasks/B4/B4-02_fix/task.md) |
+| ListTasks repeats or skips work | Page token reconstructed manually | Return the server's opaque token unchanged; [practice B4-01](../../../gym/tasks/B4/B4-01_build/task.md) |
+| Upgrade loses paused conversations | Persistence behavior untested | Resume after handler restart; [practice B4-05](../../../gym/tasks/B4/B4-05_conformance/task.md) |
+| New dependency silently replaces SDK | Lockfile not respected | Install locked dependencies and rerun the matrix; [practice B4-02](../../../gym/tasks/B4/B4-02_fix/task.md) |
 
 ## Practice
 
@@ -160,31 +175,31 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/bonus/
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Does Python SDK 1.3 mean protocol 1.3?
+<details><summary>Answer</summary>No. This SDK implements the targeted 1.0 protocol family.</details>
 
-2. How would you demonstrate: separate sdk and protocol releases?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Why keep pagination tokens opaque?
+<details><summary>Answer</summary>They are server-owned continuation data, not offsets to invent or edit.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. What changes when interrupted tasks are parked?
+<details><summary>Answer</summary>Runtime resources can be released while durable task state remains available.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. What must a shared-store upgrade preserve?
+<details><summary>Answer</summary>Ownership, revision safety, event ordering and recovery behavior.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Is a release-note claim enough to mark a feature verified?
+<details><summary>Answer</summary>No. Run a focused example or regression against the pinned version.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Where should confirmed swaps and limitations be recorded?
+<details><summary>Answer</summary>In VERIFICATION_NOTES and the validation report.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. This SDK implements the targeted 1.0 protocol family.
+- They are server-owned continuation data, not offsets to invent or edit.
+- Runtime resources can be released while durable task state remains available.
+- Ownership, revision safety, event ordering and recovery behavior.
+- No. Run a focused example or regression against the pinned version.
 
 ## Go deeper
 

@@ -6,7 +6,7 @@ import json
 
 import httpx
 
-from common.config import ROOT, url
+from common.config import ROOT, VENDORS, url
 from common.pretty import show
 from common.protocol import as_dict, request
 from common.remote import GrpcRemote
@@ -42,7 +42,7 @@ async def talk(vendor: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("vendor", default="venues", nargs="?")
+    parser.add_argument("vendor", choices=VENDORS, default="venues", nargs="?")
     asyncio.run(talk(parser.parse_args().vendor))
 
 

@@ -1,10 +1,10 @@
-**Network and Concierge version 06:** what's new â€” parts and artifacts.
+**Network and Concierge version 06:** what's new — parts and artifacts.
 
 # Module 06: Parts and artifacts
 > After this module you can construct all four part alternatives.
 
-**Time:** ~90 min Â· **Level:** Beginner Â· **LLM needed:** No for examples and grading Â· **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 06
-**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
+**Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 06
+**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
 
 ## Prerequisites
 
@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Saffron: Brief requesting file outputs
+    Saffron-->>Concierge: Quote artifact with data and PDF bytes
+    Concierge->>Granite: Request floor plan
+    Granite-->>Concierge: SVG file Part
 ```
 
-Under the hood: Yes. Multiple Parts can represent different forms of the same deliverable. Compare that behavior with the captured requests and responses below.
+Under the hood: Each Part selects one content alternative. Raw bytes become base64 in JSON; mediaType identifies the content format. An artifact may contain multiple Parts. A URL is a reference, not permission to fetch it: apply origin, address, redirect and size policies before consuming remote files.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| Part | Content unit | Selects text, raw bytes, URL or data | Represent each content kind |
+| Artifact | Deliverable | Groups Parts under an artifact ID | Return quotes and files together |
 
 ## Walkthrough
 
@@ -207,16 +201,32 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/06_parts_artifacts/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood separates a structured quote from its attachment representation before returning both to the planner.
+
+Run:
+
+```console
+uv run python modules/06_parts_artifacts/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_parts.result.json) for the full output):
+
+```json
+{
+  "total_cents": 96000.0
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/06/06-02_fix/task.md) |
+| Earlier Part content disappears | Two oneof alternatives assigned | Use separate Parts; [practice 06-02](../../gym/tasks/06/06-02_fix/task.md) |
+| File displays as corrupt text | Base64 or media type mishandled | Keep bytes and the correct mediaType; [practice 06-20](../../gym/tasks/06/06-20_parts_floor_plan/task.md) |
+| Private endpoint contacted | URL fetched without egress policy | Reject private addresses and redirects; [practice 06-03](../../gym/tasks/06/06-03_predict/task.md) |
+| Quote accepted with negative amount | Schema validation skipped | Validate structured data before use; [practice 06-21](../../gym/tasks/06/06-21_parts_data/task.md) |
 
 ## Practice
 
@@ -243,35 +253,35 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. What are the four Part content alternatives?
+<details><summary>Answer</summary>Text, raw bytes, URL and structured data.</details>
 
-2. How would you demonstrate: construct all four part alternatives?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. How are bytes represented in ProtoJSON?
+<details><summary>Answer</summary>As base64 text, with the media type carried separately.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Can one Part contain both raw bytes and text?
+<details><summary>Answer</summary>No. They are alternatives in the same content oneof.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Can a quote artifact contain JSON and a PDF?
+<details><summary>Answer</summary>Yes, as separate Parts of the same artifact.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Why validate integer-valued ProtoJSON numbers?
+<details><summary>Answer</summary>Struct numbers may round-trip as floats; whole-number business quantities still require validation.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Why refuse redirects when fetching an approved file?
+<details><summary>Answer</summary>A redirect can send the request to a private or otherwise unapproved destination.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- Text, raw bytes, URL and structured data.
+- As base64 text, with the media type carried separately.
+- No. They are alternatives in the same content oneof.
+- Yes, as separate Parts of the same artifact.
+- Struct numbers may round-trip as floats; whole-number business quantities still require validation.
 
 ## Go deeper
 
-[Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) Â· [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
+[Specification](https://a2a-protocol.org/v1.0.1/specification/) · [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) · [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
 
 ## Next: Module 07
 

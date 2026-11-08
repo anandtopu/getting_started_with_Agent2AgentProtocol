@@ -182,10 +182,16 @@ def sign_card(card: dict, private: Ed25519PrivateKey, kid: str) -> dict:
 
 
 def verify_card(card: dict, trusted_keys: dict[str, Ed25519PublicKey]) -> dict:
+    if not isinstance(card, dict) or not isinstance(card.get("signatures"), list):
+        raise ValueError("A card must contain a signature list.")
     unsigned = {key: value for key, value in card.items() if key != "signatures"}
     for signature in card.get("signatures", []):
         try:
+            if not isinstance(signature, dict):
+                continue
             header = json.loads(unb64(signature["protected"]))
+            if not isinstance(header, dict):
+                continue
             if header.get("alg") != "EdDSA" or header.get("crit") or "jku" in header:
                 continue
             key = trusted_keys[header["kid"]]

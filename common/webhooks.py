@@ -9,7 +9,7 @@ from a2a.server.tasks.push_notification_sender import PushNotificationSender
 from a2a.types import StreamResponse
 from a2a.utils.proto_utils import to_stream_response
 from fastapi import FastAPI, Request
-from google.protobuf.json_format import ParseDict
+from google.protobuf.json_format import ParseDict, ParseError
 from starlette.responses import JSONResponse
 
 from common.protocol import as_dict
@@ -22,15 +22,18 @@ def receiver(secret: bytes):
 
     @app.post("/notifications")
     async def receive(request: Request):
-        body = await request.body()
-        if len(body) > 1_000_000:
-            return JSONResponse({"error": "Payload too large"}, 413)
+        body = bytearray()
+        async for chunk in request.stream():
+            body.extend(chunk)
+            if len(body) > 1_000_000:
+                return JSONResponse({"error": "Payload too large"}, 413)
+        body = bytes(body)
         try:
             verify_webhook(body, dict(request.headers), secret, app.state.seen)
             event = ParseDict(json.loads(body), StreamResponse())
             if event.WhichOneof("payload") is None:
                 raise ValueError("Empty event")
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, ParseError):
             return JSONResponse({"error": "Notification not verified"}, 401)
         app.state.deliveries.append(as_dict(event))
         return {"accepted": True}
@@ -51,9 +54,15 @@ class SignedPushSender(PushNotificationSender):
             headers = webhook_headers(body, self.destinations[config.url], nonce)
             headers["Content-Type"] = "application/a2a+json"
             for attempt in range(3):
-                response = await self.client.post(
-                    config.url, content=body, headers=headers, follow_redirects=False, timeout=3
-                )
+                try:
+                    response = await self.client.post(
+                        config.url, content=body, headers=headers, follow_redirects=False, timeout=3
+                    )
+                except httpx.TransportError:
+                    if attempt == 2:
+                        raise
+                    await asyncio.sleep(0.01 * 2**attempt)
+                    continue
                 if 200 <= response.status_code < 300:
                     break
                 if response.status_code < 500 or attempt == 2:

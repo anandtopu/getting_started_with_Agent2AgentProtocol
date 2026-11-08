@@ -20,7 +20,7 @@ the complete network. Run it without another copy of the network already running
 The check asserts that Inkwell rejects an unauthenticated gRPC request and has no
 HTTP send-message route.
 
-[Server](../agents/grpc_server.py) Â· [trust policy](../common/card_trust.py) Â·
+[Server](../agents/grpc_server.py) · [trust policy](../common/card_trust.py) ·
 [all operation captures](OPERATIONS_ON_THE_WIRE.md)
 
 ## LangGraph and private MCP tools
@@ -81,11 +81,15 @@ uv run pytest tests/test_recovery.py tests/test_compensation.py
 uv run python modules/20_designing_agent_networks/examples/03_compensate.py
 ~~~
 
-[Recovery](../agents/concierge.py) Â· [hold executor](../agents/holds.py) Â·
+[Recovery](../agents/concierge.py) · [hold executor](../agents/holds.py) ·
 [compensation](../common/saga.py)
 
-The hold ledger is in memory and is a teaching example. Durable outboxes,
-reservation expiry and recovery after a process crash remain deployment work.
+This introductory hold ledger is in memory. The final deployment uses the
+[durable reservation ledger](../common/reservations.py), 15-minute expiry,
+idempotency keys and reconciliation after lost or malformed confirmations.
+[The cluster lab](../tests/test_cluster.py) separately verifies atomic outbox
+commit and crash recovery. These mechanisms are implemented and tested; an
+operator still owns backups and retention for a deployed database.
 
 ## Identity, tracing and persistence
 
@@ -128,7 +132,7 @@ release list currently identifies v1.0.0-preview4 as a prerelease. Its
 [native lab](../modules/bonus/B2_other_sdks/dotnet/README.md) is implemented and tested,
 but this course does not represent the package as stable.
 
-[Go source](../modules/bonus/B2_other_sdks/go/main.go) Â·
+[Go source](../modules/bonus/B2_other_sdks/go/main.go) ·
 [official .NET releases](https://github.com/a2aproject/a2a-dotnet/releases)
 
 ## Final deployment and live callbacks

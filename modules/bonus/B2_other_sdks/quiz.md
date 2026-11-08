@@ -1,19 +1,19 @@
 # Quiz
 
-1. Is every official SDK stable?
-<details><summary>Answer</summary>No. The verified .NET SDK is 1.0.0-preview4; official status and stable release status differ.</details>
+1. Do SDK version numbers have to match across languages?
+<details><summary>Answer</summary>No. The implemented protocol contract must be compatible.</details>
 
-2. Which Java boundary needs an auth filter?
-<details><summary>Answer</summary>The SDK Vert.x router. A Jakarta REST filter alone does not protect that router.</details>
+2. What does the .NET preview label imply?
+<details><summary>Answer</summary>Its upstream API may change; pin it and retain interoperability tests.</details>
 
-3. What does the native test matrix cover?
-<details><summary>Answer</summary>Authentication, quote and invalid-input behavior through Python clients on Linux, Windows and macOS.</details>
+3. Does protobuf alone guarantee correct business behavior?
+<details><summary>Answer</summary>No. State transitions, authorization and artifacts still need checks.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Inspect language compatibility: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. Why run the same scenario in all languages?
+<details><summary>Answer</summary>It reveals semantic differences hidden by language-specific types.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>Official SDK status does not guarantee that every language release supports the same protocol revision. Check Go, Java and .NET release notes and minimum runtimes before selecting versions. Run the same request and compare semantics, allowing generated IDs and timestamps to differ.</details>
+5. What differs across operating systems?
+<details><summary>Answer</summary>Runtime installation, process startup and filesystem or shell behavior can differ.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. What should an SDK migration preserve?
+<details><summary>Answer</summary>Advertised interfaces, authorization rules and observable task semantics.</details>

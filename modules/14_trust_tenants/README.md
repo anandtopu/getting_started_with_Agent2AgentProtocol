@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Vendor: Fetch signed Agent Card
+    Concierge->>Trust: Load configured verification keys
+    Trust-->>Concierge: Approved key set
+    Concierge->>Concierge: Canonicalize and verify JWS
+    Concierge->>Vendor: Request under authenticated owner scope
 ```
 
-Under the hood: No. Trust comes from operator-pinned keys or a configured HTTPS vendor endpoint. Compare that behavior with the captured requests and responses below.
+Under the hood: JWS authenticates the canonical card payload with a protected header. Key trust comes from operator policy, not a URL supplied by the card. Card integrity and task authorization are independent: knowing a task ID or having a valid card signature cannot grant access to another owner's task.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| common.security.sign_card (course) | Agent Card JWS | Signs the canonical unsigned card | Publish a verifiable identity |
+| common.security.verify_card (course) | Trust verification | Accepts only approved signing keys | Reject forgery before delegation |
 
 ## Walkthrough
 
@@ -132,16 +127,34 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/14_trust_tenants/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood verifies that a published vendor card has an approved signature before trusting its advertised identity.
+
+Run:
+
+```console
+uv run python modules/14_trust_tenants/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_sign.result.json) for the full output):
+
+```json
+{
+  "name": "Granite Hall Venues",
+  "protocolBinding": "JSONRPC",
+  "protocolVersion": "1.0"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/14/14-02_fix/task.md) |
+| Signature fails after harmless JSON formatting | Raw serialization signed | Use canonical JSON; [practice 14-43](../../gym/tasks/14/14-43_trust_canonical/task.md) |
+| Attacker signs its own forged identity | Any supplied key accepted | Verify only approved vendor keys; [practice 14-02](../../gym/tasks/14/14-02_fix/task.md) |
+| Cached cards fail during rotation | Old verification key removed too early | Retain the overlap window; [practice 14-44](../../gym/tasks/14/14-44_trust_rotation/task.md) |
+| Revoked key still verifies | Verifier uses a stale unbounded cache | Refresh and enforce revocation policy; [practice 14-45](../../gym/tasks/14/14-45_trust_revocation/task.md) |
 
 ## Practice
 
@@ -169,31 +182,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Which card field is excluded from the signed payload?
+<details><summary>Answer</summary>signatures itself.</details>
 
-2. How would you demonstrate: sign canonical card bytes?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Why canonicalize JSON before signing?
+<details><summary>Answer</summary>Equivalent JSON formatting and key order should produce the same signing bytes.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Can a key URL in an untrusted card establish trust?
+<details><summary>Answer</summary>No. Use separately configured keys or an operator-pinned HTTPS source.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Why overlap keys during rotation?
+<details><summary>Answer</summary>Previously cached cards must remain verifiable for their allowed lifetime.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Does a signed card authorize reading a task?
+<details><summary>Answer</summary>No. Task ownership comes from authenticated request identity.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What should a malformed signature header do?
+<details><summary>Answer</summary>Fail validation cleanly without accepting the card or crashing orchestration.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- signatures itself.
+- Equivalent JSON formatting and key order should produce the same signing bytes.
+- No. Use separately configured keys or an operator-pinned HTTPS source.
+- Previously cached cards must remain verifiable for their allowed lifetime.
+- No. Task ownership comes from authenticated request identity.
 
 ## Go deeper
 

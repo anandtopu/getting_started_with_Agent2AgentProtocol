@@ -23,6 +23,29 @@ STOP = ROOT / "workspace" / "network.stop"
 console = Console()
 
 
+def child_environment(vendor, tokens, keys, trust, *, llm=False, frameworks=False):
+    """Give only the orchestrator the credentials needed to call other vendors."""
+    env = {key: value for key, value in os.environ.items() if key != "MAPLEWOOD_VENDOR_TOKENS"}
+    env.update(
+        MAPLEWOOD_TOKEN=tokens[vendor],
+        MAPLEWOOD_SIGNING_KEY=b64(keys[vendor].private_bytes_raw()),
+        MAPLEWOOD_TRUSTED_KEYS=json.dumps(trust),
+        MAPLEWOOD_VENDOR_TIMEOUT="120" if llm else "90" if frameworks else "5",
+    )
+    if vendor == "concierge":
+        env["MAPLEWOOD_VENDOR_TOKENS"] = json.dumps(
+            {name: token for name, token in tokens.items() if name != "concierge"}
+        )
+    return env
+
+
+def network_status():
+    if not STATE.exists():
+        return "No local network is running."
+    state = json.loads(STATE.read_text(encoding="utf-8"))
+    return json.dumps({"module": state["module"], "agents": list(state["tokens"])}, indent=2)
+
+
 def logs(process: subprocess.Popen, vendor: str, color: str) -> None:
     for line in process.stdout:
         console.print(f"[{vendor}] {line.rstrip()}", style=color, markup=False)
@@ -47,9 +70,12 @@ def main() -> None:
         print("Stop requested. The supervisor will close its own child processes.")
         return
     if args.action == "status":
-        print(STATE.read_text() if STATE.exists() else "No local network is running.")
+        print(network_status())
         return
-    members = network_members(args.module)
+    try:
+        members = network_members(args.module)
+    except ValueError as exc:
+        parser.error(str(exc))
     ports = [PORTS[vendor] for vendor in members]
     if "print" in members:
         ports.append(GRPC_PORT)
@@ -73,16 +99,9 @@ def main() -> None:
     children = []
     try:
         for vendor, color in zip(members, ["cyan", "green", "yellow", "magenta", "blue", "white"]):
-            env = {
-                **os.environ,
-                "MAPLEWOOD_TOKEN": tokens[vendor],
-                "MAPLEWOOD_SIGNING_KEY": b64(keys[vendor].private_bytes_raw()),
-                "MAPLEWOOD_TRUSTED_KEYS": json.dumps(trust),
-                "MAPLEWOOD_VENDOR_TIMEOUT": "120" if args.llm else "90" if args.frameworks else "5",
-                "MAPLEWOOD_VENDOR_TOKENS": json.dumps(
-                    {k: v for k, v in tokens.items() if k != "concierge"}
-                ),
-            }
+            env = child_environment(
+                vendor, tokens, keys, trust, llm=args.llm, frameworks=args.frameworks
+            )
             command = [sys.executable, "-m", "agents.server", "--vendor", vendor]
             framework_map = {
                 "venues": "adk",
@@ -117,7 +136,7 @@ def main() -> None:
         )
         while not STOP.exists():
             if any(child.poll() is not None for child in children):
-                raise RuntimeError("An agent exited. Check the log above and scripts/check_env.py.")
+                raise SystemExit("An agent exited. Check the log above and scripts/check_env.py.")
             time.sleep(0.2)
     except KeyboardInterrupt:
         print("Stopping the network.")

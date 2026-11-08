@@ -1,4 +1,4 @@
-# Validation report â€” expanded course release
+# Validation report — expanded course release
 
 Repository: [getting_started_with_Agent2AgentProtocol](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol)
 
@@ -11,11 +11,11 @@ is evidence of the learning deployment, not an external production certification
 
 | Check | Evidence |
 |---|---|
-| Offline Python | 697 tests; application sockets disabled; A2A deprecations are errors |
+| Offline Python | 721 tests; application sockets disabled; A2A deprecations are errors |
 | Gym | 265 starters fail and 265 solutions pass; 25 modules, eight types, at least four types and three levels per module |
 | Examples and notebooks | 118 standalone commands (83 examples, 25 use cases, 10 capstone starter/reference commands) and all 25 notebooks |
 | Style | Ruff lint and formatting; no banned current-track legacy APIs |
-| Links | 1,554 local references and 74 external URLs checked before final publication |
+| Links | 1,679 local references and 75 external URLs checked after the final lesson review |
 | Protocol | All eleven operations captured for JSON-RPC, HTTP+JSON and protobuf service boundaries; real network gRPC separately checked |
 | Golden scenarios | All twenty fixtures check exact vendor states, chunks, artifact IDs and quotes; hardened framework deployment also checks every golden plan |
 | Persistence and replicas | SQLite/PostgreSQL CAS, atomic task/event/outbox rollback, publisher crash, second-handler stream reconnect, owner isolation |
@@ -28,6 +28,7 @@ is evidence of the learning deployment, not an external production certification
 | Observability | HTTP/gRPC trace propagation, task/context span attributes, bounded vendor metric labels, all six services exported to Jaeger |
 | Business recovery | Idempotent no-charge hotel/venue holds, uncertain-response cleanup, compensating release and explicit manual follow-up |
 | Review | [Per-file](reviews/PER_FILE_REVIEW.md), [cross-file](reviews/INTEGRATION_REVIEW.md) and [closed action plan](reviews/ACTION_PLAN.md) |
+| Final brief review | [Fresh requirements and adversarial review](reviews/FINAL_BRIEF_REVIEW.md); ten additional findings fixed, 25 lesson rewrites, every core module's network lifecycle checked |
 
 The [expanded implementation run](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42438012884)
 at 55fb956 passed **all 26 jobs**, including PostgreSQL and all twenty hardened-network

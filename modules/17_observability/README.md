@@ -1,10 +1,10 @@
-**Network and Concierge version 17:** what's new â€” observability and evaluation.
+**Network and Concierge version 17:** what's new — observability and evaluation.
 
 # Module 17: Observability and evaluation
 > After this module you can read related spans.
 
-**Time:** ~90 min Â· **Level:** Advanced Â· **LLM needed:** No for examples and grading Â· **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 17
-**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
+**Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 17
+**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
 
 ## Prerequisites
 
@@ -29,16 +29,15 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Learner->>Concierge: Event brief with trace context
+    Concierge->>Venue: Child request and traceparent
+    Concierge->>Saffron: Child request and traceparent
+    Venue-->>Collector: Span with task and context IDs
+    Saffron-->>Collector: Related span
+    Collector-->>Learner: Cross-agent timeline
 ```
 
-Under the hood: Their unbounded cardinality can exhaust a metrics backend; use bounded vendor labels and span attributes for IDs. Compare that behavior with the captured requests and responses below.
+Under the hood: Trace IDs join a distributed request; span IDs describe individual operations. Task and context IDs are attributes, not metric labels. Metrics aggregate bounded categories such as vendor and outcome. Golden evaluation checks the business result independently of whether a trace looks healthy.
 
 ## On the wire
 
@@ -50,13 +49,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| opentelemetry.trace.get_tracer | Tracing | Creates related operation spans | Instrument vendor work |
+| common.observability.record_task (course) | Correlation | Adds task and context attributes | Connect protocol work to traces |
 
 ## Walkthrough
 
@@ -125,16 +121,32 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/17_observability/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood follows an offsite request through related vendor spans instead of treating each service log as an isolated event.
+
+Run:
+
+```console
+uv run python modules/17_observability/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_trace.result.json) for the full output):
+
+```json
+{
+  "name": "venues.request"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/17/17-02_fix/task.md) |
+| Separate traces for one plan | traceparent not forwarded | Propagate context at every outgoing boundary; [practice 17-02](../../gym/tasks/17/17-02_fix/task.md) |
+| Exploding metric series | Task IDs used as labels | Use bounded vendor and outcome labels; [practice 17-02](../../gym/tasks/17/17-02_fix/task.md) |
+| Green transport but wrong event result | Only status codes evaluated | Compare exact golden business outputs; [practice 17-05](../../gym/tasks/17/17-05_conformance/task.md) |
+| Credentials visible in logs | Raw headers recorded | Redact secrets before recording; [practice 17-02](../../gym/tasks/17/17-02_fix/task.md) |
 
 ## Practice
 
@@ -149,35 +161,35 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/17_obs
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. What links spans across HTTP and gRPC?
+<details><summary>Answer</summary>W3C trace context propagated in headers or metadata.</details>
 
-2. How would you demonstrate: read related spans?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Are task ID and trace ID interchangeable?
+<details><summary>Answer</summary>No. A task can outlive a single request trace.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Why avoid task IDs as metric labels?
+<details><summary>Answer</summary>Each new ID creates another time series and unbounded cardinality.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Can a successful HTTP span prove the quote is correct?
+<details><summary>Answer</summary>No. Golden evaluation must check delegations, states and artifacts.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What should be excluded from telemetry?
+<details><summary>Answer</summary>Credentials, private reasoning and unnecessary personal event fields.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Why preserve a recording span across the SDK boundary?
+<details><summary>Answer</summary>A non-recording replacement can silently lose task and context attributes.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- W3C trace context propagated in headers or metadata.
+- No. A task can outlive a single request trace.
+- Each new ID creates another time series and unbounded cardinality.
+- No. Golden evaluation must check delegations, states and artifacts.
+- Credentials, private reasoning and unnecessary personal event fields.
 
 ## Go deeper
 
-[Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) Â· [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
+[Specification](https://a2a-protocol.org/v1.0.1/specification/) · [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) · [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
 
 ## Next: Module 18
 

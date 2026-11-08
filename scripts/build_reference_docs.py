@@ -125,32 +125,32 @@ def main() -> None:
         )
     schedule = """## Three-week intensive
 
-Plan 3â€“4 hours per study day, plus extra capstone time. Every day: predict one
+Plan 3–4 hours per study day, plus extra capstone time. Every day: predict one
 result before running it, finish the assigned gym checks, and review yesterday's mistakes.
 
 | Days | Work |
 |---|---|
-| 1â€“3 | 00â€“02: setup, objects, discovery |
-| 4â€“6 | 03â€“05: server, client, lifecycle |
-| 7â€“9 | 06â€“08: parts, streams and bindings; Tier 1 checkpoint |
-| 10â€“13 | 09â€“12: models, orchestration, framework boundaries and MCP |
-| 14â€“16 | 13â€“15: authentication, card trust and security audit |
-| 17â€“20 | 16â€“19: tests, traces, extensions and deployment |
+| 1–3 | 00–02: setup, objects, discovery |
+| 4–6 | 03–05: server, client, lifecycle |
+| 7–9 | 06–08: parts, streams and bindings; Tier 1 checkpoint |
+| 10–13 | 09–12: models, orchestration, framework boundaries and MCP |
+| 14–16 | 13–15: authentication, card trust and security audit |
+| 17–20 | 16–19: tests, traces, extensions and deployment |
 | 21 | 20: architecture review and flagship capstone plan |
 
 ## Six-week part-time
 
-Plan 8â€“12 hours weekly. Study four days, practice on two days, then review.
+Plan 8–12 hours weekly. Study four days, practice on two days, then review.
 On every study day run gym next; once a module is finished, use gym drill for review.
 
 | Week | Modules | Practice/checkpoint |
 |---|---|---|
-| 1 | 00â€“03 | Discover and serve a deterministic vendor |
-| 2 | 04â€“08 | Complete Tier 1 with continuation, chunks and protobuf |
-| 3 | 09â€“12 | Script decisions, delegate safely and compare tool boundaries |
-| 4 | 13â€“15 | Audit identity, authorization, signatures and untrusted content |
-| 5 | 16â€“18 | Contract tests, golden scenarios and version negotiation |
-| 6 | 19â€“20 | Deployment review and capstone presentation |
+| 1 | 00–03 | Discover and serve a deterministic vendor |
+| 2 | 04–08 | Complete Tier 1 with continuation, chunks and protobuf |
+| 3 | 09–12 | Script decisions, delegate safely and compare tool boundaries |
+| 4 | 13–15 | Audit identity, authorization, signatures and untrusted content |
+| 5 | 16–18 | Contract tests, golden scenarios and version negotiation |
+| 6 | 19–20 | Deployment review and capstone presentation |
 
 ## Tier checkpoints
 
@@ -211,12 +211,12 @@ Use the capstone acceptance criteria and the verification notes to identify rema
         write(
             f"cheatsheets/tier_{tier}.md",
             f"# Tier {tier}: desk reference\n\n"
-            + "\n\n".join(f"**{m['title']}** â€” {m['idea']}" for m in topics)
+            + "\n\n".join(f"**{m['title']}** — {m['idea']}" for m in topics)
             + "\n\nPractice: uv run gym list --module NN; uv run gym next; uv run gym drill.",
         )
     write(
         "cheatsheets/protocol.md",
-        "# A2A protocol at a glance\n\nCard â†’ interface â†’ authenticated request â†’ Message or Task â†’ status and artifacts.\n\n- Interface version: 1.0. Specification release: 1.0.1.\n- Bindings: JSONRPC, HTTP+JSON, GRPC.\n- Parts: text, raw, url or data; exactly one content alternative.\n- States: submitted, working; interrupted input-required/auth-required; terminal completed/failed/canceled/rejected. Wire values use TASK_STATE_ prefixes.\n- New task streams start with Task; direct-message streams contain one Message.\n- Chunk flags concern an artifact; task state concerns the work order.\n- Keep tokens in headers; validate destinations and outputs.\n\nSee the [operation table](../docs/PROTOCOL_GUIDE.md).",
+        "# A2A protocol at a glance\n\nCard → interface → authenticated request → Message or Task → status and artifacts.\n\n- Interface version: 1.0. Specification release: 1.0.1.\n- Bindings: JSONRPC, HTTP+JSON, GRPC.\n- Parts: text, raw, url or data; exactly one content alternative.\n- States: submitted, working; interrupted input-required/auth-required; terminal completed/failed/canceled/rejected. Wire values use TASK_STATE_ prefixes.\n- New task streams start with Task; direct-message streams contain one Message.\n- Chunk flags concern an artifact; task state concerns the work order.\n- Keep tokens in headers; validate destinations and outputs.\n\nSee the [operation table](../docs/PROTOCOL_GUIDE.md).",
     )
     print(
         f"Wrote learning schedules, {len(TERMS)} glossary terms, version table and descriptor-based protocol reference."

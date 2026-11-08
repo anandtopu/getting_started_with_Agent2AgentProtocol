@@ -29,16 +29,15 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Travel: Create idempotent no-charge hotel hold
+    Travel-->>Concierge: Confirmed hold
+    Concierge->>Venue: Request venue hold
+    Venue-->>Concierge: Reject or uncertain response
+    Concierge->>Travel: Compensating release
+    Concierge-->>Learner: Recovery result or manual follow-up
 ```
 
-Under the hood: A new business action such as releasing a hold; it is not a distributed database rollback. Compare that behavior with the captured requests and responses below.
+Under the hood: An organizational boundary justifies independent agents when ownership or deployment must remain separate. Distributed failure can leave partially completed business work. Compensation is a new authorized action, not a cross-company database rollback. Unknown outcomes need reconciliation before declaring success.
 
 ## On the wire
 
@@ -50,13 +49,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| common.saga.reserve_pair (course) | Business compensation | Reconciles and releases tentative holds | Recover partial success |
+| CancelTaskRequest | Protocol cancellation | Stops eligible unfinished work | Cancel a task, not a completed business effect |
 
 ## Walkthrough
 
@@ -161,16 +157,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/20_designing_agent_networks/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood evaluates independent vendor outcomes before approving an event; the compensation example then handles partial holds.
+
+Run:
+
+```console
+uv run python modules/20_designing_agent_networks/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_orchestrate.result.json) for the full output):
+
+```json
+{
+  "vendor": "venues",
+  "state": "TASK_STATE_COMPLETED",
+  "total_cents": 80000.0,
+  "currency": "USD",
+  "approval_required": true
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/20/20-02_fix/task.md) |
+| Duplicate hotel holds after retry | No stable application request ID | Use idempotent reservation keys; [practice 20-02](../../gym/tasks/20/20-02_fix/task.md) |
+| Completed hold survives task cancellation | Business undo confused with protocol cancellation | Invoke the release skill; [practice 20-02](../../gym/tasks/20/20-02_fix/task.md) |
+| Partial plan presented as fully booked | Failure state discarded | Report each vendor outcome and approval state; [practice 20-05](../../gym/tasks/20/20-05_conformance/task.md) |
+| Unknown cleanup reported successful | Acknowledgement not verified | Require explicit confirmation or manual follow-up; [practice 20-02](../../gym/tasks/20/20-02_fix/task.md) |
 
 ## Practice
 
@@ -185,31 +201,31 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/20_des
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. When is one process preferable to A2A services?
+<details><summary>Answer</summary>When work shares ownership and lifecycle and independent deployment adds little value.</details>
 
-2. How would you demonstrate: choose useful agent boundaries?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Does canceling an A2A task undo a completed hold?
+<details><summary>Answer</summary>No. A release skill performs the compensating business action.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Why use a stable hold request ID?
+<details><summary>Answer</summary>Retries can reconcile the same business operation instead of creating duplicate holds.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. What if a hold committed but its confirmation is malformed?
+<details><summary>Answer</summary>Treat the outcome as uncertain and reconcile by its idempotency key.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What if cleanup cannot be confirmed?
+<details><summary>Answer</summary>Report manual follow-up explicitly rather than claiming compensation succeeded.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What belongs in an architecture decision record?
+<details><summary>Answer</summary>Context, alternatives, chosen boundaries, measurable tradeoffs and failure policy.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- When work shares ownership and lifecycle and independent deployment adds little value.
+- No. A release skill performs the compensating business action.
+- Retries can reconcile the same business operation instead of creating duplicate holds.
+- Treat the outcome as uncertain and reconcile by its idempotency key.
+- Report manual follow-up explicitly rather than claiming compensation succeeded.
 
 ## Go deeper
 

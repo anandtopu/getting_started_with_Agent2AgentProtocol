@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Python->>TypeScript: Discover native vendor card
+    TypeScript-->>Python: Compatible interface
+    Python->>TypeScript: SendMessage over real HTTP
+    TypeScript-->>Python: Native SDK task and quote
+    TypeScript->>Python: Native client interoperability request
 ```
 
-Under the hood: No. Compare semantics while retaining each task/context mapping. Compare that behavior with the captured requests and responses below.
+Under the hood: The JSON contract crosses a process and language boundary; no Python task object is shared. Native TypeScript source and its pinned JavaScript SDK are checked with the Python client. The introductory Python scripts show wire shapes, while the native lab proves interoperability.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| scripts/check_typescript_interop.py (course) | Native interoperability check | Starts real language endpoints | Verify both directions |
+| AgentCard | Shared wire contract | Advertises compatible native interfaces | Choose the cross-language transport |
 
 ## Walkthrough
 
@@ -328,16 +323,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/bonus/B1_typescript/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood studies the JSON contract that its native TypeScript vendor and Python client exchange in the accompanying native lab.
+
+Run:
+
+```console
+uv run python modules/bonus/B1_typescript/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_jsonrpc.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "name": "quote",
+  "vendor": "venues",
+  "total_cents": 80000.0,
+  "currency": "USD"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../../gym/tasks/B1/B1-02_fix/task.md) |
+| Compile succeeds but exchange fails | Only type checking was run | Run the native interoperability command; [practice B1-02](../../../gym/tasks/B1/B1-02_fix/task.md) |
+| Task comparison fails on fresh IDs | Whole responses compared literally | Compare invariant semantics; [practice B1-05](../../../gym/tasks/B1/B1-05_conformance/task.md) |
+| Client uses an unsupported binding | Card ignored | Select a compatible advertised interface; [practice B1-02](../../../gym/tasks/B1/B1-02_fix/task.md) |
+| Dependency update changes behavior | Lockfile bypassed | Use npm ci and rerun contract tests; [practice B1-02](../../../gym/tasks/B1/B1-02_fix/task.md) |
 
 ## Practice
 
@@ -352,31 +367,31 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/bonus/
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Does a Python-only test prove TypeScript interoperability?
+<details><summary>Answer</summary>No. A native TypeScript process must participate.</details>
 
-2. How would you demonstrate: compare json representations?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Why run npm ci instead of an unpinned install?
+<details><summary>Answer</summary>It reproduces the dependency lockfile used by CI.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Should task IDs match across independent runs?
+<details><summary>Answer</summary>No. Compare semantic states, fields and amounts rather than generated IDs.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Which files contain the native implementation?
+<details><summary>Answer</summary>The TypeScript lab files in this module, linked in its native-language walkthrough.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Does a TypeScript interface replace runtime validation?
+<details><summary>Answer</summary>No. Remote JSON still needs validation at the boundary.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Why test both client and server directions?
+<details><summary>Answer</summary>Serialization and transport assumptions can fail in either role.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. A native TypeScript process must participate.
+- It reproduces the dependency lockfile used by CI.
+- No. Compare semantic states, fields and amounts rather than generated IDs.
+- The TypeScript lab files in this module, linked in its native-language walkthrough.
+- No. Remote JSON still needs validation at the boundary.
 
 ## Go deeper
 

@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Rogue->>Concierge: Card text or artifact with hidden instructions
+    Concierge->>Concierge: Validate identity, schema and requested scope
+    Concierge->>Egress: Approved file or callback destination
+    Egress-->>Concierge: Bounded content or policy rejection
+    Concierge-->>Learner: Safe quote or explicit failure
 ```
 
-Under the hood: An approved initial URL could redirect to an internal or otherwise forbidden destination. Compare that behavior with the captured requests and responses below.
+Under the hood: Untrusted content remains data even when its source has a valid signature. Code enforces destinations, requested scope, schemas and budgets around model decisions. File fetching rejects private addresses and redirects. Credential provisioning and human approval stay outside vendor-controlled content.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| common.security.safe_file_url (course) | Egress policy | Checks explicit trusted public-IP URLs | Before file fetching |
+| common.security.fetch_file (course) | Bounded retrieval | Rejects redirects and oversized bodies | Consume approved file Parts |
 
 ## Walkthrough
 
@@ -123,16 +118,35 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/15_security/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+A rogue vendor proposes a private file destination; Maplewood's egress policy rejects it before any request leaves.
+
+Run:
+
+```console
+uv run python modules/15_security/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_ssrf.result.json) for the full output):
+
+```json
+{
+  "blocked": [
+    "https://127.0.0.1/private",
+    "https://169.254.169.254/latest"
+  ]
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/15/15-02_fix/task.md) |
+| Internal URL fetched through file Part | SSRF policy missing | Validate address, origin and redirect behavior; [practice 15-07](../../gym/tasks/15/15-07_ssrf/task.md) |
+| Oversized response consumes memory | Limit checked after downloading everything | Stop while streaming at the byte limit; [practice 15-43](../../gym/tasks/15/15-43_egress_oversize/task.md) |
+| Forged artifact changes the plan | Remote text interpreted as instructions | Validate outputs and keep policy outside model text; [practice 15-02](../../gym/tasks/15/15-02_fix/task.md) |
+| Same notification causes another effect | Replay state absent | Authenticate and deduplicate delivery IDs; [practice 15-45](../../gym/tasks/15/15-45_egress_replay/task.md) |
 
 ## Practice
 
@@ -160,31 +174,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Can signed skill text override the user's requested vendor scope?
+<details><summary>Answer</summary>No. Signatures establish origin, not authority to expand the task.</details>
 
-2. How would you demonstrate: reject unsafe destinations?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Why block private file addresses?
+<details><summary>Answer</summary>They can target internal services or cloud metadata endpoints.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Why is a redirect a separate trust decision?
+<details><summary>Answer</summary>It changes the destination after the initial URL was approved.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. What stops a poisoned quote from approving payment?
+<details><summary>Answer</summary>A strict output contract and a separate human approval gate.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What prevents delegation from leaking unrelated fields?
+<details><summary>Answer</summary>A per-vendor payload allow-list enforced in code.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What makes a callback replay distinguishable?
+<details><summary>Answer</summary>An authenticated timestamp and delivery ID plus replay or durable inbox state.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. Signatures establish origin, not authority to expand the task.
+- They can target internal services or cloud metadata endpoints.
+- It changes the destination after the initial URL was approved.
+- A strict output contract and a separate human approval gate.
+- A per-vendor payload allow-list enforced in code.
 
 ## Go deeper
 

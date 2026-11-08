@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Vendor: JSON-RPC SendMessage, request id 7
+    Vendor-->>Concierge: Result containing task id T
+    Concierge->>Vendor: GetTask for T
+    Vendor-->>Concierge: Status and artifacts for T
 ```
 
-Under the hood: Yes. A direct Message is a valid alternative to a tracked Task. Compare that behavior with the captured requests and responses below.
+Under the hood: JSON-RPC wraps the operation and its parameters. The RPC id belongs to one exchange; the task id belongs to the work across exchanges. A context groups related interactions. The same semantics can be encoded through HTTP+JSON or protobuf/gRPC.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| Message | Communication | Carries role, parts and correlation fields | Send a brief |
+| Task | Tracked work | Carries status, history and artifacts | Poll or continue work |
 
 ## Walkthrough
 
@@ -260,16 +254,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/01_how_a2a_works/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood compares an RPC exchange ID with the vendor's longer-lived work-order ID while requesting a venue quote.
+
+Run:
+
+```console
+uv run python modules/01_how_a2a_works/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_jsonrpc.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "name": "quote",
+  "vendor": "venues",
+  "total_cents": 80000.0,
+  "currency": "USD"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/01/01-02_fix/task.md) |
+| Invalid params | Message fields placed directly in params | Nest the message under params.message; [practice 01-02](../../gym/tasks/01/01-02_fix/task.md) |
+| Response matched to the wrong request | Task id used as RPC id | Track exchange and work identifiers separately; [practice 01-02](../../gym/tasks/01/01-02_fix/task.md) |
+| Quote text mistaken for task status | Reading prose instead of typed fields | Read status.state and artifacts; [practice 01-02](../../gym/tasks/01/01-02_fix/task.md) |
+| GetTask returns not found | Message id supplied as task id | Use the task id returned by the server; [practice 01-02](../../gym/tasks/01/01-02_fix/task.md) |
 
 ## Practice
 
@@ -284,31 +298,31 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/01_how
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Which ID matches an RPC response to its request?
+<details><summary>Answer</summary>The top-level JSON-RPC id, not messageId or task id.</details>
 
-2. How would you demonstrate: read a json-rpc envelope?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Where does SendMessage's message go?
+<details><summary>Answer</summary>Inside params.message in a JSON-RPC request.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Must every response create a task?
+<details><summary>Answer</summary>No. An agent may reply with a direct Message when tracked work is unnecessary.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. What does contextId group?
+<details><summary>Answer</summary>Related interactions; it does not authorize access to other tasks.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Is an artifact the same as a status message?
+<details><summary>Answer</summary>No. Artifacts are deliverables, while status messages explain progress or missing input.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Why compare three bindings?
+<details><summary>Answer</summary>To recognize the same operations despite different HTTP paths, envelopes and protobuf encoding.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- The top-level JSON-RPC id, not messageId or task id.
+- Inside params.message in a JSON-RPC request.
+- No. An agent may reply with a direct Message when tracked work is unnecessary.
+- Related interactions; it does not authorize access to other tasks.
+- No. Artifacts are deliverables, while status messages explain progress or missing input.
 
 ## Go deeper
 

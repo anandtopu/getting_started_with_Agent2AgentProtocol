@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Saffron: Event brief
+    Saffron->>Model: Allowed action schema and minimized data
+    Model-->>Saffron: Streamed tool arguments
+    Saffron->>Saffron: Validate complete call and enforce budget
+    Saffron-->>Concierge: Safe progress then quote or input-required
 ```
 
-Under the hood: No. Emit safe progress and the validated deliverable, not internal reasoning or partial tool arguments. Compare that behavior with the captured requests and responses below.
+Under the hood: Provider chunks are untrusted partial arguments until the response ends and schema validation succeeds. Only an allowed complete call reaches application tools. Progress reports contain frame counts rather than private reasoning. Code still enforces required dietary counts and kitchen limits.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| common.llm.Model.tool_decide (course) | Bounded model decision | Validates provider-native tool streams | Choose an allowed action |
+| TaskStatusUpdateEvent | Safe progress | Reports work without exposing reasoning | Connect model work to A2A status |
 
 ## Walkthrough
 
@@ -134,16 +129,35 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/09_llm_server/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Saffron uses a repeatable scripted decision to rehearse the exact tool boundary later used by the live model.
+
+Run:
+
+```console
+uv run python modules/09_llm_server/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_fake_llm.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "vendor": "catering",
+  "currency": "USD",
+  "total_cents": 96000
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/09/09-02_fix/task.md) |
+| Malformed tool arguments execute | Partial stream treated as a call | Validate only after final provider completion; [practice 09-44](../../gym/tasks/09/09-44_native_model_truncated/task.md) |
+| Unexpected tool runs | Model output trusted without an allow-list | Reject unknown tool names; [practice 09-45](../../gym/tasks/09/09-45_native_model_unsafe/task.md) |
+| Task costs grow without bound | No token, byte or time limits | Enforce shared decision budgets; [practice 09-02](../../gym/tasks/09/09-02_fix/task.md) |
+| Missing-input quote appears | Model decision bypasses business validation | Enforce required inputs in code; [practice 09-01](../../gym/tasks/09/09-01_build/task.md) |
 
 ## Practice
 
@@ -170,31 +184,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. May a partial JSON tool argument execute?
+<details><summary>Answer</summary>No. Wait for a complete, valid tool call.</details>
 
-2. How would you demonstrate: replace model output with a script?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Who calculates the quote amount?
+<details><summary>Answer</summary>Deterministic business code, not model arithmetic.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. What if the model chooses an unknown tool?
+<details><summary>Answer</summary>Reject the decision before any tool executes.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. How do graded tasks avoid provider cost and randomness?
+<details><summary>Answer</summary>They use scripted decisions and captured provider framing.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Does model-selected quote_menu bypass missing dietary counts?
+<details><summary>Answer</summary>No. Application validation still pauses the task.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What may be streamed as progress?
+<details><summary>Answer</summary>Safe operational updates; never private reasoning or incomplete executable arguments.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. Wait for a complete, valid tool call.
+- Deterministic business code, not model arithmetic.
+- Reject the decision before any tool executes.
+- They use scripted decisions and captured provider framing.
+- No. Application validation still pauses the task.
 
 ## Go deeper
 

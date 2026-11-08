@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Test->>ASGI: Real SDK request without sockets
+    ASGI-->>Test: Task and event observations
+    Test->>TCK: Execute pinned upstream scenarios
+    TCK-->>Test: Raw pass, skip and failure evidence
+    Test->>Review: Compare requirement and diagnostic
 ```
 
-Under the hood: No unexpected deviation from the documented baseline; four exact upstream contradictions remain raw failures. Compare that behavior with the captured requests and responses below.
+Under the hood: Contract checks exercise the real SDK through in-process transports. They are distinct from real socket and language tests. Conformance claims must retain the raw upstream result: a regression gate with named known contradictions is not equivalent to every official test passing.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| httpx.ASGITransport | In-process HTTP boundary | Runs real routes without sockets | Offline contract tests |
+| TaskEventStream | Shared event interface | Supports independent observers | Reconnect and replica tests |
 
 ## Walkthrough
 
@@ -200,16 +195,44 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/16_testing_conformance/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood deliberately requests missing or unsupported work to verify that the boundary returns protocol errors.
+
+Run:
+
+```console
+uv run python modules/16_testing_conformance/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_errors.result.json) for the full output):
+
+```json
+{
+  "error": {
+    "code": 404,
+    "status": "NOT_FOUND",
+    "message": "Task not found",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "TASK_NOT_FOUND",
+        "domain": "a2a-protocol.org",
+        "metadata": {}
+      }
+    ]
+  }
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/16/16-02_fix/task.md) |
+| Unknown operation treated as success | Method dispatch too permissive | Return the protocol method error; [practice 16-20](../../gym/tasks/16/16-20_conformance_method/task.md) |
+| Malformed request crashes handler | Parsing failures not mapped | Return the correct invalid-request response; [practice 16-24](../../gym/tasks/16/16-24_conformance_parse/task.md) |
+| Every response labeled application/json | Binding-specific media rules ignored | Use the required A2A media type; [practice 16-25](../../gym/tasks/16/16-25_conformance_rest_media/task.md) |
+| Regression disappears behind broad TCK exception | Failures ignored by substring alone | Match case name and exact known diagnostic; [practice 16-02](../../gym/tasks/16/16-02_fix/task.md) |
 
 ## Practice
 
@@ -236,31 +259,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Does an in-process HTTP test need a listening port?
+<details><summary>Answer</summary>No. ASGITransport calls the app in the same process.</details>
 
-2. How would you demonstrate: run offline contracts?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. What does protobuf parsing alone fail to check?
+<details><summary>Answer</summary>Behavioral rules such as task transitions and authorization.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Why retain the raw TCK report?
+<details><summary>Answer</summary>To distinguish actual passes from skips and documented upstream contradictions.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Does green CI mean full official certification?
+<details><summary>Answer</summary>No. Read the exact conformance scope and exceptions.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. How do you test reconnect after publisher loss?
+<details><summary>Answer</summary>Persist the task and journal, then subscribe through a second handler.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What makes a useful bug report?
+<details><summary>Answer</summary>A minimal request, observed response, expected behavior and specific requirement reference.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. ASGITransport calls the app in the same process.
+- Behavioral rules such as task transitions and authorization.
+- To distinguish actual passes from skips and documented upstream contradictions.
+- No. Read the exact conformance scope and exceptions.
+- Persist the task and journal, then subscribe through a second handler.
 
 ## Go deeper
 

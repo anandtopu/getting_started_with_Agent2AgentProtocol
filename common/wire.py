@@ -2,23 +2,77 @@
 
 import json
 from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import httpx
 
-SENSITIVE = {"authorization", "cookie", "set-cookie", "x-api-key", "x-maplewood-signature"}
+SENSITIVE = {
+    "authorization",
+    "cookie",
+    "set-cookie",
+    "x-api-key",
+    "x-maplewood-signature",
+    "credentials",
+    "token",
+    "access_token",
+    "refresh_token",
+    "api_key",
+    "client_secret",
+    "password",
+    "x-amz-signature",
+    "x-amz-security-token",
+}
 
 
 def redact(value):
     if isinstance(value, dict):
         return {
-            key: "[REDACTED]"
-            if key.lower() in SENSITIVE or key.lower() in {"credentials", "token"}
-            else redact(item)
+            key: "[REDACTED]" if key.lower() in SENSITIVE else redact(item)
             for key, item in value.items()
         }
     if isinstance(value, list):
         return [redact(item) for item in value]
     return value
+
+
+def redact_url(value):
+    parsed = urlsplit(value)
+    query = parse_qsl(parsed.query, keep_blank_values=True)
+    if not any(key.lower() in SENSITIVE for key, _ in query) and parsed.username is None:
+        return value
+    netloc = parsed.netloc.rsplit("@", 1)[-1]
+    return urlunsplit(
+        (
+            parsed.scheme,
+            netloc,
+            parsed.path,
+            urlencode(
+                [(key, "[REDACTED]" if key.lower() in SENSITIVE else item) for key, item in query]
+            ),
+            parsed.fragment,
+        )
+    )
+
+
+def redact_events(text):
+    """Reframe multiline SSE data before redaction; never retain unparsed event data."""
+    frames, lines, data = [], [], []
+    for line in text.splitlines() + [""]:
+        if line.startswith("data:"):
+            data.append(line[5:].lstrip())
+        elif line:
+            lines.append(line)
+        else:
+            if data:
+                try:
+                    value = json.dumps(redact(json.loads("\n".join(data))))
+                except ValueError:
+                    value = '"[REDACTED: invalid event JSON]"'
+                lines.append("data: " + value)
+            if lines:
+                frames.append("\n".join(lines))
+            lines, data = [], []
+    return "\n\n".join(frames) + "\n\n"
 
 
 class Recorder(httpx.AsyncBaseTransport):
@@ -33,7 +87,7 @@ class Recorder(httpx.AsyncBaseTransport):
             {
                 "request": {
                     "method": request.method,
-                    "url": str(request.url),
+                    "url": redact_url(str(request.url)),
                     "headers": redact(dict(request.headers)),
                     "body": self.decode(body),
                 },
@@ -51,7 +105,12 @@ class Recorder(httpx.AsyncBaseTransport):
         try:
             return redact(json.loads(data))
         except (ValueError, UnicodeDecodeError):
-            return data.decode("utf-8", errors="replace")
+            text = data.decode("utf-8", errors="replace")
+            return (
+                redact_events(text)
+                if any(line.startswith("data:") for line in text.splitlines())
+                else text
+            )
 
     def save(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)

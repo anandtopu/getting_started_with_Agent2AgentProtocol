@@ -1,7 +1,7 @@
 # Delivery plan and assumptions
 
 The user authorized all seven phases without intermediate approval on 2026-11-07.
-The workspace was empty. Python 3.11â€“3.13 and an editable package let examples run
+The workspace was empty. Python 3.11–3.13 and an editable package let examples run
 by path on PowerShell, macOS and Linux.
 
 1. Verify the specification, migration guide, protobuf and package releases.

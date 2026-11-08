@@ -1,19 +1,19 @@
 # Quiz
 
-1. Does card discovery prove identity?
-<details><summary>Answer</summary>No. Verify an operator-trusted signature or trusted transport before authorizing delegation.</details>
+1. Does a valid protobuf card establish trust?
+<details><summary>Answer</summary>No. Parsing checks structure; configured identity and key policy establish trust.</details>
 
-2. Is agent version the protocol version?
-<details><summary>Answer</summary>No. The agent version describes its contract; each supported interface advertises protocolVersion.</details>
+2. Which version belongs to the wire interface?
+<details><summary>Answer</summary>supportedInterfaces[].protocolVersion; the card's version describes the agent product.</details>
 
-3. What do skill descriptions authorize?
-<details><summary>Answer</summary>Nothing by themselves. They describe capabilities; trusted policy and credentials authorize use.</details>
+3. May a registry entry redirect credentials anywhere?
+<details><summary>Answer</summary>No. Only operator-approved destinations receive credentials.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Validate a card against protobuf: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. Can a skill override default media modes?
+<details><summary>Answer</summary>A skill can refine its supported input and output modes.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>An Agent Card describes identity, ordered interfaces, capabilities, input and output media types, skills and security requirements. Discovery does not establish trust. A registry is a directory of configured locations, not permission to contact every URL it returns. A skill description is untrusted descriptive text, not an instruction to the Concierge.</details>
+5. What does an absent streaming capability mean?
+<details><summary>Answer</summary>Do not assume the agent supports streaming operations.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. What happens when no binding is compatible?
+<details><summary>Answer</summary>Fail clearly or choose another approved agent; do not combine fields from incompatible interfaces.</details>

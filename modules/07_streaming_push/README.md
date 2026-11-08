@@ -29,16 +29,14 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>AV: SendStreamingMessage
+    AV-->>Concierge: Working and artifact chunks
+    Concierge->>AV: SubscribeToTask after disconnect
+    AV-->>Concierge: Remaining events
+    AV->>Webhook: Signed StreamResponse notification
 ```
 
-Under the hood: No. Reconnect with SubscribeToTask or inspect GetTask; cancellation is explicit. Compare that behavior with the captured requests and responses below.
+Under the hood: SSE frames contain status or artifact updates, not arbitrary model tokens. Append chunks by artifact ID and use lastChunk to finish an artifact. Subscription resumes observation of work; it does not start another task. Push delivery has independent authentication, retries and deduplication.
 
 ## On the wire
 
@@ -50,13 +48,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| TaskArtifactUpdateEvent | Artifact stream update | Carries append and last_chunk flags | Assemble streamed deliverables |
+| TaskPushNotificationConfig | Push subscription | Configures a callback for one task | Receive asynchronous notifications |
 
 ## Walkthrough
 
@@ -121,16 +116,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/07_streaming_push/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Brightline reports setup progress as it prepares the AV plan, allowing Maplewood to display chunks before completion.
+
+Run:
+
+```console
+uv run python modules/07_streaming_push/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_stream.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_SUBMITTED",
+  "name": "setup-plan",
+  "vendor": "av",
+  "total_cents": 28000.0,
+  "currency": "USD"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/07/07-02_fix/task.md) |
+| Only the last text chunk remains | Append flag ignored | Accumulate by artifact ID; [practice 07-07](../../gym/tasks/07/07-07_chunks/task.md) |
+| Viewer waits forever for a finished artifact | lastChunk missing | Mark the final artifact chunk; [practice 07-22](../../gym/tasks/07/07-22_stream_flags/task.md) |
+| Duplicate effects after lost acknowledgement | Receiver lacks durable deduplication | Use a signed delivery ID and inbox; [practice 07-31](../../gym/tasks/07/07-31_push_delivery/task.md) |
+| Private webhook URL accepted | Destination validator bypassed | Allow only approved callback endpoints; [practice 07-30](../../gym/tasks/07/07-30_push_ssrf/task.md) |
 
 ## Practice
 
@@ -164,31 +179,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. What identifies chunks of the same artifact?
+<details><summary>Answer</summary>The artifact ID within its task.</details>
 
-2. How would you demonstrate: read sse frames?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. What does append=true mean?
+<details><summary>Answer</summary>Append the new Parts to the existing artifact instead of replacing it.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Does lastChunk mean the task completed?
+<details><summary>Answer</summary>No. It finishes that artifact; task completion is a separate status event.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. What operation follows a dropped stream?
+<details><summary>Answer</summary>SubscribeToTask for the existing active task when supported.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Why authenticate a webhook before deduplicating it?
+<details><summary>Answer</summary>An attacker must not poison the inbox with an unauthenticated delivery ID.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Is exactly-once delivery promised?
+<details><summary>Answer</summary>No. Durable receivers deduplicate at-least-once delivery attempts.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- The artifact ID within its task.
+- Append the new Parts to the existing artifact instead of replacing it.
+- No. It finishes that artifact; task completion is a separate status event.
+- SubscribeToTask for the existing active task when supported.
+- An attacker must not poison the inbox with an unauthenticated delivery ID.
 
 ## Go deeper
 

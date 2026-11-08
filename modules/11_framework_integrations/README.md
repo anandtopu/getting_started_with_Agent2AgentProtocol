@@ -29,16 +29,15 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>A2A: Standard event brief
+    A2A->>Worker: Bounded framework-specific invocation
+    Worker->>Framework: Run its real agent workflow
+    Framework-->>Worker: Structured result
+    Worker-->>A2A: Validated inventory quote
+    A2A-->>Concierge: Shared task lifecycle
 ```
 
-Under the hood: The shared A2A adapter. Frameworks execute internal workflows without redefining protocol states. Compare that behavior with the captured requests and responses below.
+Under the hood: Frameworks own internal execution, while the official A2A SDK owns the external contract. Some framework dependencies still require incompatible SDK versions, so isolated worker environments keep them away from the main protocol runtime. Offline contract tests and real worker tests prove different boundaries.
 
 ## On the wire
 
@@ -50,13 +49,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| agents.framework_vendor.FrameworkVendor (course) | Framework adapter | Preserves the shared A2A lifecycle | Run an isolated native worker |
+| AgentExecutor | Protocol execution contract | Separates framework internals from A2A | Expose a framework agent |
 
 ## Walkthrough
 
@@ -249,16 +245,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/11_framework_integrations/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood rehearses the shared vendor contract before replacing its implementation with a native framework worker.
+
+Run:
+
+```console
+uv run python modules/11_framework_integrations/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_delegate.result.json) for the full output):
+
+```json
+{
+  "vendor": "venues",
+  "state": "TASK_STATE_COMPLETED",
+  "total_cents": 80000.0,
+  "currency": "USD",
+  "approval_required": true
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/11/11-02_fix/task.md) |
+| Import failure after installing a framework | Dependency constraints collide | Use the pinned isolated worker environment; [practice 11-02](../../gym/tasks/11/11-02_fix/task.md) |
+| Framework quote breaks artifact schema | Internal output exposed directly | Validate through the shared adapter; [practice 11-43](../../gym/tasks/11/11-43_framework_unsafe/task.md) |
+| Missing dietary counts become completed | Framework bypasses shared lifecycle | Pause before invoking quote work; [practice 11-41](../../gym/tasks/11/11-41_framework_pause/task.md) |
+| Capacity-invalid request succeeds | Worker result trusted unconditionally | Compare it with validated inventory rules; [practice 11-44](../../gym/tasks/11/11-44_framework_capacity/task.md) |
 
 ## Practice
 
@@ -285,31 +301,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Must two vendors use the same framework?
+<details><summary>Answer</summary>No. They must agree on the A2A contract.</details>
 
-2. How would you demonstrate: separate framework internals from the protocol?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. What does a mocked framework test fail to prove?
+<details><summary>Answer</summary>That the real framework package imports and executes correctly.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Why isolate worker environments?
+<details><summary>Answer</summary>To prevent incompatible SDK dependencies from replacing the current boundary runtime.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Who handles paused task IDs?
+<details><summary>Answer</summary>The shared A2A handler and lifecycle adapter.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. How is a framework-generated quote checked?
+<details><summary>Answer</summary>Against the deterministic inventory and business schema.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What does the interoperability matrix measure?
+<details><summary>Answer</summary>Actual tested framework and operating-system combinations, not presumed compatibility.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. They must agree on the A2A contract.
+- That the real framework package imports and executes correctly.
+- To prevent incompatible SDK dependencies from replacing the current boundary runtime.
+- The shared A2A handler and lifecycle adapter.
+- Against the deterministic inventory and business schema.
 
 ## Go deeper
 

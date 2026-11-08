@@ -1,19 +1,19 @@
 # Quiz
 
-1. What must commit atomically?
-<details><summary>Answer</summary>Task snapshot, revision, durable event and callback outbox entry.</details>
+1. Does a SQL task store alone make SSE work across replicas?
+<details><summary>Answer</summary>No. Replicas also need a shared event stream or journal.</details>
 
-2. Why does a dispatcher need a lease token?
-<details><summary>Answer</summary>It fences acknowledgements from an expired worker after another worker claims the delivery.</details>
+2. Why commit the outbox with the task snapshot?
+<details><summary>Answer</summary>A crash must not leave committed work without its notification record.</details>
 
-3. Does a database task store alone recover streams?
-<details><summary>Answer</summary>No. Replicas also need a shared event journal and consistent snapshot/cursor behavior.</details>
+3. What prevents stale task writers from overwriting newer work?
+<details><summary>Answer</summary>A compare-and-swap revision check in the database transaction.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Persist and reload a task: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. Why fence dispatcher leases?
+<details><summary>Answer</summary>An expired worker must not acknowledge another worker's newer claim.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>A persistent task store survives process loss; an in-memory event queue does not coordinate multiple replicas. The current SDK offers a database event stream and versioned database store, which must be paired correctly. Proxies need streaming timeouts and buffering disabled. Webhook retry requires a durable outbox for crash recovery. Docker packages the process; it does not automatically provide trust or persistence.</details>
+5. Why disable proxy buffering for SSE?
+<details><summary>Answer</summary>Otherwise progress can arrive only after the response finishes.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. What operational work remains beyond a green Compose test?
+<details><summary>Answer</summary>Certificate renewal, backups, retention, monitoring and capacity planning.</details>

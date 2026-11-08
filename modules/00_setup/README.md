@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Learner->>Vendor: GET public Agent Card
+    Vendor-->>Learner: Interfaces and skills
+    Learner->>Vendor: SendMessage with event brief
+    Vendor-->>Learner: Completed venue quote
 ```
 
-Under the hood: The skill and endpoint change; messages, tasks and artifacts retain the protocol contract. Compare that behavior with the captured requests and responses below.
+Under the hood: Discovery is a normal HTTP GET. The returned JSON describes the agent; sending work is a separate request. The first demo runs on loopback without credentials. The in-process examples make the same exchanges without opening a port.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| AgentCard | Discovery document | Read supported interfaces and skills | Before sending work |
+| httpx.AsyncClient.get | HTTP discovery | Fetch the configured card URL | First manual client |
 
 ## Walkthrough
 
@@ -206,16 +200,34 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/00_setup/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood's new planner discovers Granite's available service before sending its first offsite request.
+
+Run:
+
+```console
+uv run python modules/00_setup/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_discover.result.json) for the full output):
+
+```json
+{
+  "name": "Granite Hall Venues",
+  "protocolBinding": "JSONRPC",
+  "protocolVersion": "1.0"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/00/00-02_fix/task.md) |
+| Connection refused | Vendor process is stopped | Start network.py in a second terminal; [practice 00-02](../../gym/tasks/00/00-02_fix/task.md) |
+| Port already in use | Another network owns the fixed port | Run network.py down for that supervisor and retry; [practice 00-02](../../gym/tasks/00/00-02_fix/task.md) |
+| Gym reports no attempt | gym start was skipped | Create the workspace attempt before checking; [practice 00-02](../../gym/tasks/00/00-02_fix/task.md) |
+| Local service exposed to the LAN | Wildcard address selected | Use 127.0.0.1 for unauthenticated demos; [practice 00-02](../../gym/tasks/00/00-02_fix/task.md) |
 
 ## Practice
 
@@ -230,31 +242,31 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/00_set
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Which command installs the locked Python environment?
+<details><summary>Answer</summary>Run uv sync from the repository root; later offline runs reuse the installed dependencies.</details>
 
-2. How would you demonstrate: discover a vendor?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Does reading a card create a task?
+<details><summary>Answer</summary>No. Discovery describes the service; SendMessage requests work.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Why can Tier 1 run without model keys?
+<details><summary>Answer</summary>Its inventory checks and quotes are deterministic Python.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. What does 127.0.0.1 mean?
+<details><summary>Answer</summary>The local computer's loopback interface, reachable only from that computer.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Where should you edit a gym attempt?
+<details><summary>Answer</summary>In workspace after gym start, leaving the trusted task tests unchanged.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Is the kitchen inventory lookup A2A or MCP?
+<details><summary>Answer</summary>An internal tool lookup belongs to MCP; delegation to the independent caterer belongs to A2A.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- Run uv sync from the repository root; later offline runs reuse the installed dependencies.
+- No. Discovery describes the service; SendMessage requests work.
+- Its inventory checks and quotes are deterministic Python.
+- The local computer's loopback interface, reachable only from that computer.
+- In workspace after gym start, leaving the trusted task tests unchanged.
 
 ## Go deeper
 

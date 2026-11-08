@@ -13,7 +13,7 @@ from uuid import uuid4
 import httpx
 from a2a.types import StreamResponse
 from fastapi import FastAPI, Request
-from google.protobuf.json_format import ParseDict
+from google.protobuf.json_format import ParseDict, ParseError
 from starlette.responses import JSONResponse
 
 from common.security import verify_webhook, webhook_headers
@@ -115,7 +115,7 @@ def durable_receiver(secret: bytes, store: DeliveryStore):
             if event.WhichOneof("payload") is None:
                 raise ValueError("Empty notification")
             fresh = store.accept(request.headers["x-maplewood-nonce"], bytes(body))
-        except (ValueError, TypeError, KeyError):
+        except (ValueError, TypeError, KeyError, ParseError):
             return JSONResponse({"error": "Unverified notification"}, 401)
         if fresh:
             app.state.deliveries.append(json.loads(body))

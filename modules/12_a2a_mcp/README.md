@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Saffron: A2A SendMessage
+    Saffron->>MCP: available_menu with guest count
+    MCP-->>Saffron: Inventory and capacity
+    Saffron-->>Concierge: A2A quote artifact or rejection
 ```
 
-Under the hood: Continuation, cancellation, ownership, status history and artifact structure unless explicitly mapped. Compare that behavior with the captured requests and responses below.
+Under the hood: An MCP call is an internal tool invocation, not an independently tracked A2A task. Saffron translates tool errors into its external business status. The Concierge cannot reach the kitchen directly or infer its private implementation from the quote artifact.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| mcp.Client | Internal tool client | Connects to the private kitchen server | Invoke available_menu |
+| mcp.server.MCPServer | Tool server | Registers kitchen inventory tools | Keep tools behind Saffron |
 
 ## Walkthrough
 
@@ -191,16 +185,35 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/12_a2a_mcp/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Saffron distinguishes its internal menu tool from the independently operated A2A service visible to Maplewood.
+
+Run:
+
+```console
+uv run python modules/12_a2a_mcp/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_tool_call.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED",
+  "vendor": "catering",
+  "currency": "USD",
+  "total_cents": 96000
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/12/12-02_fix/task.md) |
+| Tool result treated as an A2A task | Protocol boundaries conflated | Wrap it in the vendor's lifecycle and artifact contract; [practice 12-02](../../gym/tasks/12/12-02_fix/task.md) |
+| Too-large party receives a menu | Capacity validation bypassed | Reject beyond kitchen capacity; [practice 12-41](../../gym/tasks/12/12-41_mcp_too_many/task.md) |
+| Boolean guest count accepted | Python bool treated as an integer | Validate business quantities explicitly; [practice 12-42](../../gym/tasks/12/12-42_mcp_invalid/task.md) |
+| Kitchen details leak to Concierge | Internal tool result forwarded wholesale | Expose only the agreed quote artifact; [practice 12-43](../../gym/tasks/12/12-43_mcp_quote/task.md) |
 
 ## Practice
 
@@ -227,31 +240,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Which protocol connects Saffron to its kitchen tool?
+<details><summary>Answer</summary>MCP.</details>
 
-2. How would you demonstrate: choose a tool versus a remote agent?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Which protocol connects Maplewood to Saffron?
+<details><summary>Answer</summary>A2A.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Does an MCP result automatically include an A2A task lifecycle?
+<details><summary>Answer</summary>No. The vendor supplies that lifecycle at its boundary.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Should kitchen credentials appear in an A2A brief?
+<details><summary>Answer</summary>No. The vendor provisions its own internal tool access.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What happens above kitchen capacity?
+<details><summary>Answer</summary>The vendor rejects the request instead of inventing inventory.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What can be lost in an automatic MCP-to-A2A bridge?
+<details><summary>Answer</summary>Task identity, interruption, cancellation, authorization and artifact semantics need explicit mapping.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- MCP.
+- A2A.
+- No. The vendor supplies that lifecycle at its boundary.
+- No. The vendor provisions its own internal tool access.
+- The vendor rejects the request instead of inventing inventory.
 
 ## Go deeper
 

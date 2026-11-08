@@ -1,19 +1,19 @@
 # Quiz
 
-1. Is an artifact a task?
-<details><summary>Answer</summary>No. A task tracks work; an artifact is a deliverable produced by that work.</details>
+1. Which ID matches an RPC response to its request?
+<details><summary>Answer</summary>The top-level JSON-RPC id, not messageId or task id.</details>
 
-2. Can SendMessage return no task?
-<details><summary>Answer</summary>Yes. A direct Message is a valid alternative to a tracked Task.</details>
+2. Where does SendMessage's message go?
+<details><summary>Answer</summary>Inside params.message in a JSON-RPC request.</details>
 
-3. Which ID correlates a JSON-RPC response?
-<details><summary>Answer</summary>The JSON-RPC id, not messageId, task id or contextId.</details>
+3. Must every response create a task?
+<details><summary>Answer</summary>No. An agent may reply with a direct Message when tracked work is unnecessary.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Read a JSON-RPC envelope: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. What does contextId group?
+<details><summary>Answer</summary>Related interactions; it does not authorize access to other tasks.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>A message is a communication; a task is tracked work; an artifact is its deliverable. A context groups related interactions, like a project folder. JSON-RPC adds a method name, parameters and request ID to a JSON envelope. Its request ID correlates the response and is different from messageId and task ID. A server may return a direct Message or a Task.</details>
+5. Is an artifact the same as a status message?
+<details><summary>Answer</summary>No. Artifacts are deliverables, while status messages explain progress or missing input.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. Why compare three bindings?
+<details><summary>Answer</summary>To recognize the same operations despite different HTTP paths, envelopes and protobuf encoding.</details>

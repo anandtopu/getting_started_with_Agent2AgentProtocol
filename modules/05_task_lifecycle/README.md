@@ -29,16 +29,13 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Concierge->>Saffron: SendMessage without dietary counts
+    Saffron-->>Concierge: Task T, input-required
+    Concierge->>Saffron: Dietary counts with task T and same context
+    Saffron-->>Concierge: Quote artifact and completed
 ```
 
-Under the hood: No. Cancellation changes task execution; a compensating business operation releases a hold. Compare that behavior with the captured requests and responses below.
+Under the hood: Paused work retains its brief and task identity. Terminal tasks cannot be resumed; new work needs a new task. Cancellation is a protocol state change for unfinished work, while undoing a completed business reservation needs a separate release operation.
 
 ## On the wire
 
@@ -50,13 +47,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| TaskState | Lifecycle state | Distinguishes active, interrupted and terminal work | Choose a continuation action |
+| TaskStatusUpdateEvent | Status event | Updates a task's state and message | Pause, complete or cancel work |
 
 ## Walkthrough
 
@@ -199,16 +193,32 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/05_task_lifecycle/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Saffron receives an incomplete offsite brief and asks Maplewood for dietary counts rather than guessing a menu.
+
+Run:
+
+```console
+uv run python modules/05_task_lifecycle/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_pause.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_INPUT_REQUIRED"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/05/05-02_fix/task.md) |
+| Second catering task appears | Follow-up omitted taskId | Keep the returned task and context IDs; [practice 05-02](../../gym/tasks/05/05-02_fix/task.md) |
+| Task cannot be canceled | It already reached a terminal state | Use a new business operation where needed; [practice 05-21](../../gym/tasks/05/05-21_lifecycle_cancel/task.md) |
+| Continuation loses guest count | Paused brief was discarded | Merge new fields into the stored brief; [practice 05-20](../../gym/tasks/05/05-20_lifecycle_resume/task.md) |
+| Listing exposes another caller's work | Owner filtering bypassed | Use the authenticated task store context; [practice 05-23](../../gym/tasks/05/05-23_lifecycle_list/task.md) |
 
 ## Practice
 
@@ -236,31 +246,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Which states are paused?
+<details><summary>Answer</summary>INPUT_REQUIRED and AUTH_REQUIRED.</details>
 
-2. How would you demonstrate: resume a paused catering task?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Which states are terminal?
+<details><summary>Answer</summary>COMPLETED, FAILED, CANCELED and REJECTED.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Which IDs continue a paused conversation?
+<details><summary>Answer</summary>The remote task ID and its context ID.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Does contextId alone resume a task?
+<details><summary>Answer</summary>No. Supply taskId for the particular interrupted work.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Can CancelTask undo a completed hotel hold?
+<details><summary>Answer</summary>No. Use an explicit compensating release skill.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Do repeated message IDs guarantee exactly-once work?
+<details><summary>Answer</summary>No. Application idempotency must protect business effects.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- INPUT_REQUIRED and AUTH_REQUIRED.
+- COMPLETED, FAILED, CANCELED and REJECTED.
+- The remote task ID and its context ID.
+- No. Supply taskId for the particular interrupted work.
+- No. Use an explicit compensating release skill.
 
 ## Go deeper
 

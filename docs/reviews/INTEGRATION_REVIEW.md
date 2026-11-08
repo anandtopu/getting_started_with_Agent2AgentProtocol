@@ -1,5 +1,9 @@
 # Release review — cross-file pass
 
+The later [final brief review](FINAL_BRIEF_REVIEW.md) independently revisits this
+baseline and records ten additional fixes. The earlier disposition below is kept
+as review history, not substituted for the new release gate.
+
 ## Scope
 
 Trace requests from Control Room/Concierge through auth, SDK adapters, workflows,
@@ -29,3 +33,19 @@ and [validation evidence](../VALIDATION_REPORT.md). The generated local CA, back
 retention and future schema migrations require an operator; their procedures are in
 [the deployment runbook](../../deploy/HARDENED_NETWORK.md). No cloud service is published
 and no real financial or hiring effect is enabled by this learning repository.
+
+## Final cross-file pass
+
+| Boundary traced | Result after correction | Evidence |
+|---|---|---|
+| Launcher to vendor process to status command | Own inbound token only; peer-token map only in Concierge; status contains names | Launcher isolation regression and every-module live network checks |
+| Requested needs to model routing to outbound brief | Model cannot expand scope; vendors and models receive only permitted fields | Scope and data-minimization adversarial tests |
+| Remote HTTP stream to task parser to aggregate plan | Time/size bounds, typed task validation, quote contract and per-vendor failure isolation | Slow/oversized/malformed response tests plus golden scenarios |
+| Hold commit to malformed acknowledgement to reconciliation | Idempotency-key cleanup releases uncertain hotel/venue holds | Two real durable-ledger tests |
+| Signed callback to parser to inbox | Bounded body and schema validation precede accepted effects | Invalid signed event, size-limit, retry and durable inbox tests |
+| HTTP/SSE/query data to captured wire files | Credential values redacted before persistence | Multiline stream and signed-query regression |
+| Module explanations to exercises to output excerpts | 25 distinct flows and quizzes; refreshed real delegation captures; examples retain standalone execution | Lesson consistency test, gym, examples, notebooks and link checker |
+
+No additional blocking finding remains in these reviewed boundaries after the fixes.
+The current pushed revision must still pass the complete 26-job CI matrix. External
+limitations and operator responsibilities remain listed in the validation report.

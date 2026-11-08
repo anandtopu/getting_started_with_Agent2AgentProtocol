@@ -1,5 +1,7 @@
 """Use a trusted configured binding; never send credentials to a card-supplied URL."""
 
+import asyncio
+import json
 import os
 
 import grpc
@@ -48,11 +50,22 @@ class GrpcRemote:
 async def send(client, message):
     if isinstance(client, GrpcRemote):
         return await client.send(message)
-    response = await client.post(
-        "/message:send",
-        json=as_dict(message),
-        headers=outgoing_headers(),
-        timeout=float(os.environ.get("MAPLEWOOD_VENDOR_TIMEOUT", "5")),
-    )
-    response.raise_for_status()
-    return response.json()
+    deadline = float(os.environ.get("MAPLEWOOD_VENDOR_TIMEOUT", "5"))
+    try:
+        async with asyncio.timeout(deadline):
+            async with client.stream(
+                "POST",
+                "/message:send",
+                json=as_dict(message),
+                headers=outgoing_headers(),
+                timeout=deadline,
+            ) as response:
+                response.raise_for_status()
+                body = bytearray()
+                async for chunk in response.aiter_bytes():
+                    body.extend(chunk)
+                    if len(body) > 1_000_000:
+                        raise ValueError("Vendor response exceeds the byte budget")
+                return json.loads(body)
+    except TimeoutError as exc:
+        raise httpx.ReadTimeout("Vendor response exceeded the overall deadline") from exc

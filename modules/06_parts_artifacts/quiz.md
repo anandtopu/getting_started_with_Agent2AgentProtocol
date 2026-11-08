@@ -1,19 +1,19 @@
 # Quiz
 
-1. How are raw file bytes represented in ProtoJSON?
-<details><summary>Answer</summary>As base64 in raw, with filename and mediaType describing the content.</details>
+1. What are the four Part content alternatives?
+<details><summary>Answer</summary>Text, raw bytes, URL and structured data.</details>
 
-2. Can an artifact contain both data and a PDF?
-<details><summary>Answer</summary>Yes. Multiple Parts can represent different forms of the same deliverable.</details>
+2. How are bytes represented in ProtoJSON?
+<details><summary>Answer</summary>As base64 text, with the media type carried separately.</details>
 
-3. Is a signed file URL automatically safe?
-<details><summary>Answer</summary>No. Enforce trusted destination, scheme, address, redirects, expiry and byte limits before fetching.</details>
+3. Can one Part contain both raw bytes and text?
+<details><summary>Answer</summary>No. They are alternatives in the same content oneof.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Construct all four part alternatives: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. Can a quote artifact contain JSON and a PDF?
+<details><summary>Answer</summary>Yes, as separate Parts of the same artifact.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>A Part contains exactly one of text, raw bytes, a URL or structured data. Protobuf encodes raw bytes as base64 in JSON. A data Part holds a JSON value; integer-valued numbers may round-trip as floating point. Validate quantities and money at the boundary. Files referenced by URL need a separate safe fetching policy. Artifacts collect one or more parts into a named deliverable.</details>
+5. Why validate integer-valued ProtoJSON numbers?
+<details><summary>Answer</summary>Struct numbers may round-trip as floats; whole-number business quantities still require validation.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. Why refuse redirects when fetching an approved file?
+<details><summary>Answer</summary>A redirect can send the request to a private or otherwise unapproved destination.</details>

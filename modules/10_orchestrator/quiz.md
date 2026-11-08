@@ -1,19 +1,19 @@
 # Quiz
 
-1. May a model invent a vendor URL?
-<details><summary>Answer</summary>No. Selection is bounded to operator-configured trusted clients and verified skill IDs.</details>
+1. Can a trusted vendor be contacted outside requested needs?
+<details><summary>Answer</summary>No. Trust and user-requested scope are separate checks.</details>
 
-2. What survives an interrupted plan?
-<details><summary>Answer</summary>Each delegation retains vendor, task ID, context ID, state and validated quotes.</details>
+2. Should AV receive guests' dietary counts?
+<details><summary>Answer</summary>No. Catering needs those counts; AV does not.</details>
 
-3. Can a fallback resume another vendor task?
-<details><summary>Answer</summary>No. A paused task belongs to its original vendor; fallback is for a new approved read-only request.</details>
+3. What happens when one vendor returns malformed data?
+<details><summary>Answer</summary>Mark that delegation failed while retaining other valid results.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Delegate concurrently: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. Can a completed task without a quote count as success?
+<details><summary>Answer</summary>No. The quote contract requires a valid deliverable.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>The Concierge is an A2A client of vendors and can also be an A2A server for callers. It delegates independent quotes concurrently and returns partial results when one vendor needs input. Remote context IDs are owned by each vendor; retain a mapping rather than assuming one global context works everywhere. Give each vendor its own service credential and only the brief fields it needs.</details>
+5. What is reused on a follow-up plan?
+<details><summary>Answer</summary>Completed quotes and the original identities of interrupted tasks.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. Does approval_required spend money?
+<details><summary>Answer</summary>No. The plan remains a proposal requiring separate human approval.</details>

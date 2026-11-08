@@ -29,16 +29,15 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    Learner->>Concierge: Brief and requested vendor scope
+    Concierge->>Model: Verified capabilities and allowed vendors
+    Model-->>Concierge: Proposed delegates
+    Concierge->>Concierge: Enforce scope and minimize fields
+    Concierge->>Vendor: Independent quote requests
+    Vendor-->>Concierge: Validated task artifacts
 ```
 
-Under the hood: Each delegation retains vendor, task ID, context ID, state and validated quotes. Compare that behavior with the captured requests and responses below.
+Under the hood: The model proposes routing; application policy authorizes it. Each vendor receives only fields needed by its skill. Independent quotes run concurrently. The result retains each vendor's state and IDs so a partial plan can resume interrupted work without repeating completed requests.
 
 ## On the wire
 
@@ -50,13 +49,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| agents.concierge.Concierge.plan (course) | Orchestration | Validates selections and vendor results | Plan across trusted vendors |
+| SendMessageRequest | Delegated request | Carries a vendor-specific brief and continuation IDs | Start or resume remote work |
 
 ## Walkthrough
 
@@ -174,16 +170,36 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/10_orchestrator/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood gathers venue and catering proposals in parallel and retains each vendor's task identity for follow-up.
+
+Run:
+
+```console
+uv run python modules/10_orchestrator/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_delegate.result.json) for the full output):
+
+```json
+{
+  "vendor": "venues",
+  "state": "TASK_STATE_COMPLETED",
+  "total_cents": 80000.0,
+  "currency": "USD",
+  "approval_required": true
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/10/10-02_fix/task.md) |
+| Unrequested vendor receives private data | Allow-list checked without requested scope | Enforce both boundaries before dispatch; [practice 10-42](../../gym/tasks/10/10-42_orchestration_untrusted/task.md) |
+| Dietary fields reach every vendor | One shared payload sent to all | Apply per-vendor field minimization; [practice 10-43](../../gym/tasks/10/10-43_orchestration_private/task.md) |
+| Whole plan crashes on malformed reply | Response shape trusted | Validate the task and isolate delegation failures; [practice 10-44](../../gym/tasks/10/10-44_orchestration_rejected/task.md) |
+| Paused work starts on backup | Fallback reuses a foreign task ID | Keep continuation on its original server; [practice 10-45](../../gym/tasks/10/10-45_orchestration_fallback/task.md) |
 
 ## Practice
 
@@ -211,31 +227,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Can a trusted vendor be contacted outside requested needs?
+<details><summary>Answer</summary>No. Trust and user-requested scope are separate checks.</details>
 
-2. How would you demonstrate: delegate concurrently?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Should AV receive guests' dietary counts?
+<details><summary>Answer</summary>No. Catering needs those counts; AV does not.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. What happens when one vendor returns malformed data?
+<details><summary>Answer</summary>Mark that delegation failed while retaining other valid results.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Can a completed task without a quote count as success?
+<details><summary>Answer</summary>No. The quote contract requires a valid deliverable.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What is reused on a follow-up plan?
+<details><summary>Answer</summary>Completed quotes and the original identities of interrupted tasks.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. Does approval_required spend money?
+<details><summary>Answer</summary>No. The plan remains a proposal requiring separate human approval.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. Trust and user-requested scope are separate checks.
+- No. Catering needs those counts; AV does not.
+- Mark that delegation failed while retaining other valid results.
+- No. The quote contract requires a valid deliverable.
+- Completed quotes and the original identities of interrupted tasks.
 
 ## Go deeper
 

@@ -1,19 +1,19 @@
 # Quiz
 
-1. Does lastChunk finish the task?
-<details><summary>Answer</summary>No. It completes one artifact. Task status determines task completion.</details>
+1. What identifies chunks of the same artifact?
+<details><summary>Answer</summary>The artifact ID within its task.</details>
 
-2. Does disconnecting SSE cancel the work?
-<details><summary>Answer</summary>No. Reconnect with SubscribeToTask or inspect GetTask; cancellation is explicit.</details>
+2. What does append=true mean?
+<details><summary>Answer</summary>Append the new Parts to the existing artifact instead of replacing it.</details>
 
-3. Why deduplicate an authenticated callback?
-<details><summary>Answer</summary>The receiver may commit before its acknowledgement is lost, causing a legitimate retry.</details>
+3. Does lastChunk mean the task completed?
+<details><summary>Answer</summary>No. It finishes that artifact; task completion is a separate status event.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Read SSE frames: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. What operation follows a dropped stream?
+<details><summary>Answer</summary>SubscribeToTask for the existing active task when supported.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>Server-Sent Events (SSE) keep an HTTP response open and separate events with blank lines. A chunk updates one artifact by ID: append means add to existing content, and lastChunk ends that artifact. It does not finish the task. A webhook reverses the connection: the vendor calls your receiver later. Authenticate deliveries and tolerate retries. Reconnecting with SubscribeToTask does not promise replay of every missed event.</details>
+5. Why authenticate a webhook before deduplicating it?
+<details><summary>Answer</summary>An attacker must not poison the inbox with an unauthenticated delivery ID.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. Is exactly-once delivery promised?
+<details><summary>Answer</summary>No. Durable receivers deduplicate at-least-once delivery attempts.</details>

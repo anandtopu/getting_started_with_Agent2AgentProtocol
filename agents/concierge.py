@@ -4,10 +4,28 @@ import asyncio
 import json
 
 import httpx
+from a2a.types import Task
+from google.protobuf.json_format import ParseDict, ParseError
 from jsonschema import ValidationError, validate
 
 from common.protocol import request
 from common.remote import send
+
+VENDOR_FIELDS = {
+    "venues": ("guests", "date"),
+    "catering": ("guests", "date", "dietary"),
+    "av": ("guests", "date"),
+    "travel": ("guests", "date", "rooms"),
+    "print": ("guests", "date"),
+}
+SETTLED_STATES = {
+    "TASK_STATE_COMPLETED",
+    "TASK_STATE_INPUT_REQUIRED",
+    "TASK_STATE_AUTH_REQUIRED",
+    "TASK_STATE_FAILED",
+    "TASK_STATE_CANCELED",
+    "TASK_STATE_REJECTED",
+}
 
 QUOTE_SCHEMA = {
     "type": "object",
@@ -34,6 +52,14 @@ class Concierge:
         self.skills = skills or {name: ["Provide a " + name + " quote."] for name in clients}
 
     async def plan(self, brief: dict, previous: dict | None = None) -> dict:
+        requested = brief.get("needs")
+        if requested is not None and (
+            not isinstance(requested, list)
+            or not requested
+            or not all(isinstance(name, str) and name in self.clients for name in requested)
+            or len(set(requested)) != len(requested)
+        ):
+            raise ValueError("Requested needs must name distinct trusted vendors.")
         vendors = brief.get("needs", ["venues", "catering"])
         if previous:
             vendors = [item["vendor"] for item in previous["delegations"]]
@@ -82,6 +108,8 @@ class Concierge:
             or any(v not in self.clients for v in vendors)
         ):
             raise ValueError("Delegation must name up to five distinct trusted vendors.")
+        if requested is not None and any(vendor not in requested for vendor in vendors):
+            raise ValueError("Delegation exceeds the requested vendor scope.")
 
         async def delegate(vendor: str):
             prior = next(
@@ -90,9 +118,7 @@ class Concierge:
             if prior and prior["state"] == "TASK_STATE_COMPLETED":
                 return prior
             # Each client was provisioned with its own vendor token, never a user's token.
-            payload = {
-                key: brief[key] for key in ("guests", "date", "dietary", "rooms") if key in brief
-            }
+            payload = {key: brief[key] for key in VENDOR_FIELDS.get(vendor, ()) if key in brief}
             try:
                 continuation = prior and prior["state"] in {
                     "TASK_STATE_INPUT_REQUIRED",
@@ -111,6 +137,17 @@ class Concierge:
                     if continuation or vendor not in self.fallbacks:
                         raise
                     task = (await send(self.fallbacks[vendor], request(payload)))["task"]
+                parsed = ParseDict(task, Task())
+                if (
+                    not parsed.id
+                    or not parsed.context_id
+                    or task["status"]["state"] not in SETTLED_STATES
+                ):
+                    raise ValueError("Vendor did not return an identified final or paused task.")
+                if continuation and (
+                    parsed.id != prior["task_id"] or parsed.context_id != prior["context_id"]
+                ):
+                    raise ValueError("Vendor changed the resumed task identity.")
                 artifacts = task.get("artifacts", [])
                 quotes = [
                     part["data"]
@@ -122,6 +159,10 @@ class Concierge:
                     validate(quote, QUOTE_SCHEMA)
                     if quote["vendor"] != vendor:
                         raise ValueError("Vendor identity in quote does not match delegate.")
+                if task["status"]["state"] == "TASK_STATE_COMPLETED" and not quotes:
+                    raise ValueError("Completed quote task has no quote artifact.")
+                if task["status"]["state"] != "TASK_STATE_COMPLETED":
+                    quotes = []
                 return {
                     "vendor": vendor,
                     "task_id": task["id"],
@@ -130,11 +171,11 @@ class Concierge:
                     "quotes": quotes,
                     "question": task["status"].get("message"),
                 }
-            except (httpx.HTTPError, KeyError, ValueError, ValidationError) as exc:
+            except (httpx.HTTPError, KeyError, TypeError, ValueError, ValidationError, ParseError):
                 return {
                     "vendor": vendor,
                     "state": "TASK_STATE_FAILED",
-                    "error": str(exc),
+                    "error": "Vendor unavailable or returned an invalid quote task.",
                     "quotes": [],
                 }
 

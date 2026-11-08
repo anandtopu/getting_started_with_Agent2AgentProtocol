@@ -29,16 +29,15 @@ the connection to the final deployment.
 
 ```mermaid
 sequenceDiagram
-    participant L as Learner
-    participant C as Maplewood Concierge
-    participant V as Vendor boundary
-    L->>C: Event brief and approved scope
-    C->>V: Discover or request work
-    V-->>C: Typed response or progress event
-    C-->>L: Deliverable, question, or failure
+    ReplicaA->>Database: Atomic task, journal and outbox commit
+    ReplicaA-->>Client: Stream disconnects
+    Client->>ReplicaB: Subscribe to existing task
+    ReplicaB->>Database: Read committed journal
+    Dispatcher->>Webhook: Leased signed delivery
+    Webhook-->>Dispatcher: Durable acknowledgement
 ```
 
-Under the hood: It fences acknowledgements from an expired worker after another worker claims the delivery. Compare that behavior with the captured requests and responses below.
+Under the hood: Task storage, event distribution and callback delivery are separate responsibilities. The cluster store commits their records together, then independent workers publish or retry them. Compare-and-swap revisions reject stale writers, while lease fencing rejects late acknowledgements from expired dispatchers.
 
 ## On the wire
 
@@ -50,13 +49,10 @@ Executed by the course authoring tool through the same recording transport as sc
 
 ## Key APIs at a glance
 
-| SDK API | Spec operation or object | What it does | When to use it |
+| SDK API or labeled course helper | Spec operation or object | What it does | When to use it |
 |---|---|---|---|
-| a2a.types | Protobuf objects | Defines wire-compatible values | Every protocol boundary |
-| create_jsonrpc_routes | JSON-RPC binding | Mounts operations | Serving JSON-RPC |
-| create_rest_routes | HTTP+JSON binding | Mounts HTTP routes | Serving HTTP+JSON |
-| create_client | Client operations | Selects an advertised interface | Calling vendors |
-| MessageToDict | ProtoJSON | Converts protobuf into JSON values | Inspecting traffic |
+| VersionedTaskStore | Cluster storage contract | Coordinates revision-aware task persistence | Run multiple handlers safely |
+| common.cluster.ClusterStore (course) | SQL implementation | Commits task, journal and outbox together | Exercise restart and replica recovery |
 
 ## Walkthrough
 
@@ -136,16 +132,32 @@ Start the network in another terminal. Run uv run streamlit run control_room/app
 
 ## Real-world use case
 
-Maplewood needs quotes for a 40-person offsite. Run uv run python modules/19_deployment/use_case/run.py. The result applies this module's first experiment to shared synthetic data. A real team substitutes validated inventory and its identity system while retaining the A2A boundary.
+Maplewood stores a paused vendor task, recreates its handler and retrieves the preserved work after restart.
+
+Run:
+
+```console
+uv run python modules/19_deployment/use_case/run.py
+```
+
+Selected observed fields (see [the complete captured result](wire/01_persist.result.json) for the full output):
+
+```json
+{
+  "state": "TASK_STATE_COMPLETED"
+}
+```
+
+A real deployment retains this boundary while substituting its own approved inventory, identity provider and operating policy.
 
 ## Common bugs
 
-| Observed behavior | Cause | Fix |
+| Observed behavior | Cause | Fix and related practice |
 |---|---|---|
-| HTTP 401 | Missing vendor credential | Obtain the vendor token outside A2A and send a header |
-| Version not supported | Missing or wrong A2A-Version | Select the card interface and send version 1.0 |
-| Task remains interrupted | Required input is missing | Preserve IDs and answer the missing-input request |
-| Edge-case assertion fails | Happy path was hard-coded | Work through [Fix task](../../gym/tasks/19/19-02_fix/task.md) |
+| Task vanishes after restart | Only in-memory storage used | Persist the snapshot and owner scope; [practice 19-40](../../gym/tasks/19/19-40_persistence_reload/task.md) |
+| Second replica misses streamed events | Process-local queue used | Pair the task store with a shared journal; [practice 19-42](../../gym/tasks/19/19-42_persistence_replay/task.md) |
+| Committed work never notifies | Outbox written in another transaction | Commit task, event and outbox atomically; [practice 19-45](../../gym/tasks/19/19-45_persistence_atomic/task.md) |
+| Expired worker marks delivery complete | Lease token not checked | Fence acknowledgement against the current claim; [practice 19-43](../../gym/tasks/19/19-43_persistence_lease/task.md) |
 
 ## Practice
 
@@ -172,31 +184,31 @@ database connections offline. Each starter must fail and each reference solution
 
 ## Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Does a SQL task store alone make SSE work across replicas?
+<details><summary>Answer</summary>No. Replicas also need a shared event stream or journal.</details>
 
-2. How would you demonstrate: persist and reload a task?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Why commit the outbox with the task snapshot?
+<details><summary>Answer</summary>A crash must not leave committed work without its notification record.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. What prevents stale task writers from overwriting newer work?
+<details><summary>Answer</summary>A compare-and-swap revision check in the database transaction.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. Why fence dispatcher leases?
+<details><summary>Answer</summary>An expired worker must not acknowledge another worker's newer claim.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. Why disable proxy buffering for SSE?
+<details><summary>Answer</summary>Otherwise progress can arrive only after the response finishes.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What operational work remains beyond a green Compose test?
+<details><summary>Answer</summary>Certificate renewal, backups, retention, monitoring and capacity planning.</details>
 
 ## Key takeaways
 
-- Read typed fields instead of inferring behavior from prose.
-- Separate transport concerns from business work.
-- Predict before running.
-- Test successful and rejected inputs.
-- Treat every remote peer as a trust boundary.
+- No. Replicas also need a shared event stream or journal.
+- A crash must not leave committed work without its notification record.
+- A compare-and-swap revision check in the database transaction.
+- An expired worker must not acknowledge another worker's newer claim.
+- Otherwise progress can arrive only after the response finishes.
 
 ## Go deeper
 

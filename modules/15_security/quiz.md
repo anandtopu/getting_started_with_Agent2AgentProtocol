@@ -1,19 +1,19 @@
 # Quiz
 
-1. Can an authentic vendor inject malicious instructions?
-<details><summary>Answer</summary>Yes. Authentication identifies a sender; its descriptions and artifacts remain untrusted data.</details>
+1. Can signed skill text override the user's requested vendor scope?
+<details><summary>Answer</summary>No. Signatures establish origin, not authority to expand the task.</details>
 
-2. Why disable redirects when fetching files?
-<details><summary>Answer</summary>An approved initial URL could redirect to an internal or otherwise forbidden destination.</details>
+2. Why block private file addresses?
+<details><summary>Answer</summary>They can target internal services or cloud metadata endpoints.</details>
 
-3. Why use separate vendor credentials?
-<details><summary>Answer</summary>Least privilege limits audience and scope and prevents the Concierge from becoming a confused deputy with the user token.</details>
+3. Why is a redirect a separate trust decision?
+<details><summary>Answer</summary>It changes the destination after the initial URL was approved.</details>
 
-4. How do you prove the first learning objective?
-<details><summary>Answer</summary>Reject unsafe destinations: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
+4. What stops a poisoned quote from approving payment?
+<details><summary>Answer</summary>A strict output contract and a separate human approval gate.</details>
 
-5. What is the trust boundary in this lesson?
-<details><summary>Answer</summary>Treat cards, messages and artifacts as untrusted inputs. Prompt injection attempts to turn those inputs into higher-priority instructions. Allow-list destinations, validate outputs, keep tokens scoped, and require human approval before spending. Private-address filtering alone does not prevent DNS rebinding; use a controlled egress path or inline files. Limit bytes, duration, concurrency and tool steps.</details>
+5. What prevents delegation from leaking unrelated fields?
+<details><summary>Answer</summary>A per-vendor payload allow-list enforced in code.</details>
 
-6. What should you do before consulting the reference solution?
-<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>
+6. What makes a callback replay distinguishable?
+<details><summary>Answer</summary>An authenticated timestamp and delivery ID plus replay or durable inbox state.</details>

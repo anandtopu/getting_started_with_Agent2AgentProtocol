@@ -1,4 +1,4 @@
-# Release review â€” per-file pass
+# Release review — per-file pass
 
 ## Scope
 
@@ -127,3 +127,26 @@ unexpected tool_args object. Arguments remain strictly validated. A structural
 schema error permits one correction request inside the original overall deadline;
 unknown tools/enum values and repeated structural errors still fail. Regression
 tests prove that no extra fields are silently dropped and no unbounded retry occurs.
+
+## Final brief review of fe6800a
+
+This fresh pass found additional issues despite the earlier green matrix. All
+findings below have implemented fixes and focused regression evidence; the final
+release still requires the full CI gate described in [the brief review](FINAL_BRIEF_REVIEW.md).
+
+| ID | File | Current line | Reviewed correction |
+|---|---|---:|---|
+| R12 | [scripts/network.py](../../scripts/network.py) | 26 | Peer credentials now reach only Concierge; status omits secret values. |
+| R13 | [agents/concierge.py](../../agents/concierge.py) | 54 | Reject model scope expansion; send only per-vendor fields. |
+| R13 | [agents/langgraph_vendor.py](../../agents/langgraph_vendor.py) | 27 | Exclude unrelated private fields from the catering model prompt. |
+| R14 | [common/remote.py](../../common/remote.py) | 50 | Bound response bytes and total elapsed request time. |
+| R14 | [agents/concierge.py](../../agents/concierge.py) | 140 | Validate Task shape, settled state, continuation identity and quote presence. |
+| R15 | [common/saga.py](../../common/saga.py) | 11 | Reconcile malformed acknowledgements after a committed hold. |
+| R16 | [common/webhooks.py](../../common/webhooks.py) | 19 | Stop reading oversized bodies and reject invalid signed event schemas. |
+| R16 | [common/delivery.py](../../common/delivery.py) | 99 | Reject invalid protobuf event data without a server exception. |
+| R16 | [common/security.py](../../common/security.py) | 184 | Reject malformed signature lists and protected-header shapes cleanly. |
+| R17 | [common/wire.py](../../common/wire.py) | 57 | Redact structured event streams, signed query fields and URL userinfo. |
+| R18 | [control_room/app.py](../../control_room/app.py) | 14 | Validate brief objects and keep discovery cards per vendor. |
+| R19 | [scripts/check_env.py](../../scripts/check_env.py) | 14 | Probe local model readiness and report hosted-key presence without values. |
+| R20 | [modules/13_authentication/README.md](../../modules/13_authentication/README.md) | 28 | Representative of 25 individually authored module flow/quiz/bug/API/use-case replacements. |
+| R21 | [scripts/check_network.py](../../scripts/check_network.py) | 18 | Exercise every module including authentication and listener shutdown. |

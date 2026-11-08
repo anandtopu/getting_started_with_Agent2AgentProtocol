@@ -1,5 +1,11 @@
 # Verification notes
 
+Final brief review on 2026-11-08 UTC reconfirmed the stable spec and Python SDK
+release pointers. See the [fresh review](reviews/FINAL_BRIEF_REVIEW.md) for the
+requirements audit, new boundary fixes and acceptance gate. The network matrix now
+executes every core module (00–20), rather than inferring untested module numbers
+from representative configurations.
+
 Checked **2026-11-07**. This document is the release's evidence and limitation
 record. The expanded course closes the previously listed implementation gaps; external
 release status and official TCK exceptions remain explicit below.
