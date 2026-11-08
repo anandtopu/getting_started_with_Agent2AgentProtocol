@@ -31,7 +31,7 @@ class Concierge:
         self.clients = clients
         self.model = model
         self.fallbacks = fallbacks or {}
-        self.skills = skills or {name: [name + ".quote"] for name in clients}
+        self.skills = skills or {name: ["Provide a " + name + " quote."] for name in clients}
 
     async def plan(self, brief: dict, previous: dict | None = None) -> dict:
         vendors = brief.get("needs", ["venues", "catering"])
@@ -46,10 +46,12 @@ class Concierge:
             prompt = (
                 "Select vendors for the event's requested needs. Call select_action with "
                 'arguments {"vendors":[vendor names]}. Use vendor names, not skill IDs. '
-                "Verified vendor-to-skills mapping (JSON): "
+                "Verified vendor capabilities (JSON): "
                 + json.dumps(self.skills, sort_keys=True)
                 + ". Event data (JSON): "
                 + json.dumps(model_brief, sort_keys=True)
+                + ". Allowed vendor names: "
+                + json.dumps(list(self.clients))
             )
             schema = {
                 "type": "object",

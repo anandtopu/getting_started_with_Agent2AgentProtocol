@@ -14,7 +14,7 @@ keys from arbitrary incoming requests.
 
 The catering agent uses a real LangGraph workflow to choose ask_dietary or
 quote_menu, then calls its internal MCP kitchen tool. The Concierge verifies
-vendor cards, provides their skill IDs to the model and bounds the selection to
+vendor cards, provides their skill names/descriptions to the model and bounds the selection to
 its configured trusted clients. It sends only permitted event fields to the
 model and remote vendors. Quotes use deterministic inventory arithmetic.
 

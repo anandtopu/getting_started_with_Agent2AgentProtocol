@@ -50,7 +50,10 @@ class ConciergeExecutor(AgentExecutor):
                     response = await discovery.get(url(vendor) + "/.well-known/agent-card.json")
                     response.raise_for_status()
                     await verify_discovered(response.json(), vendor, discovery)
-                    skills[vendor] = [skill["id"] for skill in response.json()["skills"]]
+                    skills[vendor] = [
+                        skill["name"] + ": " + skill["description"]
+                        for skill in response.json()["skills"]
+                    ]
             clients = {
                 vendor: await stack.enter_async_context(
                     GrpcRemote(token)
