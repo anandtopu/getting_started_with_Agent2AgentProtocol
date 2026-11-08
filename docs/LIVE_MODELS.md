@@ -98,3 +98,11 @@ deadline. The repair prompt identifies only the required structure; it does not
 forward the model's rejected text as instructions. Unknown enum values, unsafe tool
 names, incomplete streams and a second invalid structure still fail. No tool is
 executed before validation, and unexpected fields are never silently discarded.
+
+Each live-check attempt first clears `workspace/live-model.json`. Expected model
+or configuration failures exit with status 1 and a short recovery message pointing
+to `scripts/check_env.py`; provider response text and credentials are not printed.
+The success report is written only after all three acceptance paths pass, so an
+older successful attempt cannot masquerade as the current result. The separate
+introductory JSON helper also caps replies at 512,000 decoded bytes and 45 seconds
+total; native tool streaming retains the limits described above.

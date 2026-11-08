@@ -187,3 +187,25 @@ construction, duplicate/empty/untrusted selections, original-schema immutability
 property names and literal data. The live OpenAI checker passed with gpt-4o-mini;
 the retained evidence contains no credentials. Anthropic/Gemini live checks were
 deferred explicitly by the user, and their request paths remain unchanged.
+
+## Final brief recheck of 6ccd1fb
+
+The 2026-11-08 recheck traced the original brief's bounded networking, explicit
+terminal task state and friendly learner diagnostics requirements. These additional
+findings are fixed; no conformance requirement or exception gate was relaxed.
+
+| ID | Severity | File | Line | Finding and implemented correction |
+|---|---|---|---:|---|
+| R27 | P2 | [common/security.py](../../common/security.py) | 61 | UTF-8 header decoding and ASCII-only constant-time comparison raised exceptions for malformed credentials; duplicate credentials used the last value. Decode HTTP bytes safely and reject non-ASCII or duplicate credentials with 401 before verification or routing. |
+| R28 | P2 | [common/http_limits.py](../../common/http_limits.py) | 18 | Per-read timeouts allowed a peer to keep auxiliary downloads open; several JSON paths buffered unbounded responses. Apply a shared total deadline and decoded-byte limit to discovery, card/OIDC keys, OAuth tokens and introductory model replies; file downloads use the same byte collector and a total deadline. Authenticated request bodies also have a total deadline. |
+| R29 | P2 | [agents/concierge_executor.py](../../agents/concierge_executor.py) | 47 | Discovery and client setup happened after WORKING but outside the failure handler. Include them in the terminal-state boundary, parse verified cards into typed SDK messages and emit FAILED with a safe recovery hint. |
+| R30 | P2 | [scripts/check_live_model.py](../../scripts/check_live_model.py) | 64 | Expected provider failures printed tracebacks and left earlier success evidence in place. Clear the latest report before starting, preserve nonzero failure exit, print a bounded safe diagnostic and write success only after all acceptance paths pass. |
+
+Individually reviewed changed consumers: `common/auth_profiles.py`,
+`common/card_trust.py`, `common/identity.py`, `common/llm.py`,
+`common/security.py`, `agents/concierge_executor.py`, the HTTP helper and live checker.
+Malformed JWKS shapes now fail closed. Existing streamed-model budgets, pinned
+trust, TLS verification, local schema validation and actual transport selection
+remain intact. `tests/test_final_boundaries.py` adds 29 adversarial cases; existing
+provider mapping, identity rotation, ownership and protocol tests supply positive
+compatibility coverage. Documentation was reconciled with these exact limits.

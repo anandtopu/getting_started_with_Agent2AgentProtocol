@@ -72,3 +72,21 @@ are supplied, and operating a production deployment still requires an operator.
 Those qualifications are not relabeled as certification. Local subprocesses run as
 the same user: environment minimization reduces accidental credential exposure but
 does not claim OS isolation from hostile code with access to the workspace.
+
+## Final recheck of baseline 6ccd1fb
+
+On 2026-11-08, the original brief was checked again against the current course and
+its accumulated review evidence. The individual-file pass focused on authentication,
+file fetching, model helpers, card/OIDC trust and the live-check command. The
+integration pass followed discovery through task completion and failure through
+retained evidence. Four additional P2 findings (R27–R30) are now fixed: malformed
+credential handling, missing total/size budgets on auxiliary HTTP paths, discovery
+failures outside the Concierge's terminal-state handler, and stale success evidence
+with unfriendly live-check failures. The detailed reports record affected paths,
+line references, limits and 29 regression cases.
+
+The complete course, network, conformance and publication gates apply again to
+this revision. The earlier green baseline is historical evidence only. The four
+official TCK exceptions retain exact diagnostics and independent wire controls;
+the .NET preview and unavailable Anthropic/Gemini credentials remain external
+limitations. There is no remaining identified repository-side implementation item.

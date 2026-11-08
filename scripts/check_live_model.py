@@ -2,12 +2,20 @@
 
 import asyncio
 import json
+import sys
 from pathlib import Path
+
+import httpx
+from jsonschema import ValidationError
 
 from common.llm import create_model
 
+ROOT = Path(__file__).resolve().parents[1]
+
 
 async def main():
+    output = ROOT / "workspace/live-model.json"
+    output.unlink(missing_ok=True)
     model = create_model()
     schema = {
         "type": "object",
@@ -48,11 +56,36 @@ async def main():
         "a2a_langgraph_mcp_stream": "passed",
         "model_selected_concierge_plan": "passed",
     }
-    output = Path("workspace/live-model.json")
     output.parent.mkdir(exist_ok=True)
     output.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(evidence))
 
 
+async def run_check():
+    try:
+        await main()
+    except (ValueError, httpx.HTTPError, ValidationError, AssertionError) as exc:
+        # Model content and provider diagnostics may contain sensitive input. Do not echo them.
+        status = ""
+        cause = exc
+        while cause is not None:
+            if isinstance(cause, httpx.HTTPStatusError):
+                status = f" (HTTP {cause.response.status_code})"
+                break
+            cause = cause.__cause__
+        print(
+            f"Live-model check failed{status}. Run scripts/check_env.py; check the provider, "
+            "model access, private .env credentials and budget, or start Ollama. "
+            "See docs/LIVE_MODELS.md. No success report was retained.",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
+
+def cli():
+    return asyncio.run(run_check())
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    raise SystemExit(cli())

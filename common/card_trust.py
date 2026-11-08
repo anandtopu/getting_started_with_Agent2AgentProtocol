@@ -7,6 +7,7 @@ from a2a.types import AgentCard
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from google.protobuf.json_format import ParseDict
 
+from common.http_limits import request_json
 from common.protocol import as_dict
 from common.security import b64, sign_card, unb64, verify_card
 
@@ -35,8 +36,12 @@ def jwks(public_key: Ed25519PublicKey, kid: str) -> dict:
 
 
 def trusted_jwks(document: dict) -> dict[str, Ed25519PublicKey]:
+    if not isinstance(document, dict) or not isinstance(document.get("keys"), list):
+        raise ValueError("Card signing keys must be a JWKS object.")
     result = {}
     for key in document["keys"]:
+        if not isinstance(key, dict) or not all(isinstance(key.get(k), str) for k in ("kid", "x")):
+            raise ValueError("Malformed card signing key")
         if key.get("kty") != "OKP" or key.get("crv") != "Ed25519" or key.get("use") != "sig":
             raise ValueError("Unsupported card signing key")
         if key["kid"] in result:
@@ -60,8 +65,5 @@ async def verify_discovered(card: dict, vendor: str, client):
     endpoint = url(vendor)
     if not endpoint.startswith("https://"):
         raise ValueError("Rotating card trust requires a configured HTTPS vendor endpoint")
-    response = await client.get(
-        endpoint + "/.well-known/jwks.json", follow_redirects=False, timeout=3
-    )
-    response.raise_for_status()
-    return verify_card(card, trusted_jwks(response.json()))
+    document = await request_json(client, "GET", endpoint + "/.well-known/jwks.json", timeout=3)
+    return verify_card(card, trusted_jwks(document))

@@ -11,11 +11,11 @@ is evidence of the learning deployment, not an external production certification
 
 | Check | Evidence |
 |---|---|
-| Offline Python | 779 tests; application sockets disabled; A2A deprecations are errors |
+| Offline Python | 808 tests; application sockets disabled; A2A deprecations are errors |
 | Gym | 265 starters fail and 265 solutions pass; 25 modules, eight types, at least four types and three levels per module |
 | Examples and notebooks | 118 standalone commands (83 examples, 25 use cases, 10 capstone starter/reference commands) and all 25 notebooks |
 | Style | Ruff lint and formatting; no banned current-track legacy APIs |
-| Links | 1,697 local references and 83 external URLs checked after the hosted OpenAI acceptance review |
+| Links | 1,701 local references and 83 external URLs checked after the final brief recheck |
 | Protocol | All eleven operations captured for JSON-RPC, HTTP+JSON and protobuf service boundaries; real network gRPC separately checked |
 | Golden scenarios | All twenty fixtures check exact vendor states, chunks, artifact IDs and quotes; hardened framework deployment also checks every golden plan |
 | Persistence and replicas | SQLite/PostgreSQL CAS, atomic task/event/outbox rollback, publisher crash, second-handler stream reconnect, owner isolation |

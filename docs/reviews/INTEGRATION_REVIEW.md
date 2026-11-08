@@ -75,3 +75,20 @@ Duplicate, empty and unknown vendor selections produce no vendor requests in the
 new boundary tests. Property names and literal data are preserved by the schema
 projection. All three live acceptance paths subsequently passed; see the
 [retained OpenAI evidence](../evidence/openai-live-2026-11-08.json).
+
+## Final brief boundary recheck
+
+| Boundary traced | Correction and acceptance |
+|---|---|
+| Raw HTTP credential bytes to authentication and routing | Malformed or duplicate bearer/API-key credentials return 401; no verifier or application call is made for invalid credential encoding/ambiguity. A stalled authenticated upload returns 408 after the total body budget. |
+| Configured peer to discovery/keys/OAuth/model parser | Shared response collection enforces decoded size before extending the buffer, stops reading on overflow and closes the stream on timeout. The total deadline includes response headers; redirects remain disabled even on a redirect-enabled client. |
+| Signed discovery to Concierge task persistence | Signature, transport, typed-card and credential setup failures produce a FAILED event after WORKING instead of escaping the executor. Safe diagnostics identify environment/network/trust configuration without exposing peer text. |
+| Live check attempt to published evidence | Each attempt removes the latest success file before configuration or API calls. Expected failures exit nonzero with a recovery hint; successful evidence is written only after native tool selection, A2A/LangGraph/MCP completion and Concierge routing pass. |
+
+R27–R30 close repository-side gaps in the original brief. JSON peer responses are
+limited to 1,000,000 decoded bytes and five seconds total by default; JWKS calls
+use three seconds. Introductory model JSON uses 512,000 bytes and 45 seconds.
+Remote files use 1,000,000 bytes/five seconds and authenticated incoming bodies
+1,000,000 bytes/ten seconds. Provider-native streaming retains its separate
+existing wire/frame/argument limits and shared 90-second budget. These are course
+request budgets, not a claim of operating-system isolation or production capacity.

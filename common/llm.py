@@ -8,6 +8,7 @@ import httpx
 from jsonschema import ValidationError
 
 from common.config import Settings
+from common.http_limits import request_json
 
 
 class Model:
@@ -60,9 +61,15 @@ class Model:
             raise ValueError("LLM_PROVIDER must be ollama, openai, anthropic or gemini.")
         try:
             async with httpx.AsyncClient(transport=self.transport, timeout=45) as client:
-                response = await client.post(endpoint, json=body, headers=headers)
-                response.raise_for_status()
-                data = response.json()
+                data = await request_json(
+                    client,
+                    "POST",
+                    endpoint,
+                    json=body,
+                    headers=headers,
+                    timeout=45,
+                    limit=512_000,
+                )
         except httpx.HTTPError as exc:
             raise ValueError(
                 "Model unavailable. Check .env, your budget, and scripts/check_env.py."

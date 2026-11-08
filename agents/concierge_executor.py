@@ -5,14 +5,15 @@ from contextlib import AsyncExitStack
 import httpx
 from a2a.helpers import new_task_from_user_message, new_text_status_update_event
 from a2a.server.agent_execution import AgentExecutor
-from a2a.types import Artifact, TaskArtifactUpdateEvent, TaskState
-from google.protobuf.json_format import MessageToDict, ParseDict
+from a2a.types import AgentCard, Artifact, TaskArtifactUpdateEvent, TaskState
+from google.protobuf.json_format import MessageToDict, ParseDict, ParseError
 
 from agents.concierge import Concierge
 from agents.executor import VendorExecutor
 from common.auth_profiles import vendor_headers
 from common.card_trust import verify_discovered
 from common.config import url
+from common.http_limits import request_json
 from common.model_streams import report_progress
 from common.observability import record_task
 from common.protocol import brief_from, data_part
@@ -42,45 +43,45 @@ class ConciergeExecutor(AgentExecutor):
                 task.id, task.context_id, TaskState.TASK_STATE_WORKING, "Collecting vendor quotes"
             )
         )
-        async with AsyncExitStack() as stack:
-            skills = {}
-            # Discovery is read from a configured URL; only its pinned vendor key is accepted.
-            async with httpx.AsyncClient(timeout=5, verify=client_context()) as discovery:
-                for vendor in self.tokens:
-                    response = await discovery.get(url(vendor) + "/.well-known/agent-card.json")
-                    response.raise_for_status()
-                    await verify_discovered(response.json(), vendor, discovery)
-                    skills[vendor] = [
-                        skill["name"] + ": " + skill["description"]
-                        for skill in response.json()["skills"]
-                    ]
-            clients = {
-                vendor: await stack.enter_async_context(
-                    GrpcRemote(token)
-                    if vendor == "print"
-                    else httpx.AsyncClient(
-                        base_url=url(vendor),
-                        headers=await vendor_headers(vendor, token),
-                        verify=client_context(),
+        try:
+            async with AsyncExitStack() as stack:
+                skills = {}
+                # Discovery uses configured URLs and pinned keys, with bounded responses.
+                async with httpx.AsyncClient(timeout=5, verify=client_context()) as discovery:
+                    for vendor in self.tokens:
+                        document = await request_json(
+                            discovery, "GET", url(vendor) + "/.well-known/agent-card.json"
+                        )
+                        verified = await verify_discovered(document, vendor, discovery)
+                        identity = ParseDict(verified, AgentCard())
+                        skills[vendor] = [s.name + ": " + s.description for s in identity.skills]
+                clients = {
+                    vendor: await stack.enter_async_context(
+                        GrpcRemote(token)
+                        if vendor == "print"
+                        else httpx.AsyncClient(
+                            base_url=url(vendor),
+                            headers=await vendor_headers(vendor, token),
+                            verify=client_context(),
+                        )
                     )
-                )
-                for vendor, token in self.tokens.items()
-            }
-            try:
+                    for vendor, token in self.tokens.items()
+                }
                 async with report_progress(event_queue, task):
                     result = await Concierge(clients, model=self.model, skills=skills).plan(
                         brief, previous
                     )
-            except (ValueError, TypeError, KeyError):
-                await event_queue.enqueue_event(
-                    new_text_status_update_event(
-                        task.id,
-                        task.context_id,
-                        TaskState.TASK_STATE_FAILED,
-                        "Planning could not select safe vendors. Check model configuration and retry.",
-                    )
+        except (httpx.HTTPError, ValueError, TypeError, KeyError, ParseError):
+            await event_queue.enqueue_event(
+                new_text_status_update_event(
+                    task.id,
+                    task.context_id,
+                    TaskState.TASK_STATE_FAILED,
+                    "Planning could not reach or validate vendors. Check scripts/check_env.py, "
+                    "the running network, vendor trust and model configuration before retrying.",
                 )
-                return
+            )
+            return
         await event_queue.enqueue_event(
             TaskArtifactUpdateEvent(
                 task_id=task.id,

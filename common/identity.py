@@ -6,11 +6,14 @@ import time
 import httpx
 import jwt
 
+from common.http_limits import request_json
 from common.security import Principal
 
 
 class OIDCVerifier:
     def __init__(self, jwks: dict, issuer: str, audience: str):
+        if not isinstance(jwks, dict):
+            raise ValueError("OIDC keys must be a JWKS object.")
         self.keys = jwt.PyJWKSet.from_dict(jwks)
         self.issuer, self.audience = issuer, audience
 
@@ -81,13 +84,10 @@ class RefreshingOIDCVerifier:
                 if now - self.attempted >= self.cooldown:
                     self.attempted = now
                     try:
-                        response = await self.client.get(
-                            self.url, follow_redirects=False, timeout=3
-                        )
-                        response.raise_for_status()
-                        self.verifier = OIDCVerifier(response.json(), self.issuer, self.audience)
+                        document = await request_json(self.client, "GET", self.url, timeout=3)
+                        self.verifier = OIDCVerifier(document, self.issuer, self.audience)
                         self.updated = now
-                    except (httpx.HTTPError, ValueError):
+                    except (httpx.HTTPError, ValueError, TypeError, KeyError, jwt.PyJWTError):
                         pass
         if self.verifier is None or self.clock() - self.updated >= self.ttl:
             return None

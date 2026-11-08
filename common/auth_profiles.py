@@ -5,6 +5,7 @@ import os
 import httpx
 from a2a import types
 
+from common.http_limits import request_json
 from common.identity import RefreshingOIDCVerifier
 from common.tls import client_context
 
@@ -88,7 +89,9 @@ async def vendor_headers(vendor, token):
         return {**headers, "X-API-Key": token}
     if vendor in {"av", "travel"}:
         async with httpx.AsyncClient(verify=client_context(), timeout=5) as http:
-            response = await http.post(
+            document = await request_json(
+                http,
+                "POST",
                 os.environ["OIDC_TOKEN_URL"],
                 data={
                     "grant_type": "client_credentials",
@@ -97,6 +100,5 @@ async def vendor_headers(vendor, token):
                     "scope": "quote",
                 },
             )
-            response.raise_for_status()
-            token = response.json()["access_token"]
+            token = document["access_token"]
     return {**headers, "Authorization": "Bearer " + token}

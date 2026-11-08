@@ -85,3 +85,17 @@ duplicates, empty selections and untrusted vendors fail before delegation, and t
 schema property names, literal values and the original schema are preserved.
 The complete live checker then passed with gpt-4o-mini. TCK/.NET remain dependent
 on upstream releases; Anthropic/Gemini remain explicitly deferred.
+
+## Final brief recheck closure
+
+| ID | Priority | Owner | Completed action | Acceptance evidence |
+|---|---|---|---|---|
+| R27 | P2 | Authentication | Reject malformed and duplicate credentials without server exceptions | Bearer/API-key cases return 401 before application execution |
+| R28 | P2 | Network boundaries | Total elapsed-time and decoded-byte budgets for auxiliary HTTP paths and authenticated uploads | Slow body/header, oversized response, stream closure, malformed JWKS and redirect regressions |
+| R29 | P2 | Concierge lifecycle | Include discovery/trust/client setup in terminal failure handling | Transport, signature, malformed card and credential setup cases emit FAILED with a safe hint |
+| R30 | P2 | Learner tooling | Remove stale live evidence and handle expected failures without sensitive tracebacks | Failure test verifies nonzero result, absent old report and sanitized guidance; real OpenAI acceptance rerun |
+
+All repository-side review findings R1–R30 are closed. Publication still requires
+the complete local checks and all 26 CI jobs on the final pushed revision. The
+external follow-ups above remain unchanged, including the user's explicit deferral
+of Anthropic/Gemini live checks.

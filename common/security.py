@@ -1,5 +1,6 @@
 """Small security boundaries with explicit policy and no implicit remote trust."""
 
+import asyncio
 import base64
 import hashlib
 import hmac
@@ -17,6 +18,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 from starlette.authentication import SimpleUser
 from starlette.responses import JSONResponse
 
+from common.http_limits import response_bytes
 from common.limits import RateBudget
 
 
@@ -38,10 +40,12 @@ class BearerGate:
         verifier=None,
         rate_budget=None,
         api_key_header=None,
+        body_timeout: float = 10,
     ):
         self.app, self.tokens, self.max_bytes = app, tokens, max_bytes
-        if any(not secret for secret in tokens):
-            raise ValueError("Authentication tokens must not be empty.")
+        if any(not secret or not secret.isascii() for secret in tokens):
+            raise ValueError("Authentication tokens must not be empty and must use ASCII.")
+        self.body_timeout = body_timeout
         self.verifier = verifier
         self.api_key_header = api_key_header
         self.rate_budget = rate_budget or RateBudget()
@@ -54,16 +58,23 @@ class BearerGate:
         ):
             await self.app(scope, receive, send)
             return
-        headers = {k.decode().lower(): v.decode() for k, v in scope["headers"]}
+        pairs = [(k.decode("latin-1").lower(), v.decode("latin-1")) for k, v in scope["headers"]]
+        headers = dict(pairs)
         scheme, _, token = headers.get("authorization", "").partition(" ")
         if scheme.lower() != "bearer":
             token = ""
         if self.api_key_header:
             token = headers.get(self.api_key_header.lower(), "")
-        principal = next(
-            (p for secret, p in self.tokens.items() if hmac.compare_digest(secret, token)), None
+        credential_header = (self.api_key_header or "authorization").lower()
+        valid = token.isascii() and sum(k == credential_header for k, _ in pairs) == 1
+        principal = (
+            next(
+                (p for secret, p in self.tokens.items() if hmac.compare_digest(secret, token)), None
+            )
+            if valid
+            else None
         )
-        if self.verifier:
+        if valid and self.verifier:
             principal = self.verifier(token)
             if inspect.isawaitable(principal):
                 principal = await principal
@@ -84,16 +95,26 @@ class BearerGate:
             )(scope, receive, send)
             return
         body = bytearray()
-        while True:
-            event = await receive()
-            if event["type"] == "http.disconnect":
-                return
-            body.extend(event.get("body", b""))
-            if len(body) > self.max_bytes:
-                await JSONResponse({"error": "Request too large"}, 413)(scope, receive, send)
-                return
-            if not event.get("more_body"):
-                break
+        try:
+            async with asyncio.timeout(self.body_timeout):
+                while True:
+                    event = await receive()
+                    if event["type"] == "http.disconnect":
+                        return
+                    chunk = event.get("body", b"")
+                    if len(chunk) > self.max_bytes - len(body):
+                        await JSONResponse({"error": "Request too large"}, 413)(
+                            scope, receive, send
+                        )
+                        return
+                    body.extend(chunk)
+                    if not event.get("more_body"):
+                        break
+        except TimeoutError:
+            await JSONResponse({"error": "Request body time limit exceeded"}, 408)(
+                scope, receive, send
+            )
+            return
         try:
             payload = json.loads(body) if body else {}
         except ValueError:
@@ -149,18 +170,24 @@ def safe_file_url(url: str, allowed: set[str]) -> str:
 
 
 async def fetch_file(
-    url: str, allowed: set[str], client: httpx.AsyncClient, limit: int = 1_000_000
+    url: str,
+    allowed: set[str],
+    client: httpx.AsyncClient,
+    limit: int = 1_000_000,
+    *,
+    timeout: float = 5,
 ) -> bytes:
     safe_file_url(url, allowed)
-    content = bytearray()
-    async with client.stream("GET", url, follow_redirects=False, timeout=5) as response:
-        if response.status_code != 200:
-            raise ValueError("File fetch must return 200 without redirects.")
-        async for chunk in response.aiter_bytes():
-            content.extend(chunk)
-            if len(content) > limit:
-                raise ValueError("File exceeds size limit.")
-    return bytes(content)
+    try:
+        async with asyncio.timeout(timeout):
+            async with client.stream(
+                "GET", url, follow_redirects=False, timeout=timeout
+            ) as response:
+                if response.status_code != 200:
+                    raise ValueError("File fetch must return 200 without redirects.")
+                return await response_bytes(response, limit)
+    except TimeoutError as exc:
+        raise ValueError("File fetch exceeded total time limit.") from exc
 
 
 def b64(value: bytes) -> str:
