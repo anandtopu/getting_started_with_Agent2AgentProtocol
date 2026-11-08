@@ -39,6 +39,26 @@ exceptions after upstream contradictions are resolved; optionally run hosted-mod
 checks with an account owner's credentials. These do not change the verified offline
 course or replace the operating responsibilities documented in the runbook.
 
+### Follow-up check: 2026-11-08 (America/Chicago)
+
+| Item | Verified status | Next completion condition |
+|---|---|---|
+| TCK exceptions | Upstream main remains at 104a7b4; only Python/dependency metadata changed after the course pin. Issue [202](https://github.com/a2aproject/a2a-tck/issues/202) and open proposals [203](https://github.com/a2aproject/a2a-tck/pull/203) and [238](https://github.com/a2aproject/a2a-tck/pull/238) cover the defects. Neither proposal is merged. | Review an integrated upstream revision retaining the 1.0.1 error mappings and strict validators, run the entire suite and independent wire controls, then remove only exceptions that genuinely pass. |
+| Stable .NET SDK | Official GitHub releases and the NuGet A2A.AspNetCore version index still provide 1.0.0-preview4; no stable package was found. | A stable compatible package is published; update the native lab and pass interoperability on Windows, Linux and macOS. |
+| Hosted-model live checks | No OpenAI, Anthropic or Gemini API key was configured in the execution environment, project .env, persistent user environment or repository secrets. No live hosted call was attempted. | Configure the provider keys privately, select accessible models, then run the existing live checker once per provider and retain each provider's evidence. |
+
+The TCK proposals are useful tracking references, not validated replacements for
+the pinned suite. PR 203's inspected regression fixture still uses the old HTTP
+415 mapping; the released 1.0.1 mapping is 400. PR 238 also changes older media
+checks and schema coverage. Adopting either historical branch wholesale could
+discard later conformance corrections. Keep the current strict baseline until an
+integrated candidate has been reviewed and tested.
+
+The hosted checker already exercises streamed tool selection, A2A/LangGraph/MCP
+completion and Concierge routing. Its command and credential setup are in
+[the live-model guide](../LIVE_MODELS.md). Missing credentials and unpublished
+upstream fixes remain explicit blockers, not passing results.
+
 ## TCK investigation closure
 
 | ID | Priority | Owner | Completed action | Acceptance evidence |

@@ -72,6 +72,13 @@ changes only `pyproject.toml` and `uv.lock`, requires Python 3.15+, and does not
 repair either test defect. The compatible revision remains pinned. No upstream
 test, requirement metadata or generated executor is patched by the course.
 
+The 2026-11-08 follow-up found existing upstream proposals for these defects:
+[PR 238](https://github.com/a2aproject/a2a-tck/pull/238) covers the HTTP assertion
+and missing expected-error binding; [PR 203](https://github.com/a2aproject/a2a-tck/pull/203)
+also addresses the latter. Both are open and based on earlier suite behavior.
+Their existence does not establish a passing, integrated 1.0.1 suite. The
+[backlog check](reviews/ACTION_PLAN.md) records the upgrade acceptance conditions.
+
 ### Independent obligations, without score substitution
 
 [scripts/tck_evidence.py](../scripts/tck_evidence.py) runs against the same real
