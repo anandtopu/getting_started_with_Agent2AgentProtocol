@@ -1,9 +1,10 @@
+**Network and Concierge version 10:** what's new — the orchestrator.
+
 # Module 10: The orchestrator
 > After this module you can delegate concurrently.
 
 **Time:** ~90 min · **Level:** Intermediate · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 10
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 10:** what's new — the orchestrator.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ The Concierge is an A2A client of vendors and can also be an A2A server for call
 
 **Analogy:** An event coordinator asks specialists for estimates while keeping a ledger of each conversation.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Each delegation retains vendor, task ID, context ID, state and validated quotes. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -191,6 +195,19 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/10_orc
 | [10-04](../../gym/tasks/10/10-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [10-05](../../gym/tasks/10/10-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [10-06](../../gym/tasks/10/10-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [10-07: Share only Granite's required brief](../../gym/tasks/10/10-07_minimize/task.md)
+- [10-40: Coordinate vendor work: parallel](../../gym/tasks/10/10-40_orchestration_parallel/task.md)
+- [10-41: Coordinate vendor work: resume](../../gym/tasks/10/10-41_orchestration_resume/task.md)
+- [10-42: Coordinate vendor work: untrusted](../../gym/tasks/10/10-42_orchestration_untrusted/task.md)
+- [10-43: Coordinate vendor work: private](../../gym/tasks/10/10-43_orchestration_private/task.md)
+- [10-44: Coordinate vendor work: rejected](../../gym/tasks/10/10-44_orchestration_rejected/task.md)
+- [10-45: Coordinate vendor work: fallback](../../gym/tasks/10/10-45_orchestration_fallback/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

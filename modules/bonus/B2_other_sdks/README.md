@@ -1,9 +1,10 @@
+**Network and Concierge version B2:** what's new — other official sdks.
+
 # Module B2: Other official SDKs
 > After this module you can inspect language compatibility.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 08
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version B2:** what's new — other official sdks.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Official SDK status does not guarantee that every language release supports the 
 
 **Analogy:** An approved translation still needs checking against the edition of the contract in use.
 
+Read the [feature companion](../../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: The SDK Vert.x router. A Jakarta REST filter alone does not protect that router. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 

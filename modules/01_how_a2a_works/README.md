@@ -1,9 +1,10 @@
+**Network and Concierge version 01:** what's new — how a2a works.
+
 # Module 01: How A2A works
 > After this module you can read a json-rpc envelope.
 
 **Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 01
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 01:** what's new — how a2a works.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ A message is a communication; a task is tracked work; an artifact is its deliver
 
 **Analogy:** A work order tracks progress, while the finished estimate is a separate deliverable.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Yes. A direct Message is a valid alternative to a tracked Task. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 

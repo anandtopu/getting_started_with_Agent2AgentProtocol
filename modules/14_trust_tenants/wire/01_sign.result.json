@@ -49,7 +49,9 @@
     ],
     "defaultOutputModes": [
       "application/json",
-      "text/plain"
+      "text/plain",
+      "application/pdf",
+      "image/svg+xml"
     ],
     "skills": [
       {
@@ -69,7 +71,7 @@
   "signature": [
     {
       "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6ImdyYW5pdGUtMjAyNiJ9",
-      "signature": "kAQH_gQ3sEE88DZxb_vnxtu7a2eDvjsCDtCZUtEjuFjVwQiyWrWBMqPus71nCrmKSbYUtvq_PucrsHsdUquxDw"
+      "signature": "Jjobq3u8zvTOc5U0ybGfZH5Kunf4xNzP1LtfkzmiyLMaWH5sMGHzCOg5izmY2ApdicqSd8wnzMEGOtr_JJuSCg"
     }
   ]
 }

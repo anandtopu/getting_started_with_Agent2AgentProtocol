@@ -20,6 +20,8 @@ Use a remote agent when independent ownership, execution or coordination matters
 A bridge must deliberately map continuation, cancellation, streaming, credentials
 and errors. Returning a long-running task as one string loses important information.
 
-The current module demonstrates the boundary decision and deterministic tool
-dispatch. A complete live MCP server/client integration is tracked as remaining
-work in the verification notes.
+The [kitchen server](../agents/kitchen.py) uses the actual MCP server and client SDK,
+with its in-memory transport for offline grading and stdio for a standalone process.
+The [LangGraph executor](../agents/langgraph_vendor.py) invokes that kitchen privately
+and reports only validated A2A artifacts. Run `uv run python -m agents.kitchen` for
+the stdio server, or module 12's examples for the complete in-process integration.

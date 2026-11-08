@@ -5,15 +5,11 @@ You need basic Python, a terminal and Git. You do not need an LLM, API keys or a
 cloud account for the examples and graded exercises.
 
 **Target:** A2A specification **1.0.1**, official Python SDK **1.3.0**.
-This is an initial course implementation, with 21 core modules, four bonus
-modules, 80 runnable examples and 157 exercises. Read
-[verification notes](docs/VERIFICATION_NOTES.md) for the distinction between
-implemented examples, introductory coverage and remaining advanced work.
-
-The tested integrations include all seven requested frameworks, native TypeScript,
-Go, Java and an explicitly labeled .NET preview, a Keycloak token lab,
-PostgreSQL recovery, and HTTP/gRPC tracing. See the
-[validation report](docs/VALIDATION_REPORT.md) for evidence and limitations.
+The course includes 21 core modules, four bonus modules, 83 runnable examples,
+265 graded exercises and five capstones. Build deterministic agents first, then add
+native model tool streams, framework interoperability, heterogeneous authentication,
+and a durable encrypted deployment. See the [validation report](docs/VALIDATION_REPORT.md)
+for executed checks and the [feature companion](docs/FEATURE_DEEP_DIVES.md) for deeper explanations.
 
 A2A is an open protocol for independently operated agents to exchange work.
 An **Agent Card** describes a vendor's skills and interfaces. A **message**
@@ -41,7 +37,7 @@ All names, events and inventory in the course data are fictional.
 ## Five-minute quick start
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and Git.
-Python 3.11–3.13 is supported. Node is optional until the TypeScript bonus.
+Python 3.11Ã¢â‚¬â€œ3.13 is supported. Node is optional until the TypeScript bonus.
 These commands work in **Windows PowerShell, macOS and Linux**:
 
 ~~~console
@@ -88,11 +84,11 @@ files. Real deployments need TLS and managed credentials.
 
 ~~~mermaid
 flowchart LR
-    A["00–08: Protocol foundations"] --> B["09–12: Models and orchestration"]
-    B --> C["13–15: Trust and security"]
-    C --> D["16–20: Testing and production"]
+    A["00Ã¢â‚¬â€œ08: Protocol foundations"] --> B["09Ã¢â‚¬â€œ12: Models and orchestration"]
+    B --> C["13Ã¢â‚¬â€œ15: Trust and security"]
+    C --> D["16Ã¢â‚¬â€œ20: Testing and production"]
     D --> E["Bonuses and capstones"]
-    G["Predict → Run → Explain → Practice"] --- A
+    G["Predict Ã¢â€ â€™ Run Ã¢â€ â€™ Explain Ã¢â€ â€™ Practice"] --- A
     G --- B
     G --- C
     G --- D
@@ -100,11 +96,11 @@ flowchart LR
 
 | Tier | Reading and labs | Suggested additional practice |
 |---|---:|---:|
-| 1: Foundations | 12 hours | 6–10 hours |
-| 2: Intelligent agents | 10 hours | 5–8 hours |
-| 3: Security | 10 hours | 5–8 hours |
-| 4: Production and design | 12 hours | 6–10 hours |
-| Bonuses and capstones | Variable | 10–30 hours |
+| 1: Foundations | 12 hours | 6Ã¢â‚¬â€œ10 hours |
+| 2: Intelligent agents | 10 hours | 5Ã¢â‚¬â€œ8 hours |
+| 3: Security | 10 hours | 5Ã¢â‚¬â€œ8 hours |
+| 4: Production and design | 12 hours | 6Ã¢â‚¬â€œ10 hours |
+| Bonuses and capstones | Variable | 10Ã¢â‚¬â€œ30 hours |
 
 ## Watch the network
 
@@ -113,7 +109,9 @@ uv run python scripts/network.py up --module 08
 uv run streamlit run control_room/app.py
 ~~~
 
-The Control Room discovers cards, sends briefs and displays streamed events.
+The Control Room discovers cards, sends briefs and displays streamed events. Start
+`uv run python scripts/webhook_lab.py` in another terminal to watch live signed
+callbacks in its durable inbox panel.
 For the current standalone A2A Inspector, use
 [the official installation instructions](https://github.com/a2aproject/a2a-inspector).
 
@@ -140,8 +138,9 @@ live models use .env.example and common/llm.py.
 **Does initial installation work without internet?** No. Initial installation needs
 package access. Later runs use the lockfile and cached packages offline.
 
-**Are all advanced production features complete?** No. The verification notes
-track gaps explicitly; a passing teaching suite is not a production certification.
+**Can I deploy the final network?** Yes. Follow the [hardened deployment](deploy/HARDENED_NETWORK.md).
+Operate certificates, backups and retention for your environment; passing course tests
+is not an external production or protocol certification.
 
 **Can I use a different model?** Yes. Configure the provider and model in .env.
 Never commit credentials.
@@ -155,4 +154,4 @@ Generated IDs and timestamps vary between runs.
 Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
 License: [MIT](LICENSE).
 
-See [integration labs](docs/INTEGRATION_LABS.md), [all operations on the wire](docs/OPERATIONS_ON_THE_WIRE.md), and [the validation report](docs/VALIDATION_REPORT.md) for executed checks and remaining scope.
+See [integration labs](docs/INTEGRATION_LABS.md), [all operations on the wire](docs/OPERATIONS_ON_THE_WIRE.md), and [the validation report](docs/VALIDATION_REPORT.md) for executed checks and external limitations.

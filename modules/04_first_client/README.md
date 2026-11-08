@@ -1,9 +1,10 @@
+**Network and Concierge version 04:** what's new — your first a2a client.
+
 # Module 04: Your first A2A client
 > After this module you can create an sdk client.
 
 **Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 04
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 04:** what's new — your first a2a client.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ The client reads the card and selects an interface it understands. It sends A2A-
 
 **Analogy:** A lost phone connection does not mean a vendor tore up your order.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: No. taskId identifies the paused task; contextId groups related work. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -287,6 +291,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/04_fir
 | [04-04](../../gym/tasks/04/04-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [04-05](../../gym/tasks/04/04-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [04-06](../../gym/tasks/04/04-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [04-20: Send a raw JSON-RPC quote request](../../gym/tasks/04/04-20_client_rpc/task.md)
+- [04-21: Send the same brief over HTTP+JSON](../../gym/tasks/04/04-21_client_rest/task.md)
+- [04-22: Choose a binding with the official client](../../gym/tasks/04/04-22_client_sdk/task.md)
+- [04-23: Poll the work order you created](../../gym/tasks/04/04-23_client_poll/task.md)
+- [04-24: Handle an unknown task without retrying](../../gym/tasks/04/04-24_client_missing/task.md)
+- [04-25: Separate exchange and work-order identities](../../gym/tasks/04/04-25_client_correlation/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

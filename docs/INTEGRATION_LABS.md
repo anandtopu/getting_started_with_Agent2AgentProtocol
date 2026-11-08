@@ -20,7 +20,7 @@ the complete network. Run it without another copy of the network already running
 The check asserts that Inkwell rejects an unauthenticated gRPC request and has no
 HTTP send-message route.
 
-[Server](../agents/grpc_server.py) · [trust policy](../common/card_trust.py) ·
+[Server](../agents/grpc_server.py) Â· [trust policy](../common/card_trust.py) Â·
 [all operation captures](OPERATIONS_ON_THE_WIRE.md)
 
 ## LangGraph and private MCP tools
@@ -81,7 +81,7 @@ uv run pytest tests/test_recovery.py tests/test_compensation.py
 uv run python modules/20_designing_agent_networks/examples/03_compensate.py
 ~~~
 
-[Recovery](../agents/concierge.py) · [hold executor](../agents/holds.py) ·
+[Recovery](../agents/concierge.py) Â· [hold executor](../agents/holds.py) Â·
 [compensation](../common/saga.py)
 
 The hold ledger is in memory and is a teaching example. Durable outboxes,
@@ -128,5 +128,17 @@ release list currently identifies v1.0.0-preview4 as a prerelease. Its
 [native lab](../modules/bonus/B2_other_sdks/dotnet/README.md) is implemented and tested,
 but this course does not represent the package as stable.
 
-[Go source](../modules/bonus/B2_other_sdks/go/main.go) ·
+[Go source](../modules/bonus/B2_other_sdks/go/main.go) Â·
 [official .NET releases](https://github.com/a2aproject/a2a-dotnet/releases)
+
+## Final deployment and live callbacks
+
+The [hardened mixed-framework network](../deploy/HARDENED_NETWORK.md) combines
+TLS, Keycloak, API keys, mTLS, PostgreSQL and shared signing-key rotation.
+Run `uv run python scripts/check_webhook_lab.py` for signed callbacks, unsigned
+rejection and task/inbox restart recovery. For the interactive inbox start
+`uv run python scripts/webhook_lab.py` and open the Control Room.
+
+The live Concierge can request tentative holds with tentative_holds=true and a
+stable hold_request_id. The durable reservation tests cover lost acknowledgements
+and compensating releases. Approval remains required and no money is charged.

@@ -1,9 +1,10 @@
+**Network and Concierge version 19:** what's new — deployment and scale.
+
 # Module 19: Deployment and scale
 > After this module you can persist and reload a task.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 19
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 19:** what's new — deployment and scale.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ A persistent task store survives process loss; an in-memory event queue does not
 
 **Analogy:** Keeping a ledger is different from ensuring every office sees new entries immediately.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: It fences acknowledgements from an expired worker after another worker claims the delivery. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -153,6 +157,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/19_dep
 | [19-04](../../gym/tasks/19/19-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [19-05](../../gym/tasks/19/19-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [19-06](../../gym/tasks/19/19-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [19-40: Load a task through another replica](../../gym/tasks/19/19-40_persistence_reload/task.md)
+- [19-41: Reject a stale task writer](../../gym/tasks/19/19-41_persistence_stale/task.md)
+- [19-42: Recover an event before publication](../../gym/tasks/19/19-42_persistence_replay/task.md)
+- [19-43: Fence an expired delivery worker](../../gym/tasks/19/19-43_persistence_lease/task.md)
+- [19-44: Share a request budget across replicas](../../gym/tasks/19/19-44_persistence_budget/task.md)
+- [19-45: Inspect the atomic event and outbox commit](../../gym/tasks/19/19-45_persistence_atomic/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

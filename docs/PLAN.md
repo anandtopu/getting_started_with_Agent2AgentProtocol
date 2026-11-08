@@ -1,7 +1,7 @@
 # Delivery plan and assumptions
 
 The user authorized all seven phases without intermediate approval on 2026-11-07.
-The workspace was empty. Python 3.11–3.13 and an editable package let examples run
+The workspace was empty. Python 3.11â€“3.13 and an editable package let examples run
 by path on PowerShell, macOS and Linux.
 
 1. Verify the specification, migration guide, protobuf and package releases.
@@ -38,7 +38,7 @@ agents/                   Vendor and Concierge implementations
 data/                     Inventory, 20 events and attack fixtures
 modules/00_* to 20_*/      Lessons, examples, notebooks, captures and tests
 modules/bonus/B1_* to B4_* Optional ecosystem introductions
-gym/                      CLI, grading and 157 task folders
+gym/                      CLI, grading and 265 task folders
 workspace/                Ignored attempts, local tokens and progress
 control_room/             Streamlit network viewer
 capstones/                Specifications, starters, references and rubrics
@@ -53,5 +53,5 @@ tests/                    Contracts, security and repository checks
 ## Completion rule
 
 Executed checks and unexecuted integrations are reported separately. A folder and
-passing smoke test do not prove exhaustive feature coverage. Advanced gaps remain
-visible until implemented and demonstrated.
+passing smoke test do not prove exhaustive feature coverage. The [validation report](VALIDATION_REPORT.md) records completed advanced integrations
+and the remaining external SDK/TCK limitations.

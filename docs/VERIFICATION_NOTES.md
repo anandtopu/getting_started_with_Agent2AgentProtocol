@@ -1,7 +1,8 @@
 # Verification notes
 
 Checked **2026-11-07**. This document is the release's evidence and limitation
-record. It does not claim the complete original production-course brief is finished.
+record. The expanded course closes the previously listed implementation gaps; external
+release status and official TCK exceptions remain explicit below.
 
 ## Specification and dependencies
 
@@ -82,66 +83,55 @@ Configured examples are documented as available, not live-tested account access:
 - [Anthropic Haiku 4.5](https://docs.anthropic.com/en/docs/about-claude/model-deprecations).
 - [Gemini 3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite).
 
-common/llm.py implements bounded HTTP JSON decision calls for all four providers.
-The teaching tool loop validates model decisions before invoking deterministic
-functions. This is not a complete provider-native streaming tool-call implementation.
+common/llm.py retains the introductory JSON decision method and adds provider-native
+streamed tool calls through common/model_streams.py. All four provider framings are
+validated with fragmented offline HTTP streams; the free Ollama model is also run
+in CI. Hosted account access is optional and is not claimed as live-tested.
+See [the live guide](LIVE_MODELS.md) for commands, framing and bounds.
 
-## What the current tests establish
+## Advanced implementation evidence
 
-- Actual JSON-RPC and HTTP+JSON requests through the official SDK's ASGI routes.
-- Deterministic quote artifacts for five vendors.
-- Catering interruption and continuation, stream ordering, chunks and cancellation.
-- Protobuf roundtrip calls to the real gRPC servicer without a listening port.
-- A deployed gRPC-only Inkwell endpoint with authentication, plus the Concierge's
-  HTTP-to-gRPC delegation and signed-card trust checks.
-- Real LangGraph and MCP SDK execution inside Saffron's A2A boundary.
-- OAuth/OIDC token-verifier negative cases, SQLite restart continuation, HTTP trace
-  propagation, bounded fallback, explicit hold compensation and 20 golden scenarios.
-- The vendor kit combines signed cards, authentication, durable tasks and verified
-  push; the hiring capstone coordinates three A2A agents and pauses for consent.
-- Missing-credential rejection, owner isolation, signature tampering rejection,
-  unsafe file URL rejection and webhook replay checks.
-- Every gym starter fails and every reference solution passes its task checks.
-- Module files and cleared notebooks are structurally checked.
+- The official SDK's VersionedTaskStore and TaskEventStream interfaces back a shared
+  SQL snapshot, revision, event journal and callback outbox. Tests inject a transaction
+  failure, stale writer, publisher crash, lost connection and expired dispatcher lease.
+- SQLite and PostgreSQL run the same cluster suite. Replica ownership, distributed
+  request budgets, cancellation and snapshot/subscription races are covered.
+- The vendor kit runs durable callback recovery independently of fresh traffic. The
+  live Control Room lab verifies signatures and preserves its inbox across restart.
+- Hardened Compose uses bearer, API key, OAuth client credentials, OIDC and mTLS.
+  Keycloak validates audience isolation; HTTPS clients validate the issuing CA and
+  hostname. No TLS verification bypass is used.
+- Rotating card keys share an encrypted SQL ring. Restart/replica tests cover overlap,
+  expiry and revocation. Wrapping keys remain operator-provided secrets.
+- Real PDF and SVG Parts, native model progress, exact twenty-scenario golden checks,
+  durable no-charge hold compensation and six-attack security regressions are runnable.
+- Six isolated framework workers plus LangGraph use confirmed native execution APIs;
+  one official-v1 lifecycle adapter retains identical business semantics.
+- The practice bank has 265 tasks across eight types and twenty-five modules. It
+  combines small introductory contracts with 115 protocol/workflow/adversarial tasks.
+  Every starter fails and every reference solution passes offline. Human design
+  rubrics remain deliberately outside automated correctness claims.
 
-The gym currently has 133 core tasks and 24 bonus tasks across eight types.
-Build/Fix/Conformance tasks share a small contract within each module; this is
-introductory practice, not the requested deep bank of six distinct tasks per feature.
-Seven additional tasks use real protocol and adversarial acceptance checks for
-continuation, streaming, gRPC, authentication, signing, SSRF and minimal disclosure.
-Design checks are structural only; human rubric review is mandatory.
+## Official conformance evidence
 
-## Remaining gaps against the original brief
+The [official TCK report](TCK_REPORT.md) records the pinned unmodified upstream suite,
+all three bindings, its raw score, skips, four reviewed contradictions and nine manual
+requirements. The CI gate checks names and diagnostic messages; it does not rewrite
+the official result or claim certification. Vendor business behavior is tested by
+the course contracts and golden evaluations rather than the TCK fixture executor.
 
-- A stable .NET agent; upstream currently provides a preview.
-- Complete SDK/feature coverage and distinct Build, Secure and Interop tasks testing
-  full agents rather than only small contract transformations.
-- Per-vendor production OAuth/OIDC/mTLS wiring and automated key rotation.
-  The separate Keycloak service-account lab is now verified in Docker CI.
-  Authenticated HTTP rate budgets are tested; they are per-process rather than distributed.
-- The hold-compensation lab is separate from the live Concierge's quote workflow.
-- Stream-disconnect/resubscription chaos and durable multi-replica delivery.
-  Every vendor's golden states/artifacts and HTTP/gRPC trace parentage are now tested.
-- Complete production capstones, advanced model-native streaming/tool calling,
-  and a successful official TCK run.
+## External limitations and operational scope
 
-All eleven operations have actual JSON-RPC, HTTP+JSON and in-process gRPC captures;
-the terminal-task SubscribeToTask error is deliberately included.
+The official .NET SDK remains preview4. The implemented native lab is verified;
+a stable upstream release cannot be supplied by this repository. Hosted LLM calls
+need an account; only the free local provider is live-tested. The TCK has four
+upstream contradictions described in its report. None is hidden by a claimed 100%
+compatibility score.
 
-Docker has no running engine on the authoring machine. GitHub's Linux runner
-built and ran the network and verified PostgreSQL restart continuation and Jaeger
-trace export through its v3 API.
-See [the validation report](VALIDATION_REPORT.md) for the final CI result.
-Real model calls and official TCK execution were not verified.
-
-## Additional reliability evidence
-
-The vendor kit now uses DatabasePushNotificationConfigStore as well as
-DatabaseTaskStore. A separate SQLite outbox/inbox lab persists notification
-delivery IDs and payload hashes. Its test loses an acknowledgement, closes and
-reopens both databases, and proves a signed retry is acknowledged without creating
-a second inbox record. This does not establish an atomic transaction between
-SDK task changes and outbox insertion, nor multi-dispatcher leasing.
-
-The Java, .NET, Go and TypeScript integrations and the Keycloak lab all passed in
-[CI run 42420093044](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42420093044).
+The authoring machine has no running Docker engine; GitHub's Linux runners execute
+PostgreSQL, Keycloak, Jaeger and both Compose profiles. Network, native-language,
+TLS and callback checks run on Linux, Windows and macOS. The hardened profile is a
+learning deployment with generated local certificates, not a managed public service.
+Its [runbook](../deploy/HARDENED_NETWORK.md) explains certificate renewal, schema
+rollout, backups, restore validation and retention. See [validation](VALIDATION_REPORT.md)
+for the final revision's counts and CI evidence.

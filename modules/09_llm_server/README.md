@@ -1,9 +1,10 @@
+**Network and Concierge version 09:** what's new — putting an llm behind a server.
+
 # Module 09: Putting an LLM behind a server
 > After this module you can replace model output with a script.
 
 **Time:** ~90 min · **Level:** Intermediate · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 09
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 09:** what's new — putting an llm behind a server.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ A language model predicts output from context; it is not the protocol and should
 
 **Analogy:** A junior estimator suggests an action; the office's checked procedures decide what may happen.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: No. Emit safe progress and the validated deliverable, not internal reasoning or partial tool arguments. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -151,6 +155,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/09_llm
 | [09-04](../../gym/tasks/09/09-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [09-05](../../gym/tasks/09/09-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [09-06](../../gym/tasks/09/09-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [09-40: Validate native tool frames: ollama](../../gym/tasks/09/09-40_native_model_ollama/task.md)
+- [09-41: Validate native tool frames: openai](../../gym/tasks/09/09-41_native_model_openai/task.md)
+- [09-42: Validate native tool frames: anthropic](../../gym/tasks/09/09-42_native_model_anthropic/task.md)
+- [09-43: Validate native tool frames: gemini](../../gym/tasks/09/09-43_native_model_gemini/task.md)
+- [09-44: Validate native tool frames: truncated](../../gym/tasks/09/09-44_native_model_truncated/task.md)
+- [09-45: Validate native tool frames: unsafe](../../gym/tasks/09/09-45_native_model_unsafe/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

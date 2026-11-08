@@ -1,9 +1,10 @@
+**Network and Concierge version B1:** what's new — a2a in typescript.
+
 # Module B1: A2A in TypeScript
 > After this module you can compare json representations.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 08
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version B1:** what's new — a2a in typescript.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Language interoperability rests on wire contracts, not shared Python objects. Th
 
 **Analogy:** Two offices can use different languages while agreeing on the fields of an order.
 
+Read the [feature companion](../../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: No. Compare semantics while retaining each task/context mapping. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 

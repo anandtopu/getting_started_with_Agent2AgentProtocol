@@ -33,7 +33,7 @@ flowchart LR
 - Run --native after installing the pinned npm dependencies.
 - Identify the request, task state, trust decision and resulting deliverable.
 - Run this project's tests with uv run pytest capstones/01_interop/tests.
-- State which production properties are not demonstrated by this slice.
+- Explain the verified boundaries and operating assumptions in the security review.
 
 ## Starter
 
@@ -41,13 +41,12 @@ Run uv run python capstones/01_interop/starter/run.py to inspect the input. Exte
 
 ## Filled-in security review
 
-| Control | Reference evidence | Limitation |
+| Boundary | Verified control | Scope |
 |---|---|---|
-| Synthetic data | Committed fixtures | No real user-data handling tested |
-| Credentials outside messages | HTTP headers in shared clients | Local credentials, not identity-provider integration |
-| Destination restriction | Explicit configured vendor clients | Production egress policy remains required |
-| Approval | Quotes do not spend money | No purchase workflow implemented |
-| Failure handling | Typed task outcomes and security rejection | Full recovery and compensation need extension |
+| Cross-language boundary | Native Python-to-TypeScript quotes and three-binding offline comparison | Native network checks run separately from socket-free grading |
+| Authentication | Missing credential and task owner negative cases | Use TLS for any non-loopback deployment |
+| Data contract | Same inventory and normalized states/artifacts | Generated IDs are deliberately different |
+| Effects | Read-only synthetic venue quotes | No charge or purchase endpoint |
 
 ## Rubric
 
@@ -55,4 +54,4 @@ Score contract clarity, correctness, security, failure handling and evidence fro
 
 ## Extend it
 
-Add persistent task storage, negative contract tests, reconnect behavior, a durable callback outbox and a real deployment. Prove each property with captured traffic and a regression test.
+Connect this project to the [hardened deployment](../../deploy/HARDENED_NETWORK.md), add a new partner contract, and retain both adversarial and golden regression evidence.

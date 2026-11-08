@@ -1,15 +1,17 @@
 [
   {
     "name": "venues.request",
-    "trace_id": "81f659cad8cf00f6c33ea73b732846ec",
+    "trace_id": "2c91e3437abd9180d935e4df0d5188d8",
     "attributes": {
-      "maplewood.vendor": "venues",
-      "http.request.method": "POST"
+      "http.request.method": "POST",
+      "maplewood.task.id": "e44e3343-5049-4e51-b05f-ff76ae50a909",
+      "maplewood.context.id": "3fbdaa8a-1805-46d1-ace3-13f785c7bfef",
+      "maplewood.vendor": "venues"
     }
   },
   {
     "name": "concierge.plan",
-    "trace_id": "81f659cad8cf00f6c33ea73b732846ec",
+    "trace_id": "2c91e3437abd9180d935e4df0d5188d8",
     "attributes": {}
   }
 ]

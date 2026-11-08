@@ -2,8 +2,8 @@
   "delegations": [
     {
       "vendor": "venues",
-      "task_id": "797ff512-93b6-4031-8032-3d76a4cc689d",
-      "context_id": "61d4f520-faa7-4173-97c1-5767332367bd",
+      "task_id": "42bd3dc6-4a38-431a-b754-2c3ba4cb5da4",
+      "context_id": "3e619a66-6344-4884-85ff-ef1ab2f69130",
       "state": "TASK_STATE_COMPLETED",
       "quotes": [
         {
@@ -16,9 +16,9 @@
         }
       ],
       "question": {
-        "messageId": "6027e093-8e83-4a29-8379-8cb0022fa85b",
-        "contextId": "61d4f520-faa7-4173-97c1-5767332367bd",
-        "taskId": "797ff512-93b6-4031-8032-3d76a4cc689d",
+        "messageId": "13906de3-bba5-4ff6-baa6-eefeddbbe71b",
+        "contextId": "3e619a66-6344-4884-85ff-ef1ab2f69130",
+        "taskId": "42bd3dc6-4a38-431a-b754-2c3ba4cb5da4",
         "role": "ROLE_AGENT",
         "parts": [
           {
@@ -29,8 +29,8 @@
     },
     {
       "vendor": "catering",
-      "task_id": "b949d678-dfd2-4d32-bd26-2ebec003bb69",
-      "context_id": "559ed53e-1c4d-482b-82dd-b2294e4a9685",
+      "task_id": "7d145258-2b81-4871-b19e-b18a273d3de5",
+      "context_id": "1b406116-2401-4505-8692-0b1dda75a040",
       "state": "TASK_STATE_COMPLETED",
       "quotes": [
         {
@@ -43,9 +43,9 @@
         }
       ],
       "question": {
-        "messageId": "9c5df5de-771c-4132-9c18-c44a7d7f6324",
-        "contextId": "559ed53e-1c4d-482b-82dd-b2294e4a9685",
-        "taskId": "b949d678-dfd2-4d32-bd26-2ebec003bb69",
+        "messageId": "37675b01-40da-41d7-93be-eb0c8f028343",
+        "contextId": "1b406116-2401-4505-8692-0b1dda75a040",
+        "taskId": "7d145258-2b81-4871-b19e-b18a273d3de5",
         "role": "ROLE_AGENT",
         "parts": [
           {
@@ -56,8 +56,8 @@
     },
     {
       "vendor": "av",
-      "task_id": "5170735b-c708-4fc3-bd6f-c07a82eabc9f",
-      "context_id": "e49d366f-e523-474e-8b75-503e62672851",
+      "task_id": "2744557b-5eb6-4734-905a-6f8bf83854bd",
+      "context_id": "2411d5c8-9a81-4ba7-87aa-b593e6a86c55",
       "state": "TASK_STATE_COMPLETED",
       "quotes": [
         {
@@ -70,9 +70,9 @@
         }
       ],
       "question": {
-        "messageId": "e5fef647-4d6a-4727-82ac-86d1117a4c3c",
-        "contextId": "e49d366f-e523-474e-8b75-503e62672851",
-        "taskId": "5170735b-c708-4fc3-bd6f-c07a82eabc9f",
+        "messageId": "9c85827c-c131-4a96-98c0-dc5e5a995229",
+        "contextId": "2411d5c8-9a81-4ba7-87aa-b593e6a86c55",
+        "taskId": "2744557b-5eb6-4734-905a-6f8bf83854bd",
         "role": "ROLE_AGENT",
         "parts": [
           {
@@ -83,8 +83,8 @@
     },
     {
       "vendor": "travel",
-      "task_id": "6e7bdfc8-ea5c-4cd0-b024-c868db5eaacb",
-      "context_id": "09b3caf8-4135-4f08-93b1-54945524f7f4",
+      "task_id": "e343e155-2197-4904-a473-1a642fddbf25",
+      "context_id": "58833dec-cba9-44ee-aa18-9a36bcde95c2",
       "state": "TASK_STATE_COMPLETED",
       "quotes": [
         {
@@ -97,9 +97,9 @@
         }
       ],
       "question": {
-        "messageId": "3310d7c6-eed9-42e6-ba12-cfec2d86106a",
-        "contextId": "09b3caf8-4135-4f08-93b1-54945524f7f4",
-        "taskId": "6e7bdfc8-ea5c-4cd0-b024-c868db5eaacb",
+        "messageId": "b8b8858b-156e-41f8-b3d5-e6e4e36b0698",
+        "contextId": "58833dec-cba9-44ee-aa18-9a36bcde95c2",
+        "taskId": "e343e155-2197-4904-a473-1a642fddbf25",
         "role": "ROLE_AGENT",
         "parts": [
           {
@@ -110,8 +110,8 @@
     },
     {
       "vendor": "print",
-      "task_id": "ee71c12f-b136-42ba-a5a7-8f3a383a9af7",
-      "context_id": "5d1d264f-605c-4076-86bc-0e47d6c86dee",
+      "task_id": "f6277fce-9642-406c-b010-5c700cd41d58",
+      "context_id": "b4475144-23c6-4085-bdf0-32f79754b989",
       "state": "TASK_STATE_COMPLETED",
       "quotes": [
         {
@@ -124,9 +124,9 @@
         }
       ],
       "question": {
-        "messageId": "4b83d82d-6d2b-4639-ac50-e2408f41ae6a",
-        "contextId": "5d1d264f-605c-4076-86bc-0e47d6c86dee",
-        "taskId": "ee71c12f-b136-42ba-a5a7-8f3a383a9af7",
+        "messageId": "81a213a6-86d1-4a7b-ace2-c894021f4164",
+        "contextId": "b4475144-23c6-4085-bdf0-32f79754b989",
+        "taskId": "f6277fce-9642-406c-b010-5c700cd41d58",
         "role": "ROLE_AGENT",
         "parts": [
           {

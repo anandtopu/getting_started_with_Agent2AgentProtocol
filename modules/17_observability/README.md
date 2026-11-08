@@ -1,9 +1,10 @@
+**Network and Concierge version 17:** what's new â€” observability and evaluation.
+
 # Module 17: Observability and evaluation
 > After this module you can read related spans.
 
-**Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 17
-**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 17:** what's new — observability and evaluation.
+**Time:** ~90 min Â· **Level:** Advanced Â· **LLM needed:** No for examples and grading Â· **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 17
+**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ A trace groups spans for one distributed request; a span records one operation. 
 
 **Analogy:** A shipment's tracking history shows where time was spent across organizations.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Their unbounded cardinality can exhaust a metrics backend; use bounded vendor labels and span attributes for IDs. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -71,7 +75,7 @@ Captured output (generated values vary):
 ```json
 [
   {
-    "name": "granite.quote"
+    "name": "venues.request"
   },
   {
     "name": "concierge.plan"
@@ -173,7 +177,7 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/17_obs
 
 ## Go deeper
 
-[Specification](https://a2a-protocol.org/v1.0.1/specification/) · [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) · [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
+[Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) Â· [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
 
 ## Next: Module 18
 
@@ -182,3 +186,10 @@ Use [the learning path](../../LEARNING_PATH.md) to continue or choose a capstone
 ## Connected integration lab
 
 Continue with [the tested integration walkthrough](../../docs/INTEGRATION_LABS.md), including actual commands, expected behavior, security boundaries and current limitations.
+
+## Request metrics
+
+Run `uv run python modules/17_observability/examples/04_metrics.py`. The actual
+OpenTelemetry reader reports two requests with only the vendor label. Predict why
+task IDs belong in spans rather than this counter's labels. Configure an SDK metric
+reader/exporter in the hosting process to deliver this instrument to your backend.

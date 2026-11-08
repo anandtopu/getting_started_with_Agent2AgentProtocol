@@ -282,6 +282,13 @@ class ClusterStore(VersionedTaskStore, TaskEventStream):
                 await connection.execute(
                     delete(self.legacy.task_model).where(self.legacy.task_model.id == task_id)
                 )
+                if self.callbacks:
+                    await connection.execute(
+                        delete(self.callbacks.config_model).where(
+                            self.callbacks.config_model.task_id == task_id,
+                            self.callbacks.config_model.owner == resolve_user_scope(context),
+                        )
+                    )
 
     async def publish(self, task_id, event):
         # save() already committed the event. This verifies integration mistakes instead

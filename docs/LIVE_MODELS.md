@@ -32,7 +32,23 @@ Predict first: what happens if the model returns a sixth vendor, a URL, duplicat
 vendor names or a tool name that is not allowed? The boundary rejects the decision.
 When a task pauses, continuation retains the original vendor choices and task IDs.
 
-All four provider request/response formats are tested with mocked HTTP responses.
-Live account access is optional and has not been verified by this release.
-This implementation uses bounded JSON decisions; it does not claim provider-native
-streamed function-call support. A2A task streaming is a separate protocol feature.
+All four native tool-stream formats are tested with fragmented HTTP responses:
+Ollama NDJSON, OpenAI Responses SSE, Anthropic tool-use SSE and Gemini streaming
+function calls. Partial arguments are accumulated with a 64 KB budget and a
+90-second deadline; only a complete schema-valid select_action call is accepted.
+The executor emits bounded A2A progress updates and final artifacts without exposing
+private model reasoning. Provider-native streaming and A2A streaming remain separate
+layers with different framing and completion rules.
+
+~~~console
+uv run python scripts/check_live_model.py
+~~~
+
+CI installs checksum-verified Ollama v0.40.15 and runs qwen3:4b on CPU. This proves
+actual free-model tool selection; hosted provider account calls remain optional and
+were not made with user credentials. The same checker can run against a configured
+hosted provider. Costs and quotas belong to that account; no graded exercise calls it.
+
+Official framing references: [OpenAI](https://developers.openai.com/api/docs/guides/function-calling),
+[Ollama](https://docs.ollama.com/capabilities/streaming),
+[Anthropic](https://platform.claude.com/docs/en/build-with-claude/streaming).

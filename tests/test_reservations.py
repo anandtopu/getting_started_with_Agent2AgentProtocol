@@ -101,3 +101,42 @@ async def test_flagship_plan_runs_holds_and_compensation(tmp_path):
                 assert plan["reservations"]["charged_cents"] == 0
     finally:
         await engine.dispose()
+
+
+async def test_lost_first_hold_reply_is_reconciled(tmp_path):
+    engine = create_async_engine("sqlite+aiosqlite:///" + (tmp_path / "first-hold.db").as_posix())
+    store = ReservationStore(engine, "travel")
+    try:
+        async with client(
+            "travel", handler=make_handler("travel", executor=ReservationExecutor("travel", store))
+        ) as travel:
+
+            class LostReply:
+                async def post(self, path, **kwargs):
+                    response = await travel.post(path, **kwargs)
+                    if kwargs["json"]["message"]["parts"][0]["data"]["action"] == "hold":
+                        raise httpx.ReadError("Lost hotel acknowledgement after commit")
+                    return response
+
+            result = await reserve_pair(LostReply(), None, "first-hold")
+            assert result["compensated"] and not result["manual_followup_required"]
+            async with engine.connect() as connection:
+                assert (await connection.execute(select(store.holds.c.state))).scalars().all() == [
+                    "released"
+                ]
+    finally:
+        await engine.dispose()
+
+
+async def test_unreachable_cleanup_requires_manual_followup():
+    class Unreachable:
+        async def post(self, *args, **kwargs):
+            raise httpx.ConnectError("Synthetic unreachable partner")
+
+    result = await reserve_pair(Unreachable(), None, "unreachable")
+    assert result == {
+        "reserved": False,
+        "compensated": False,
+        "manual_followup_required": True,
+        "charged_cents": 0,
+    }

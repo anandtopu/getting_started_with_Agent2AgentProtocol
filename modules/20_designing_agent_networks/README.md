@@ -1,9 +1,10 @@
+**Network and Concierge version 20:** what's new — designing agent networks.
+
 # Module 20: Designing agent networks
 > After this module you can choose useful agent boundaries.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 20
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 20:** what's new — designing agent networks.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Choose agent boundaries around ownership, independent deployment and durable res
 
 **Analogy:** A coordinator can release a hotel hold, but cannot pretend the vendor never processed it.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: A new business action such as releasing a hold; it is not a distributed database rollback. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -143,8 +147,11 @@ Captured output (generated values vary):
 
 ```json
 {
-  "result_type": "dict",
-  "complete_result": "wire/03_compensate.result.json"
+  "reserved": false,
+  "compensated": true,
+  "manual_followup_required": false,
+  "charged_cents": 0,
+  "remaining_hotel_holds": 0
 }
 ```
 

@@ -23,3 +23,7 @@ async def test_manual_envelope():
         envelope["params"]["message"]["parts"][0]["data"]["guests"] = 150
         result = (await http.post("/rpc", json=envelope)).json()
         assert result["result"]["task"]["status"]["state"] == "TASK_STATE_REJECTED"
+        envelope["params"]["message"]["parts"][0]["data"]["guests"] = {}
+        assert (await http.post("/rpc", json=envelope)).json()["result"]["task"]["status"][
+            "state"
+        ] == "TASK_STATE_REJECTED"

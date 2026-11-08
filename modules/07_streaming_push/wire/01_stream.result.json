@@ -1,16 +1,16 @@
 [
   {
     "task": {
-      "id": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
-      "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
+      "id": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
+      "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
       "status": {
         "state": "TASK_STATE_SUBMITTED"
       },
       "history": [
         {
-          "messageId": "1c1760c0-204f-43b5-afe6-c5572781df6b",
-          "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
-          "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
+          "messageId": "bc65dc89-f818-45d0-a5cc-c8ec83d0c1a7",
+          "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
+          "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
           "role": "ROLE_USER",
           "parts": [
             {
@@ -43,14 +43,14 @@
   },
   {
     "statusUpdate": {
-      "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
-      "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
+      "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
+      "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
       "status": {
         "state": "TASK_STATE_WORKING",
         "message": {
-          "messageId": "31707200-ae0a-489d-abce-dcb83752f40c",
-          "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
-          "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
+          "messageId": "7c753fc9-f6bb-47d7-858c-d704e656ea11",
+          "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
+          "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
           "role": "ROLE_AGENT",
           "parts": [
             {
@@ -63,8 +63,8 @@
   },
   {
     "artifactUpdate": {
-      "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
-      "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
+      "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
+      "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
       "artifact": {
         "artifactId": "plan",
         "name": "setup-plan",
@@ -78,8 +78,8 @@
   },
   {
     "artifactUpdate": {
-      "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
-      "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
+      "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
+      "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
       "artifact": {
         "artifactId": "plan",
         "name": "setup-plan",
@@ -94,8 +94,8 @@
   },
   {
     "artifactUpdate": {
-      "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
-      "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
+      "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
+      "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
       "artifact": {
         "artifactId": "plan",
         "name": "setup-plan",
@@ -111,8 +111,8 @@
   },
   {
     "artifactUpdate": {
-      "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
-      "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
+      "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
+      "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
       "artifact": {
         "artifactId": "quote",
         "name": "quote",
@@ -135,14 +135,14 @@
   },
   {
     "statusUpdate": {
-      "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
-      "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
+      "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
+      "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
       "status": {
         "state": "TASK_STATE_COMPLETED",
         "message": {
-          "messageId": "58138519-8a6f-4a6d-bd8a-b2395e06e69d",
-          "contextId": "c344fbd9-76e5-4732-af92-aa96ab718eaa",
-          "taskId": "4ea958ad-9592-450b-8f7f-55c4d35c0741",
+          "messageId": "f69d9e49-596b-423c-a3c7-d7b5742eab57",
+          "contextId": "e5a9f154-7dd0-47d5-ada3-4c9bae91cac0",
+          "taskId": "a9cb26f2-1b51-4d8f-917f-5850e974715d",
           "role": "ROLE_AGENT",
           "parts": [
             {

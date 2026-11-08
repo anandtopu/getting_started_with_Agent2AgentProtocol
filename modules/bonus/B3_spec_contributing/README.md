@@ -1,9 +1,10 @@
+**Network and Concierge version B3:** what's new — reading the specification and contributing.
+
 # Module B3: Reading the specification and contributing
 > After this module you can locate a protobuf field.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 08
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version B3:** what's new — reading the specification and contributing.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Read the normative protobuf alongside binding rules and behavioral requirements.
 
 **Analogy:** A building blueprint and an inspection checklist describe different aspects of the same building.
 
+Read the [feature companion](../../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Capture the smallest request/response, identify the exact requirement and test revision, and retain the raw result. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 

@@ -1,9 +1,10 @@
+**Network and Concierge version 08:** what's new — protocol bindings.
+
 # Module 08: Protocol bindings
 > After this module you can compare equivalent calls.
 
 **Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 08
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 08:** what's new — protocol bindings.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ JSON-RPC, HTTP+JSON and gRPC map the same abstract operations onto different tra
 
 **Analogy:** Three delivery services carry the same work order in different packaging.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: The A2AService methods in the normative versioned a2a.proto. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -345,6 +349,19 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/08_bin
 | [08-04](../../gym/tasks/08/08-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [08-05](../../gym/tasks/08/08-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [08-06](../../gym/tasks/08/08-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [08-07: Connect the Concierge to a gRPC-only printer](../../gym/tasks/08/08-07_binding/task.md)
+- [08-40: Send a protobuf request to Inkwell](../../gym/tasks/08/08-40_grpc_send/task.md)
+- [08-41: Call GetTask over gRPC](../../gym/tasks/08/08-41_grpc_get/task.md)
+- [08-42: Call CancelTask over gRPC](../../gym/tasks/08/08-42_grpc_cancel/task.md)
+- [08-43: List tasks through protobuf](../../gym/tasks/08/08-43_grpc_list/task.md)
+- [08-44: Inspect the gRPC stream union](../../gym/tasks/08/08-44_grpc_stream/task.md)
+- [08-45: Read advertised gRPC protocol compatibility](../../gym/tasks/08/08-45_grpc_version/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

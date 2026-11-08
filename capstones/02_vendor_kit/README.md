@@ -1,52 +1,74 @@
 # Vendor Agent Kit
 
-As a vendor, I can expose a signed card, require authentication, persist tasks,
-pause for dietary counts, continue over a stream and deliver verified push events.
-The [integrated implementation](../../common/vendor_kit.py) composes all of these
-features and accepts a SQLite or PostgreSQL URL and operator-provisioned keys.
-Callback registrations and tasks use database stores. The immediate callback
-receiver still keeps replay history in memory; the separate
-[durable-delivery lab](../../modules/19_deployment/examples/04_durable_delivery.py)
-demonstrates restart-safe outbox/inbox behavior. Combining task changes and outbox
-insertion in one transaction remains production work.
+As a vendor, I can publish a signed card, authenticate callers, pause for dietary
+counts, resume over a stream, persist tasks, and recover signed callbacks after a
+restart. As a receiver, I can accept a retried delivery without repeating its effect.
 
-## Architecture
+The [reference bundle](../../common/vendor_kit.py) combines the official SDK with
+ClusterStore, a database callback registry, an atomic task/event/outbox transaction,
+leased dispatch and a durable verified inbox. It accepts SQLite or PostgreSQL URLs,
+operator keys and an exact destination allow-list.
 
 ~~~mermaid
-flowchart LR
-    U[User] --> C[Coordinator]
-    C --> V[Trusted vendor]
-    V --> D[Validated deliverable]
-    D --> A[Human approval]
+sequenceDiagram
+    participant C as Concierge
+    participant V as Vendor kit
+    participant D as SQL task and outbox
+    participant W as Recovery dispatcher
+    participant R as Verified inbox
+    C->>V: Authenticated message and callback config
+    V->>D: Commit task, event and delivery together
+    V-->>C: input-required or streamed quote
+    W->>D: Claim delivery lease
+    W->>R: Signed body, timestamp and delivery ID
+    R-->>W: Acknowledge durable acceptance or duplicate
+    W->>D: Acknowledge current lease
 ~~~
+
+## Build and run
+
+~~~console
+uv run python capstones/02_vendor_kit/starter/run.py
+uv run python capstones/02_vendor_kit/solution/run.py
+uv run pytest capstones/02_vendor_kit/tests tests/test_cluster.py tests/test_durable_delivery.py
+uv run python scripts/check_webhook_lab.py
+~~~
+
+To watch callbacks, start `uv run python scripts/webhook_lab.py` and then
+`uv run streamlit run control_room/app.py` in another terminal. The local lab uses
+fresh ignored credentials, fixed loopback ports and persistent SQLite files.
 
 ## Acceptance criteria
 
-- Run the reference slice: uv run python capstones/02_vendor_kit/solution/run.py.
-- Identify the request, task state, trust decision and resulting deliverable.
-- Run this project's tests with uv run pytest capstones/02_vendor_kit/tests.
-- State which production properties are not demonstrated by this slice.
-
-## Starter
-
-Run uv run python capstones/02_vendor_kit/starter/run.py to inspect the input. Extend it to meet the project contract; compare against the reference only after attempting a design.
+- Verify the card with a separately trusted public key; reject unsigned requests.
+- Preserve task/context IDs through input-required and streaming continuation.
+- Return a structured quote artifact, with no charge or implicit purchase.
+- Commit the task, event and outbox atomically; a forced failure leaves none written.
+- Recover eligible callbacks after restart without requiring another user request.
+- Reject forged callbacks and reused delivery IDs with different bodies; deduplicate
+  authenticated retries after a lost acknowledgement.
+- Fence expired dispatcher leases, bound retries, and surface dead deliveries.
+- Run all three binding contracts and review the [official TCK result](../../docs/TCK_REPORT.md).
 
 ## Filled-in security review
 
-| Control | Reference evidence | Limitation |
+| Control | Evidence | Operating responsibility |
 |---|---|---|
-| Synthetic data | Committed fixtures | No real user-data handling tested |
-| Credentials outside messages | HTTP headers in shared clients | Local credentials, not identity-provider integration |
-| Destination restriction | Explicit configured vendor clients | Production egress policy remains required |
-| Approval | Quotes do not spend money | No purchase workflow implemented |
-| Failure handling | Typed task outcomes and security rejection | Full recovery and compensation need extension |
+| Authentication and owner isolation | SDK routes plus BearerGate; cluster owner tests | Provision/revoke vendor identities |
+| Signed identity | Separate signing and trusted verification keys | Preserve wrapping key; rotate/revoke keys |
+| Callback trust | Exact URL allow-list and HMAC verification before acceptance | Configure private destinations; never accept arbitrary URLs |
+| Recovery | Atomic SQL outbox, leases, bounded backoff, durable inbox | Monitor dead deliveries and apply retention |
+| Encrypted deployment | Hardened Compose, CA validation and mTLS tests | Renew certificates and protect secrets |
+| Effects | Quote-only contract and explicit no-charge holds | Add an independently reviewed approval workflow before purchases |
 
 ## Rubric
 
-Score contract clarity, correctness, security, failure handling and evidence from 0 to 2 each. Require at least 8/10 and no zero in security. Automated smoke tests do not replace this review.
+Score protocol lifecycle, durable recovery, authorization, verified delivery and
+operational evidence from 0–2 each. Require 8/10 and no zero for authorization or
+recovery. Show the injected failure and recovery evidence, not only a happy-path quote.
 
 ## Extend it
 
-Add migrations, backup/restore checks, reconnect behavior, an atomic task/outbox
-transaction and a public TLS deployment. Prove each property with captured traffic
-and a regression test.
+Add a receiver-specific OAuth scheme, a custom dead-letter dashboard or a managed
+certificate issuer. Preserve the same callback authentication and idempotency tests.
+Use the [deployment runbook](../../deploy/HARDENED_NETWORK.md) for backup and rollout.

@@ -20,11 +20,33 @@ async def main():
         schema,
     )
     assert result == {"tool": "quote_menu"}, result
+    from agents.app import make_handler
+    from agents.concierge import Concierge
+    from agents.langgraph_vendor import LangGraphCatering
+    from common.protocol import as_dict, request
+    from common.testing import client
+
+    async with client(
+        "catering", handler=make_handler("catering", executor=LangGraphCatering(model))
+    ) as catering:
+        response = await catering.post(
+            "/message:stream", json=as_dict(request({"guests": 40, "dietary": {"vegan": 40}}))
+        )
+        assert "TASK_STATE_COMPLETED" in response.text, response.text
+        assert "Receiving model response" in response.text
+    async with client("venues") as venues:
+        plan = await Concierge({"venues": venues}, model=model).plan(
+            {"guests": 40, "needs": ["venues"]}
+        )
+        assert plan["delegations"][0]["state"] == "TASK_STATE_COMPLETED"
+        assert plan["approval_required"]
     evidence = {
         "provider": model.settings.llm_provider,
         "model": model.settings.llm_model,
         "native_streamed_tool_call": result,
         "credentials_logged": False,
+        "a2a_langgraph_mcp_stream": "passed",
+        "model_selected_concierge_plan": "passed",
     }
     output = Path("workspace/live-model.json")
     output.parent.mkdir(exist_ok=True)

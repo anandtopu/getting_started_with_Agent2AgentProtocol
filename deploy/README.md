@@ -25,6 +25,7 @@ plan, restart Saffron and resume its PostgreSQL-backed task, and query Jaeger v3
 for exported traces. GitHub CI runs this integration on Linux; see the
 [validation report](../docs/VALIDATION_REPORT.md).
 
-Production still requires TLS, per-vendor identity integration, durable event delivery,
-migrations, backups, reliable callback outboxes and operational runbooks.
-Task persistence alone does not make in-flight streams survive a replica loss.
+Continue to [the hardened network](HARDENED_NETWORK.md) for TLS, five different
+authentication schemes, real framework workers, shared key rotation, atomic event
+and outbox persistence, and the backup/restore and rollout runbook. The base Compose
+file is the incremental bearer-token lesson; the overlays are the final deployment.

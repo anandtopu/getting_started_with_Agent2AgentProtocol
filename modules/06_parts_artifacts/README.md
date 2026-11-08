@@ -1,9 +1,10 @@
+**Network and Concierge version 06:** what's new â€” parts and artifacts.
+
 # Module 06: Parts and artifacts
 > After this module you can construct all four part alternatives.
 
-**Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 06
-**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 06:** what's new — parts and artifacts.
+**Time:** ~90 min Â· **Level:** Beginner Â· **LLM needed:** No for examples and grading Â· **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 06
+**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ A Part contains exactly one of text, raw bytes, a URL or structured data. Protob
 
 **Analogy:** An envelope can contain a note, an attachment, or a reference to an approved document.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Yes. Multiple Parts can represent different forms of the same deliverable. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -225,6 +229,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/06_par
 | [06-05](../../gym/tasks/06/06-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [06-06](../../gym/tasks/06/06-06_design/task.md) | design | hard | Design a partner contract and failure policy |
 
+### Full boundary exercises
+
+- [06-20: Receive Granite's real image artifact](../../gym/tasks/06/06-20_parts_floor_plan/task.md)
+- [06-21: Read and validate a structured quote](../../gym/tasks/06/06-21_parts_data/task.md)
+- [06-22: Keep independent deliverables separate](../../gym/tasks/06/06-22_parts_artifact_ids/task.md)
+- [06-23: Attach inline artwork as a raw Part](../../gym/tasks/06/06-23_parts_raw_input/task.md)
+- [06-24: Negotiate supported file media types](../../gym/tasks/06/06-24_parts_unsupported/task.md)
+- [06-25: Receive Saffron's data and PDF together](../../gym/tasks/06/06-25_parts_multi_part/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
+
 ## Quiz
 
 1. What does the vendor own?
@@ -255,8 +271,15 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/06_par
 
 ## Go deeper
 
-[Specification](https://a2a-protocol.org/v1.0.1/specification/) · [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) · [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
+[Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) Â· [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
 
 ## Next: Module 07
 
 Use [the learning path](../../LEARNING_PATH.md) to continue or choose a capstone.
+
+## Real vendor files
+
+Run `uv run python modules/06_parts_artifacts/examples/04_vendor_files.py` to receive
+a valid PDF quote and SVG floor plan. The PDF and structured quote share an artifact
+with multiple Parts. Predict the ProtoJSON base64 representation before reading
+[the captured exchange](wire/04_vendor_files.jsonl). Never execute received artwork.

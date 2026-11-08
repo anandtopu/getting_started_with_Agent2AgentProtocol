@@ -64,9 +64,9 @@ class VendorExecutor(AgentExecutor):
             result = await self.produce_quote(
                 brief, partner=context.call_context.state.get("partner", False)
             )
-        except TimeoutError:
+        except (TimeoutError, RuntimeError):
             await state(
-                TaskState.TASK_STATE_FAILED, "Vendor workflow timed out; no booking was made."
+                TaskState.TASK_STATE_FAILED, "Vendor workflow unavailable; no booking was made."
             )
             return
         except (ValueError, TypeError) as exc:

@@ -12,7 +12,10 @@ class FrameworkVendor(VendorExecutor):
 
     async def produce_quote(self, brief, *, partner=False):
         expected = quote(self.vendor, brief, partner=partner)
-        result = await framework_quote(self.framework, self.vendor, brief, partner=partner)
+        try:
+            result = await framework_quote(self.framework, self.vendor, brief, partner=partner)
+        except ValueError as exc:
+            raise RuntimeError("Framework worker unavailable or invalid") from exc
         if result != expected:
-            raise ValueError("Framework quote did not match the inventory contract")
+            raise RuntimeError("Framework quote did not match the inventory contract")
         return result

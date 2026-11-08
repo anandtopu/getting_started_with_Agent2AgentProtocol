@@ -25,7 +25,7 @@ flowchart LR
 - Run the reference slice: uv run python capstones/05_design_network/solution/run.py.
 - Identify the request, task state, trust decision and resulting deliverable.
 - Run this project's tests with uv run pytest capstones/05_design_network/tests.
-- State which production properties are not demonstrated by this slice.
+- Explain the verified boundaries and operating assumptions in the security review.
 
 ## Starter
 
@@ -33,13 +33,12 @@ Run uv run python capstones/05_design_network/starter/run.py to inspect the inpu
 
 ## Filled-in security review
 
-| Control | Reference evidence | Limitation |
+| Boundary | Verified control | Scope |
 |---|---|---|
-| Synthetic data | Committed fixtures | No real user-data handling tested |
-| Credentials outside messages | HTTP headers in shared clients | Local credentials, not identity-provider integration |
-| Destination restriction | Explicit configured vendor clients | Production egress policy remains required |
-| Approval | Quotes do not spend money | No purchase workflow implemented |
-| Failure handling | Typed task outcomes and security rejection | Full recovery and compensation need extension |
+| Candidate consent | Background check pauses until explicit consent | Synthetic fixture consent is not a real legal workflow |
+| Minimum disclosure | Only necessary availability/consent fields delegated | No real candidate data is present |
+| Ownership | Each agent owns its own task/context mapping | Cross-organization authorization must be provisioned separately |
+| Effects | Scheduling proposals and synthetic check result | No real hiring decision is made |
 
 ## Rubric
 
@@ -47,4 +46,4 @@ Score contract clarity, correctness, security, failure handling and evidence fro
 
 ## Extend it
 
-Add persistent task storage, negative contract tests, reconnect behavior, a durable callback outbox and a real deployment. Prove each property with captured traffic and a regression test.
+Connect this project to the [hardened deployment](../../deploy/HARDENED_NETWORK.md), add a new partner contract, and retain both adversarial and golden regression evidence.

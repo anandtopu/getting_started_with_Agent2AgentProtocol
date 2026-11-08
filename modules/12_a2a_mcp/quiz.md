@@ -1,19 +1,19 @@
 # Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Who calls the kitchen MCP tool?
+<details><summary>Answer</summary>Saffron calls it internally. The Concierge communicates with Saffron through A2A.</details>
 
-2. How would you demonstrate: choose a tool versus a remote agent?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. What is lost by flattening a task into a tool string?
+<details><summary>Answer</summary>Continuation, cancellation, ownership, status history and artifact structure unless explicitly mapped.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. Does an in-memory MCP transport use the real SDK?
+<details><summary>Answer</summary>Yes. The course runs the actual server/client APIs without opening a network socket.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. How do you prove the first learning objective?
+<details><summary>Answer</summary>Choose a tool versus a remote agent: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What is the trust boundary in this lesson?
+<details><summary>Answer</summary>MCP connects a host to tools and resources; A2A connects independently operated agents. Inventory lookup belongs inside Saffron Table as a tool, while menu quoting can remain a remote task. A bridge must decide how to represent task IDs, interruption, streaming and authorization. Turning every task into a single tool return can lose progress and continuation.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What should you do before consulting the reference solution?
+<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>

@@ -63,7 +63,7 @@ def manual_app():
                     "parts": [{"data": result, "mediaType": "application/json"}],
                 }
             ]
-        except ValueError:
+        except (ValueError, TypeError):
             task["status"] = {"state": "TASK_STATE_REJECTED"}
         # KEY IDEA: RPC id correlates the exchange; task id identifies the work.
         tasks[task["id"]] = task

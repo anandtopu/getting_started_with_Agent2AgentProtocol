@@ -1,9 +1,10 @@
+**Network and Concierge version 16:** what's new — testing, conformance and debugging.
+
 # Module 16: Testing, conformance and debugging
 > After this module you can run offline contracts.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 16
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 16:** what's new — testing, conformance and debugging.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ An offline contract test should observe actual routing and serialized responses.
 
 **Analogy:** Testing a form's format is different from checking that the quote satisfies the event.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: No unexpected deviation from the documented baseline; four exact upstream contradictions remain raw failures. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -217,6 +221,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/16_tes
 | [16-04](../../gym/tasks/16/16-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [16-05](../../gym/tasks/16/16-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [16-06](../../gym/tasks/16/16-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [16-20: Reject an unknown operation](../../gym/tasks/16/16-20_conformance_method/task.md)
+- [16-21: Return TaskNotFound for an unknown ID](../../gym/tasks/16/16-21_conformance_missing/task.md)
+- [16-22: Reject an unsupported Part media type](../../gym/tasks/16/16-22_conformance_media/task.md)
+- [16-23: Reject an unsupported protocol version](../../gym/tasks/16/16-23_conformance_version/task.md)
+- [16-24: Separate parse errors from invalid parameters](../../gym/tasks/16/16-24_conformance_parse/task.md)
+- [16-25: Verify the HTTP error representation](../../gym/tasks/16/16-25_conformance_rest_media/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

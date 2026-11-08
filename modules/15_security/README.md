@@ -1,9 +1,10 @@
+**Network and Concierge version 15:** what's new — security threats and defenses.
+
 # Module 15: Security threats and defenses
 > After this module you can reject unsafe destinations.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 15
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 15:** what's new — security threats and defenses.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Treat cards, messages and artifacts as untrusted inputs. Prompt injection attemp
 
 **Analogy:** A forged purchase order cannot override the company's approval policy.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: An approved initial URL could redirect to an internal or otherwise forbidden destination. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -140,6 +144,19 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/15_sec
 | [15-04](../../gym/tasks/15/15-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [15-05](../../gym/tasks/15/15-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [15-06](../../gym/tasks/15/15-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [15-07: Stop artwork URLs reaching internal services](../../gym/tasks/15/15-07_ssrf/task.md)
+- [15-40: Defend a real I/O boundary: private_ip](../../gym/tasks/15/15-40_egress_private_ip/task.md)
+- [15-41: Defend a real I/O boundary: unlisted](../../gym/tasks/15/15-41_egress_unlisted/task.md)
+- [15-42: Defend a real I/O boundary: redirect](../../gym/tasks/15/15-42_egress_redirect/task.md)
+- [15-43: Defend a real I/O boundary: oversize](../../gym/tasks/15/15-43_egress_oversize/task.md)
+- [15-44: Defend a real I/O boundary: valid](../../gym/tasks/15/15-44_egress_valid/task.md)
+- [15-45: Defend a real I/O boundary: replay](../../gym/tasks/15/15-45_egress_replay/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

@@ -1,9 +1,10 @@
+**Network and Concierge version 14:** what's new — trust, signed cards and multi-tenancy.
+
 # Module 14: Trust, signed cards and multi-tenancy
 > After this module you can sign canonical card bytes.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 14
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 14:** what's new — trust, signed cards and multi-tenancy.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ A signature detects changes to a card and binds it to a key you already trust. C
 
 **Analogy:** A signed letter matters only if you know whose seal it bears.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: No. Trust comes from operator-pinned keys or a configured HTTPS vendor endpoint. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -106,8 +110,19 @@ Captured output (generated values vary):
 
 ```json
 {
-  "result_type": "dict",
-  "complete_result": "wire/03_jwks.result.json"
+  "jwks": {
+    "keys": [
+      {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "use": "sig",
+        "alg": "EdDSA",
+        "kid": "granite-2026",
+        "x": "QH6aupGC-BrQcZe09lfwfho3DnIq0D0LMlL5_7Ps2JI"
+      }
+    ]
+  },
+  "verified": true
 }
 ```
 
@@ -138,6 +153,19 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/14_tru
 | [14-04](../../gym/tasks/14/14-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [14-05](../../gym/tasks/14/14-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [14-06](../../gym/tasks/14/14-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [14-07: Reject a forged skill description](../../gym/tasks/14/14-07_signature/task.md)
+- [14-40: Verify a pinned vendor signature](../../gym/tasks/14/14-40_trust_verify/task.md)
+- [14-41: Reject an injected skill description](../../gym/tasks/14/14-41_trust_tamper/task.md)
+- [14-42: Reject a self-appointed signing key](../../gym/tasks/14/14-42_trust_unknown/task.md)
+- [14-43: Canonicalize before signing](../../gym/tasks/14/14-43_trust_canonical/task.md)
+- [14-44: Keep valid keys during rotation overlap](../../gym/tasks/14/14-44_trust_rotation/task.md)
+- [14-45: Reject a revoked card key](../../gym/tasks/14/14-45_trust_revocation/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

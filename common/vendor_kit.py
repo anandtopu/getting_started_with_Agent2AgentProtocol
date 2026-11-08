@@ -50,8 +50,17 @@ async def vendor_kit(
     )
 
     async def recover():
+        import logging
+
+        from sqlalchemy.exc import SQLAlchemyError
+
         while True:
-            await store.dispatch(callback_client, destinations)
+            try:
+                await store.dispatch(callback_client, destinations)
+            except SQLAlchemyError:
+                logging.getLogger(__name__).warning(
+                    "Callback database unavailable; retrying pending deliveries"
+                )
             await asyncio.sleep(1)
 
     worker = asyncio.create_task(recover())

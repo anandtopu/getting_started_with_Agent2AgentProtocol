@@ -1,9 +1,10 @@
+**Network and Concierge version 13:** what's new — authentication and authorization.
+
 # Module 13: Authentication and authorization
 > After this module you can reject missing credentials.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 13
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 13:** what's new — authentication and authorization.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Authentication proves identity; authorization decides what that identity may do.
 
 **Analogy:** A badge identifies a visitor; a room-access policy determines which doors it opens.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Outside A2A messages through the configured identity mechanism; send them in the appropriate headers or TLS handshake. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -248,6 +252,19 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/13_aut
 | [13-04](../../gym/tasks/13/13-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [13-05](../../gym/tasks/13/13-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [13-06](../../gym/tasks/13/13-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [13-07: Close Granite's anonymous quote endpoint](../../gym/tasks/13/13-07_auth/task.md)
+- [13-20: Keep work endpoints authenticated](../../gym/tasks/13/13-20_security_anonymous/task.md)
+- [13-21: Attack a different caller's task ID](../../gym/tasks/13/13-21_security_owner/task.md)
+- [13-22: Reject a forged tenant header](../../gym/tasks/13/13-22_security_tenant/task.md)
+- [13-23: Enforce the extended-card partner scope](../../gym/tasks/13/13-23_security_extended_denied/task.md)
+- [13-24: Discover the authorized partner skill](../../gym/tasks/13/13-24_security_extended_partner/task.md)
+- [13-25: Reject a credential smuggled in task data](../../gym/tasks/13/13-25_security_body_secret/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

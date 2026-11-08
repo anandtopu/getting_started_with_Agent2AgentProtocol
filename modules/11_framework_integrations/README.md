@@ -1,9 +1,10 @@
+**Network and Concierge version 11:** what's new — framework integrations.
+
 # Module 11: Framework integrations
 > After this module you can separate framework internals from the protocol.
 
 **Time:** ~90 min · **Level:** Intermediate · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 11
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 11:** what's new — framework integrations.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ A framework supplies internal agent execution; A2A supplies the external contrac
 
 **Analogy:** Specialists may use different office software while sharing the same order form.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: The shared A2A adapter. Frameworks execute internal workflows without redefining protocol states. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -266,6 +270,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/11_fra
 | [11-04](../../gym/tasks/11/11-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [11-05](../../gym/tasks/11/11-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [11-06](../../gym/tasks/11/11-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [11-40: Wrap a real LangGraph workflow: quote](../../gym/tasks/11/11-40_framework_quote/task.md)
+- [11-41: Wrap a real LangGraph workflow: pause](../../gym/tasks/11/11-41_framework_pause/task.md)
+- [11-42: Wrap a real LangGraph workflow: resume](../../gym/tasks/11/11-42_framework_resume/task.md)
+- [11-43: Wrap a real LangGraph workflow: unsafe](../../gym/tasks/11/11-43_framework_unsafe/task.md)
+- [11-44: Wrap a real LangGraph workflow: capacity](../../gym/tasks/11/11-44_framework_capacity/task.md)
+- [11-45: Wrap a real LangGraph workflow: stream](../../gym/tasks/11/11-45_framework_stream/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

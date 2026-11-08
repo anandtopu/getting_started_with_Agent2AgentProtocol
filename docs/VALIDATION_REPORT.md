@@ -1,74 +1,86 @@
-# Validation report — 2026-11-07
+# Validation report â€” expanded course release
 
 Repository: [getting_started_with_Agent2AgentProtocol](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol)
 
-This report distinguishes runnable implementation from completeness of the larger
-course brief. The repository is an initial course implementation; the remaining
-scope below is not represented as finished.
+The previously listed implementation gaps are now addressed. The course contains
+25 modules, 265 graded tasks, 83 module examples, 25 use cases, 25 notebooks and
+five capstones. External SDK/TCK limitations remain explicit below; this report
+is evidence of the learning deployment, not an external production certification.
 
 ## Executed checks
 
 | Check | Evidence |
 |---|---|
-| Python offline tests | 428 checks; socket access disabled and A2A deprecations treated as errors |
-| Style | Ruff lint and formatting |
-| Gym | 157 tasks across 25 modules; every starter fails and every reference solution passes |
-| Examples | Final run includes 115 standalone commands and 25 notebooks |
-| Actual network | Six-agent authenticated network, signed cards, gRPC-only print service, cross-binding Concierge |
-| TypeScript | Type checking and real Python-to-TypeScript quote exchange |
-| Go | Native compilation and real Python-to-Go venue quote matching the Python dataset |
-| Java | Official SDK 1.5.0.Final compiled; actual authentication, quote and rejection checks passed |
-| .NET | Official 1.0.0-preview4 compiled; actual authentication, quote and rejection checks passed; upstream is prerelease |
-| Golden cases | All 20 scenarios; every vendor's exact states, artifact chunks and quote |
-| Persistence | SQLite engine/handler restart and continuation |
-| Containers | Six-agent plan, PostgreSQL restart and Jaeger trace export passed in Linux CI |
-| Identity provider | Actual Keycloak service-account token issuance, failed credentials and authorized A2A quote passed in Linux CI |
-| Delivery recovery | Durable SQLite outbox/inbox survives restart and lost acknowledgement without duplicate acceptance |
-| Frameworks | All seven runtimes executed; six isolated workers passed on both Windows and Linux |
-| Captures | All eleven operations across JSON-RPC, HTTP+JSON and gRPC service calls |
-| Links | 1,079 local references and 72 external source URLs checked during final validation |
+| Offline Python | 692 tests; application sockets disabled; A2A deprecations are errors |
+| Gym | 265 starters fail and 265 solutions pass; 25 modules, eight types, at least four types and three levels per module |
+| Examples and notebooks | 118 standalone commands (83 examples, 25 use cases, 10 capstone starter/reference commands) and all 25 notebooks |
+| Style | Ruff lint and formatting; no banned current-track legacy APIs |
+| Links | 1,554 local references and 74 external URLs checked before final publication |
+| Protocol | All eleven operations captured for JSON-RPC, HTTP+JSON and protobuf service boundaries; real network gRPC separately checked |
+| Golden scenarios | All twenty fixtures check exact vendor states, chunks, artifact IDs and quotes; hardened framework deployment also checks every golden plan |
+| Persistence and replicas | SQLite/PostgreSQL CAS, atomic task/event/outbox rollback, publisher crash, second-handler stream reconnect, owner isolation |
+| Delivery | Durable signed inbox, lost acknowledgement, expired lease fencing, bounded retries, independent restart recovery and live Control Room lab |
+| Identity and TLS | Five vendor auth schemes; real Keycloak audience rejection; HTTPS CA/hostname validation; missing mTLS certificate rejected |
+| Signing keys | Encrypted shared SQL ring; rotation overlap, expiry, revocation, replica agreement and restart |
+| Models | Four provider-native stream parsers tested offline; real free Ollama qwen3:4b tool calls in CI |
+| Frameworks | LangGraph plus six isolated real runtimes; twelve Windows/Linux worker jobs and mixed-framework Docker deployment |
+| Languages | Native TypeScript, Go, Java and official .NET preview; authenticated Python interoperability on Windows, macOS and Linux |
+| Observability | HTTP/gRPC trace propagation, task/context span attributes, bounded vendor metric labels, all six services exported to Jaeger |
+| Business recovery | Idempotent no-charge hotel/venue holds, uncertain-response cleanup, compensating release and explicit manual follow-up |
+| Review | [Per-file](reviews/PER_FILE_REVIEW.md), [cross-file](reviews/INTEGRATION_REVIEW.md) and [closed action plan](reviews/ACTION_PLAN.md) |
 
-The first published revision passed all nine CI jobs: Python 3.11, 3.12 and 3.13
-on Ubuntu and Windows, plus local-network/TypeScript checks on Ubuntu, Windows and
-macOS. [Baseline run](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42416003303).
+The [expanded implementation run](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42438012884)
+at 55fb956 passed **all 26 jobs**, including PostgreSQL and all twenty hardened-network
+plans. The [main-branch workflow](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/workflows/ci.yml?query=branch%3Amain)
+records the final publication revision. Each push reruns the full matrix, including
+examples/notebooks, native languages, both Compose profiles, live Ollama and TCK.
 
-The [deployment and native Go run](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42417547352)
-passed all ten jobs. It includes the corrected Jaeger v3 API check.
-The [framework matrix](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42418652586)
-adds twelve isolated-framework jobs, all of which passed.
-The [native-language and Keycloak run](https://github.com/anandtopu/getting_started_with_Agent2AgentProtocol/actions/runs/42420093044)
-passed all 22 jobs, including TypeScript, Go, Java and .NET preview on three operating systems.
+## Closure of the previous report's gaps
 
-## Definition of done against the requested brief
+| Previous gap | Completed implementation | Reproducible evidence |
+|---|---|---|
+| Provider-native streamed tool calls | OpenAI Responses, Anthropic, Gemini and Ollama framing; safe A2A progress; complete-call schema validation | test_model_streams.py, test_model_progress.py, check_live_model.py |
+| Different auth per vendor and mTLS | Bearer, API key, OAuth client credentials, OIDC and gRPC client certificates | hardened.yml, check_tls.py, check_hardened.py |
+| Automated key rotation | Encrypted SQL-shared signing ring with overlap/revocation | test_auth_profiles.py, test_shared_keys.py |
+| Atomic outbox and distributed rate limits | One task/event/outbox transaction, CAS revisions, leased dispatch, SQL request budgets | test_cluster.py on SQLite and PostgreSQL |
+| Multi-replica delivery and reconnect chaos | Durable event journal through public SDK cluster interfaces; stream moves between handlers | test_sdk_reconnect_moves_subscription_to_another_replica |
+| Complete production capstone requirements | Mixed-framework Docker network, identity, tracing, golden evaluation, durable kit, no-charge compensation, operating runbook | capstones 02/04 and deploy/HARDENED_NETWORK.md |
+| Official TCK execution | Pinned unmodified upstream suite on all three bindings, raw reports, manual requirement evidence | [Detailed TCK report](TCK_REPORT.md) |
+| Deeper feature practice | 108 additional full-boundary/workflow tasks beyond the prior 157, linked from lessons and feature map | validate_gym.py and [feature companion](FEATURE_DEEP_DIVES.md) |
+| Files and live monitoring | Real PDF/SVG Parts, verified live webhook inbox and request metrics | module 06/17 extra examples, check_webhook_lab.py |
 
-- [x] Locked installation and default offline Python tests.
-- [x] Ruff lint and format checks.
-- [x] Python 3.11–3.13 CI on Ubuntu and Windows.
-- [x] At least 120 tasks; every module has six tasks, four types and all three levels.
-- [ ] Complete conformance certification: course contracts pass; official TCK is not run.
-- [x] Banned API scan and A2A deprecations treated as errors.
-- [x] Security-default checks for loopback, authentication, ownership, signatures, webhooks and SSRF.
-- [x] Launcher start/stop for each distinct network composition on Windows, macOS and Linux.
-- [x] Tier 1 needs no LLM, keys or provider imports.
-- [x] Every module has the required headings, examples, captures, quiz, tests, notebook and prediction.
-- [ ] Exhaustive feature coverage: introductory rows exist, but every feature is not yet taught at the requested depth.
-- [x] Runnable quick-start sequence and offline first gym task.
-- [ ] Full production completeness: the remaining integrations and capstones listed below are unfinished.
+## Definition of done
 
-Gym type coverage is eight across the repository, not eight in every module.
-The original 150 tasks are small contracts; seven additional tasks use real
-protocol boundaries. Design checks verify structure and require human rubric review.
+- [x] Locked installation, no-key/no-network grading and six Python/OS combinations.
+- [x] Twenty-five complete lesson structures, authored feature explanations, predictions,
+  actual wire captures, quizzes, notebooks and linked graded practice.
+- [x] Three bindings, all eleven operations, lifecycle, file artifacts, streaming,
+  push, extensions, signatures, tenant/owner checks and protocol version handling.
+- [x] Seven framework runtimes, four model providers and four native language labs.
+- [x] Twenty golden scenarios, adversarial tests, failure injection and durable recovery.
+- [x] Five capstone reference solutions, specific security reviews and human rubrics.
+- [x] Docker network, heterogeneous authentication, TLS, Keycloak, PostgreSQL and Jaeger.
+- [x] Final source and integration review; runbook for schema rollout, backup/restore,
+  certificate renewal, retention and uncertain business outcomes.
+- [x] Official TCK executed and its actual result retained without relabeling failures.
 
-## Unverified or incomplete work
+## External limitations, not unfinished repository code
 
-- Stable .NET SDK availability is external: the implemented native lab uses the official preview.
-- Provider-native streamed model tool calls and live model-account access.
-- Per-vendor heterogeneous authentication, production mTLS and automated key rotation.
-- An atomic task/outbox transaction, multi-dispatcher leases, distributed rate limits,
-  multi-replica event delivery and stream reconnect chaos.
-- Complete production capstone requirements and an official TCK result.
-- A deep bank of six distinct full-agent tasks for every individual feature.
+1. **TCK:** the pinned suite reports 202 passes, 57 skips and four failures out of
+   263 cases (79.6% automated requirement score). Four documented upstream
+   contradictions are matched by exact case and diagnostic in the regression gate.
+   Green CI does **not** mean 100% official TCK compatibility or certification.
+2. **.NET:** the official available SDK is 1.0.0-preview4. Its native lab passes;
+   this repository cannot turn an upstream prerelease into a stable release.
+3. **Hosted models:** OpenAI, Anthropic and Gemini are verified against provider
+   framing with offline fixtures. Live account calls require the owner's account;
+   only the free Ollama provider is live-tested by CI.
+4. **Operating environment:** local Docker was unavailable, so Linux CI supplies
+   container evidence. The local CA and loopback lab are not a hosted public service.
+   Certificate operation, backups, capacity and retention remain operator duties.
+5. **Design grading:** automated checks assess structure and executable behavior.
+   A human must apply design/security rubrics; a passing script does not certify judgment.
 
-See [verification notes](VERIFICATION_NOTES.md) for sources and API decisions,
-[integration labs](INTEGRATION_LABS.md) for commands, and
-[coverage map](FEATURE_MAP.md) for the implemented teaching paths.
+Sources and compatibility decisions are in [verification notes](VERIFICATION_NOTES.md).
+Use [integration commands](INTEGRATION_LABS.md), [the hardened runbook](../deploy/HARDENED_NETWORK.md)
+and [the feature map](FEATURE_MAP.md) to reproduce the evidence.

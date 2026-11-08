@@ -1,19 +1,19 @@
 # Quiz
 
-1. What does the vendor own?
-<details><summary>Answer</summary>Its execution, inventory, task IDs, context scope and authorization policy.</details>
+1. Is a decoded JWT proof of authorization?
+<details><summary>Answer</summary>No. Verify signature, algorithm, issuer, audience, expiry and required scope.</details>
 
-2. How would you demonstrate: reject missing credentials?
-<details><summary>Answer</summary>Run example 01 and identify the exact output field or event that proves the result.</details>
+2. Where are credentials obtained?
+<details><summary>Answer</summary>Outside A2A messages through the configured identity mechanism; send them in the appropriate headers or TLS handshake.</details>
 
-3. Does a signed card grant access?
-<details><summary>Answer</summary>No. A trusted signature checks integrity and identity; authorization is enforced separately.</details>
+3. What protects partner-only pricing?
+<details><summary>Answer</summary>Authenticated scope checks at the operation and extended-card boundary, not secrecy of the skill description.</details>
 
-4. Why use a scripted model in graded tasks?
-<details><summary>Answer</summary>Repeatable decisions isolate protocol behavior and cost no API tokens.</details>
+4. How do you prove the first learning objective?
+<details><summary>Answer</summary>Reject missing credentials: run the first example, identify the response field or event, and compare it with the stored wire/result capture.</details>
 
-5. What if an artifact asks for credentials?
-<details><summary>Answer</summary>Treat it as untrusted data. Never forward user tokens or expand the allow-list.</details>
+5. What is the trust boundary in this lesson?
+<details><summary>Answer</summary>Authentication proves identity; authorization decides what that identity may do. A card advertises schemes but does not issue credentials. Obtain API keys or OAuth tokens out of band. A JWT is signed claims, not proof until issuer, audience, signature and expiration are checked. OpenID Connect adds identity discovery to OAuth. TLS protects the connection; mutual TLS also verifies a client certificate.</details>
 
-6. Which edge case should you test?
-<details><summary>Answer</summary>Use the negative cases in this module's Fix task; explain why the broken implementation accepts or mishandles them.</details>
+6. What should you do before consulting the reference solution?
+<details><summary>Answer</summary>Write a prediction, run the starter, explain its failing assertion, then implement the required behavior and rerun the grader. For Design tasks, also apply the human rubric.</details>

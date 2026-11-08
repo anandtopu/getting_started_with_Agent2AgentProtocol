@@ -1,9 +1,10 @@
+**Network and Concierge version 18:** what's new — extensions and versioning.
+
 # Module 18: Extensions and versioning
 > After this module you can declare an extension.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 18
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 18:** what's new — extensions and versioning.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ An extension has a URI, a declaration in capabilities and request-time activatio
 
 **Analogy:** An optional rider adds terms to an agreement without rewriting the basic contract.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Reject the request with the required-extension protocol error before executing business work. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -98,6 +102,9 @@ Captured output (generated values vary):
             },
             "mediaType": "application/json"
           }
+        ],
+        "extensions": [
+          "https://maplewood.example/extensions/structured-quote/v1"
         ]
       }
     ],
@@ -220,6 +227,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/18_ext
 | [18-04](../../gym/tasks/18/18-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [18-05](../../gym/tasks/18/18-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [18-06](../../gym/tasks/18/18-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [18-40: Omit an optional extension](../../gym/tasks/18/18-40_extensions_optional/task.md)
+- [18-41: Activate the quote extension](../../gym/tasks/18/18-41_extensions_negotiated/task.md)
+- [18-42: Reject an unmet required extension](../../gym/tasks/18/18-42_extensions_required_missing/task.md)
+- [18-43: Satisfy a required extension](../../gym/tasks/18/18-43_extensions_required_present/task.md)
+- [18-44: Reject unsupported protocol negotiation](../../gym/tasks/18/18-44_extensions_unsupported_version/task.md)
+- [18-45: Discover the structured-quote extension](../../gym/tasks/18/18-45_extensions_declared/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

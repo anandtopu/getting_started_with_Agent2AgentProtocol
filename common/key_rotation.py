@@ -1,5 +1,6 @@
 """Automated card-key rotation with overlap and an HTTPS-pinned JWKS endpoint."""
 
+import asyncio
 import base64
 import hashlib
 import json
@@ -41,12 +42,14 @@ class SharedCardKeys:
             Column("body", LargeBinary, nullable=False),
         )
         self.ready = False
+        self.init_lock = asyncio.Lock()
 
     async def initialize(self):
-        if not self.ready:
-            async with self.engine.begin() as connection:
-                await connection.run_sync(self.metadata.create_all)
-            self.ready = True
+        async with self.init_lock:
+            if not self.ready:
+                async with self.engine.begin() as connection:
+                    await connection.run_sync(self.metadata.create_all)
+                self.ready = True
 
     async def ring(self, revoke=None):
         from sqlalchemy import select, update

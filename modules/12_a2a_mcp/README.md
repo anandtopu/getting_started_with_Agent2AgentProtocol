@@ -1,9 +1,10 @@
+**Network and Concierge version 12:** what's new — a2a and mcp together.
+
 # Module 12: A2A and MCP together
 > After this module you can choose a tool versus a remote agent.
 
 **Time:** ~90 min · **Level:** Intermediate · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 12
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 12:** what's new — a2a and mcp together.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ MCP connects a host to tools and resources; A2A connects independently operated 
 
 **Analogy:** The caterer's stockroom system is internal; its contract with the event planner is external.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Continuation, cancellation, ownership, status history and artifact structure unless explicitly mapped. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -208,6 +212,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/12_a2a
 | [12-04](../../gym/tasks/12/12-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [12-05](../../gym/tasks/12/12-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [12-06](../../gym/tasks/12/12-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [12-40: Keep kitchen tools inside the vendor: capacity](../../gym/tasks/12/12-40_mcp_capacity/task.md)
+- [12-41: Keep kitchen tools inside the vendor: too_many](../../gym/tasks/12/12-41_mcp_too_many/task.md)
+- [12-42: Keep kitchen tools inside the vendor: invalid](../../gym/tasks/12/12-42_mcp_invalid/task.md)
+- [12-43: Keep kitchen tools inside the vendor: quote](../../gym/tasks/12/12-43_mcp_quote/task.md)
+- [12-44: Keep kitchen tools inside the vendor: pause](../../gym/tasks/12/12-44_mcp_pause/task.md)
+- [12-45: Keep kitchen tools inside the vendor: reject](../../gym/tasks/12/12-45_mcp_reject/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

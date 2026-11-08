@@ -1,9 +1,10 @@
+**Network and Concierge version 03:** what's new â€” your first a2a server.
+
 # Module 03: Your first A2A server
 > After this module you can compose sdk routes.
 
-**Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 03
-**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 03:** what's new — your first a2a server.
+**Time:** ~90 min Â· **Level:** Beginner Â· **LLM needed:** No for examples and grading Â· **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 03
+**Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ The executor performs business work. The SDK handles routing, serialization, tas
 
 **Analogy:** A reception desk routes work orders; the estimator does the work and reports progress.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: The SDK route factories and request handler; the executor performs the business workflow. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -244,6 +248,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/03_fir
 | [03-05](../../gym/tasks/03/03-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [03-06](../../gym/tasks/03/03-06_design/task.md) | design | hard | Design a partner contract and failure policy |
 
+### Full boundary exercises
+
+- [03-40: Inspect the hand-built server: send](../../gym/tasks/03/03-40_manual_send/task.md)
+- [03-41: Inspect the hand-built server: get](../../gym/tasks/03/03-41_manual_get/task.md)
+- [03-42: Inspect the hand-built server: missing](../../gym/tasks/03/03-42_manual_missing/task.md)
+- [03-43: Inspect the hand-built server: parse](../../gym/tasks/03/03-43_manual_parse/task.md)
+- [03-44: Inspect the hand-built server: method](../../gym/tasks/03/03-44_manual_method/task.md)
+- [03-45: Inspect the hand-built server: rejected](../../gym/tasks/03/03-45_manual_rejected/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
+
 ## Quiz
 
 1. What does the vendor own?
@@ -274,8 +290,15 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/03_fir
 
 ## Go deeper
 
-[Specification](https://a2a-protocol.org/v1.0.1/specification/) · [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) · [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
+[Specification](https://a2a-protocol.org/v1.0.1/specification/) Â· [Protobuf](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto) Â· [Official SDK](https://github.com/a2aproject/a2a-python/tree/v1.3.0)
 
 ## Next: Module 04
 
 Use [the learning path](../../LEARNING_PATH.md) to continue or choose a capstone.
+
+## Build the two-operation microscope
+
+Run `uv run python modules/03_first_server/examples/04_manual_get.py`. Read
+[the actual SendMessage/GetTask capture](wire/04_manual_get.jsonl). Predict which
+ID changes between the exchanges and which task ID remains stable. The complete
+SDK server used in later examples adds the remaining operations and security.

@@ -1,9 +1,10 @@
+**Network and Concierge version 00:** what's new — setup and orientation.
+
 # Module 00: Setup and orientation
 > After this module you can discover a vendor.
 
 **Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 00
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 00:** what's new — setup and orientation.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ A2A gives independently operated agents a shared contract. A vendor can change i
 
 **Analogy:** A business directory tells you who offers a service without revealing how they run their office.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: The skill and endpoint change; messages, tasks and artifacts retain the protocol contract. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 

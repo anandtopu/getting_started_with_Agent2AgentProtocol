@@ -1,9 +1,10 @@
+**Network and Concierge version 07:** what's new — streaming and push notifications.
+
 # Module 07: Streaming and push notifications
 > After this module you can read sse frames.
 
 **Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 07
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 07:** what's new — streaming and push notifications.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Server-Sent Events (SSE) keep an HTTP response open and separate events with bla
 
 **Analogy:** Streaming is watching a progress board; a webhook is a callback when you are away.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: No. Reconnect with SubscribeToTask or inspect GetTask; cancellation is explicit. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -138,6 +142,25 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/07_str
 | [07-04](../../gym/tasks/07/07-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [07-05](../../gym/tasks/07/07-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [07-06](../../gym/tasks/07/07-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [07-07: Finish Brightline's streamed artifact](../../gym/tasks/07/07-07_chunks/task.md)
+- [07-20: Read state transitions from a real stream](../../gym/tasks/07/07-20_stream_status/task.md)
+- [07-21: Assemble an AV artifact across chunks](../../gym/tasks/07/07-21_stream_chunks/task.md)
+- [07-22: Audit AV chunk termination](../../gym/tasks/07/07-22_stream_flags/task.md)
+- [07-23: Keep task identity across all event variants](../../gym/tasks/07/07-23_stream_identity/task.md)
+- [07-24: Separate the final data artifact from progress](../../gym/tasks/07/07-24_stream_quote/task.md)
+- [07-25: Reconcile streamed chunks with stored state](../../gym/tasks/07/07-25_stream_snapshot/task.md)
+- [07-26: Register an approved callback](../../gym/tasks/07/07-26_push_create/task.md)
+- [07-27: Retrieve one callback configuration](../../gym/tasks/07/07-27_push_get/task.md)
+- [07-28: Inspect all task callback registrations](../../gym/tasks/07/07-28_push_list/task.md)
+- [07-29: Remove a callback without canceling work](../../gym/tasks/07/07-29_push_delete/task.md)
+- [07-30: Reject a metadata-service callback](../../gym/tasks/07/07-30_push_ssrf/task.md)
+- [07-31: Deliver completion through an authenticated outbox](../../gym/tasks/07/07-31_push_delivery/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

@@ -1,9 +1,10 @@
+**Network and Concierge version 02:** what's new — agent cards and discovery.
+
 # Module 02: Agent Cards and discovery
 > After this module you can validate a card against protobuf.
 
 **Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 02
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 02:** what's new — agent cards and discovery.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ An Agent Card describes identity, ordered interfaces, capabilities, input and ou
 
 **Analogy:** Read a vendor's business card, then check that it came from the vendor you trust.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: No. The agent version describes its contract; each supported interface advertises protocolVersion. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -148,6 +152,18 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/02_age
 | [02-04](../../gym/tasks/02/02-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [02-05](../../gym/tasks/02/02-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [02-06](../../gym/tasks/02/02-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [02-20: Discover binding preference order](../../gym/tasks/02/02-20_discovery_interfaces/task.md)
+- [02-21: Select Granite's quote contract](../../gym/tasks/02/02-21_discovery_skill/task.md)
+- [02-22: Read capability defaults](../../gym/tasks/02/02-22_discovery_capabilities/task.md)
+- [02-23: Choose an advertised input representation](../../gym/tasks/02/02-23_discovery_media/task.md)
+- [02-24: Resolve a named security requirement](../../gym/tasks/02/02-24_discovery_security/task.md)
+- [02-25: Validate discovered ProtoJSON](../../gym/tasks/02/02-25_discovery_validate/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

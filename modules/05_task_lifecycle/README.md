@@ -1,9 +1,10 @@
+**Network and Concierge version 05:** what's new — the task lifecycle in depth.
+
 # Module 05: The task lifecycle in depth
 > After this module you can resume a paused catering task.
 
 **Time:** ~90 min · **Level:** Beginner · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 05
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version 05:** what's new — the task lifecycle in depth.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Submitted and working are active states. Input-required and auth-required interr
 
 **Analogy:** A work order awaiting dietary counts stays open; a completed quote is filed.
 
+Read the [feature companion](../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: No. Cancellation changes task execution; a compensating business operation releases a hold. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
@@ -216,6 +220,19 @@ Maplewood needs quotes for a 40-person offsite. Run uv run python modules/05_tas
 | [05-04](../../gym/tasks/05/05-04_trace/task.md) | trace | medium | Identify the captured transport boundaries |
 | [05-05](../../gym/tasks/05/05-05_conformance/task.md) | conformance | hard | Enforce the contract across edge cases |
 | [05-06](../../gym/tasks/05/05-06_design/task.md) | design | hard | Design a partner contract and failure policy |
+
+### Full boundary exercises
+
+- [05-07: Resume Saffron without losing its work order](../../gym/tasks/05/05-07_resume/task.md)
+- [05-20: Continue Saffron's stored work order](../../gym/tasks/05/05-20_lifecycle_resume/task.md)
+- [05-21: Cancel paused catering work](../../gym/tasks/05/05-21_lifecycle_cancel/task.md)
+- [05-22: Request bounded task history](../../gym/tasks/05/05-22_lifecycle_history/task.md)
+- [05-23: Page through owner-scoped tasks](../../gym/tasks/05/05-23_lifecycle_list/task.md)
+- [05-24: Pause for out-of-band authorization](../../gym/tasks/05/05-24_lifecycle_auth/task.md)
+- [05-25: Reject an impossible catering request](../../gym/tasks/05/05-25_lifecycle_rejected/task.md)
+
+These tasks execute actual SDK routes, workflows, cryptographic checks or independent
+database connections offline. Each starter must fail and each reference solution must pass.
 
 ## Quiz
 

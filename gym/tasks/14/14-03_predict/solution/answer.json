@@ -49,7 +49,9 @@
     ],
     "defaultOutputModes": [
       "application/json",
-      "text/plain"
+      "text/plain",
+      "application/pdf",
+      "image/svg+xml"
     ],
     "skills": [
       {

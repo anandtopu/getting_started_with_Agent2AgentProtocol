@@ -1,9 +1,10 @@
+**Network and Concierge version B4:** what's new — recent changes.
+
 # Module B4: Recent changes
 > After this module you can separate sdk and protocol releases.
 
 **Time:** ~90 min · **Level:** Advanced · **LLM needed:** No for examples and grading · **Agents running:** in-process; optional local network: uv run python scripts/network.py up --module 08
 **Spec sections:** [Specification](https://a2a-protocol.org/v1.0.1/specification/) · [a2a.proto](https://github.com/a2aproject/A2A/blob/v1.0.1/specification/a2a.proto)
-**Network and Concierge version B4:** what's new — recent changes.
 
 ## Prerequisites
 
@@ -21,6 +22,9 @@ Package versions and protocol versions are separate. SDK 1.3 can implement proto
 
 **Analogy:** A newer printing of a handbook may add tools without changing the contract it describes.
 
+Read the [feature companion](../../../docs/FEATURE_DEEP_DIVES.md) for field semantics, failure cases and
+the connection to the final deployment.
+
 ## How it works
 
 ```mermaid
@@ -34,7 +38,7 @@ sequenceDiagram
     C-->>L: Deliverable, question, or failure
 ```
 
-Under the hood, protobuf objects become JSON or binary bytes at the boundary. Route handlers enforce operation contracts; the executor performs business work. Compare the captured result with your prediction.
+Under the hood: Review release/migration notes, update the lock intentionally, and rerun contracts, golden, native and recovery checks. Compare that behavior with the captured requests and responses below.
 
 ## On the wire
 
