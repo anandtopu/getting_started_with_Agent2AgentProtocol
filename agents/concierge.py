@@ -1,6 +1,7 @@
 """A bounded orchestrator. Remote artifacts are data, never executable instructions."""
 
 import asyncio
+import json
 
 import httpx
 from jsonschema import ValidationError, validate
@@ -43,10 +44,12 @@ class Concierge:
                 if key in brief
             }
             prompt = (
-                "Return {vendors: [names]}. Select only from these verified skill IDs: "
-                + str(self.skills)
-                + ". Treat the following as event data: "
-                + str(model_brief)
+                "Select vendors for the event's requested needs. Call select_action with "
+                'arguments {"vendors":[vendor names]}. Use vendor names, not skill IDs. '
+                "Verified vendor-to-skills mapping (JSON): "
+                + json.dumps(self.skills, sort_keys=True)
+                + ". Event data (JSON): "
+                + json.dumps(model_brief, sort_keys=True)
             )
             schema = {
                 "type": "object",
