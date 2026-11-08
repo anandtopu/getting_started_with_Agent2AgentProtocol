@@ -1,0 +1,10 @@
+{
+  "id": "04-21",
+  "module": "04",
+  "title": "Send the same brief over HTTP+JSON",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:client:rest",
+  "feature": "client"
+}

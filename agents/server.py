@@ -67,6 +67,21 @@ def main() -> None:
 
         run(settings.maplewood_token, args.host, handler=handler, engine=engine)
         return
+    if engine and args.vendor in {"venues", "travel"}:
+        # The framework remains responsible for quotes; independent business skills
+        # share the same secured A2A boundary and owner identity.
+        from agents.framework_vendor import FrameworkVendor
+        from agents.reservations import ReservationExecutor
+        from common.reservations import ReservationStore
+
+        delegate = FrameworkVendor(args.vendor, args.framework) if args.framework else None
+        handler = make_handler(
+            args.vendor,
+            task_store=store,
+            executor=ReservationExecutor(
+                args.vendor, ReservationStore(engine, args.vendor), delegate
+            ),
+        )
     if args.vendor == "concierge":
         tokens = json.loads(os.environ.get("MAPLEWOOD_VENDOR_TOKENS", "{}"))
         handler = make_handler(

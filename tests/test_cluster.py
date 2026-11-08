@@ -7,10 +7,19 @@ from uuid import uuid4
 
 import pytest
 from a2a.auth.user import User
+from a2a.server.cluster.event_stream import VersionedEvent
 from a2a.server.cluster.task_store import ConcurrentTaskModificationError
 from a2a.server.cluster.version import TaskVersion
 from a2a.server.context import ServerCallContext
-from a2a.types import ListTasksRequest, Task, TaskState, TaskStatus, TaskStatusUpdateEvent
+from a2a.types import (
+    ListTasksRequest,
+    SubscribeToTaskRequest,
+    Task,
+    TaskState,
+    TaskStatus,
+    TaskStatusUpdateEvent,
+)
+from google.protobuf.json_format import ParseDict
 from sqlalchemy import event, select
 from sqlalchemy.ext.asyncio import create_async_engine
 
@@ -167,3 +176,55 @@ async def test_owner_cannot_read_delete_or_reuse_another_owners_id(tmp_path):
         assert (await one.get("test-task", owner)).version == version
         with pytest.raises(ConcurrentTaskModificationError):
             await save(two, context=stranger)
+
+
+async def test_semantically_equal_protobuf_publication(tmp_path):
+    async with replicas(tmp_path) as (one, two):
+        value = task()
+        ParseDict({"a": {"z": 1, "x": 2}, "b": [1, 2, 3]}, value.metadata)
+        version = await one.save(
+            value,
+            event=value,
+            prev=None,
+            prev_version=TaskVersion.MISSING,
+            context=ServerCallContext(),
+        )
+        copied = Task.FromString(value.SerializeToString())
+        await two.publish(value.id, VersionedEvent(copied, version))
+        copied.metadata["b"] = "tampered"
+        with pytest.raises(ValueError, match="atomically"):
+            await two.publish(value.id, VersionedEvent(copied, version))
+
+
+async def test_sdk_reconnect_moves_subscription_to_another_replica(tmp_path):
+    async with replicas(tmp_path) as (one, two):
+        handlers = [make_handler("av", task_store=s) for s in (one, two)]
+        context = ServerCallContext()
+        try:
+            message = request({"guests": 40, "wait_for_confirmation": True, "delay_seconds": 0.5})
+            message.configuration.return_immediately = True
+            response = await handlers[0].on_message_send(message, context)
+            task_id = response.id
+            subscription = handlers[1].on_subscribe_to_task(
+                SubscribeToTaskRequest(id=task_id), context
+            )
+            initial = await asyncio.wait_for(anext(subscription), 2)
+            assert isinstance(initial, Task) and initial.id == task_id
+            await subscription.aclose()  # client loses its connection
+            restarted = handlers[1].on_subscribe_to_task(
+                SubscribeToTaskRequest(id=task_id), context
+            )
+            observed = []
+            async with asyncio.timeout(5):
+                async for item in restarted:
+                    observed.append(item)
+            assert isinstance(observed[0], Task)
+            assert any(
+                isinstance(e, TaskStatusUpdateEvent)
+                and e.status.state == TaskState.TASK_STATE_COMPLETED
+                for e in observed
+            )
+            assert (await two.get(task_id, context)).task.artifacts
+        finally:
+            for handler in handlers:
+                await handler.aclose()

@@ -1,0 +1,10 @@
+{
+  "id": "07-30",
+  "module": "07",
+  "title": "Reject a metadata-service callback",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:push:ssrf",
+  "feature": "push"
+}

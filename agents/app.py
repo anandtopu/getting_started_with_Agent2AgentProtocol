@@ -7,6 +7,7 @@ from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.routes import create_agent_card_routes, create_jsonrpc_routes, create_rest_routes
 from a2a.server.routes.common import DefaultServerCallContextBuilder
 from a2a.server.tasks import InMemoryTaskStore
+from a2a.utils.errors import ExtensionSupportRequiredError
 from fastapi import FastAPI
 from starlette.requests import Request
 
@@ -19,8 +20,13 @@ from common.security import BearerGate, Principal
 
 
 class CallContext(DefaultServerCallContextBuilder):
+    def __init__(self, required=()):
+        self.required = set(required)
+
     def build(self, request: Request):
         context = super().build(request)
+        if not self.required <= context.requested_extensions:
+            raise ExtensionSupportRequiredError()
         principal = getattr(request.state, "principal", None)
         if principal:
             context.state["partner"] = principal.partner
@@ -69,8 +75,9 @@ def make_app(
         routes = RotatingCardKeys(advertised).routes()
     else:
         routes = create_agent_card_routes(published_card(advertised, vendor))
-    routes += create_jsonrpc_routes(handler, rpc_url="/rpc", context_builder=CallContext())
-    routes += create_rest_routes(handler, context_builder=CallContext())
+    context_builder = CallContext(e.uri for e in advertised.capabilities.extensions if e.required)
+    routes += create_jsonrpc_routes(handler, rpc_url="/rpc", context_builder=context_builder)
+    routes += create_rest_routes(handler, context_builder=context_builder)
 
     @asynccontextmanager
     async def lifespan(app):

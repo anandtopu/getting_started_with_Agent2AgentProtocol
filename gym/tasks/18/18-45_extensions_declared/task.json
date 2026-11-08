@@ -1,0 +1,10 @@
+{
+  "id": "18-45",
+  "module": "18",
+  "title": "Discover the structured-quote extension",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:extensions:declared",
+  "feature": "extensions"
+}

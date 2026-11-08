@@ -1,0 +1,10 @@
+{
+  "id": "06-20",
+  "module": "06",
+  "title": "Receive Granite's real image artifact",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:parts:floor_plan",
+  "feature": "parts"
+}

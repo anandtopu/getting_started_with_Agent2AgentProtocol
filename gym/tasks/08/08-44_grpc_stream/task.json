@@ -1,0 +1,10 @@
+{
+  "id": "08-44",
+  "module": "08",
+  "title": "Inspect the gRPC stream union",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:grpc:stream",
+  "feature": "grpc"
+}

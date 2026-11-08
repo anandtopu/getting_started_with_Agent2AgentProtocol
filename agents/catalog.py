@@ -61,7 +61,7 @@ def card(
             extensions=[AgentExtension(uri=QUOTE_EXTENSION, required=False)],
         ),
         default_input_modes=["text/plain", "application/json", "application/octet-stream"],
-        default_output_modes=["application/json", "text/plain"],
+        default_output_modes=["application/json", "text/plain", "application/pdf", "image/svg+xml"],
         skills=[
             AgentSkill(
                 id=f"{vendor}.quote",

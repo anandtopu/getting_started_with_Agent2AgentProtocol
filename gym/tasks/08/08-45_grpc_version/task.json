@@ -1,0 +1,10 @@
+{
+  "id": "08-45",
+  "module": "08",
+  "title": "Read advertised gRPC protocol compatibility",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:grpc:version",
+  "feature": "grpc"
+}

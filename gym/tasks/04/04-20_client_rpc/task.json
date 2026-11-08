@@ -1,0 +1,10 @@
+{
+  "id": "04-20",
+  "module": "04",
+  "title": "Send a raw JSON-RPC quote request",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:client:rpc",
+  "feature": "client"
+}

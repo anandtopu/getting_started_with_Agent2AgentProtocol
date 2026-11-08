@@ -1,0 +1,10 @@
+{
+  "id": "13-20",
+  "module": "13",
+  "title": "Keep work endpoints authenticated",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:security:anonymous",
+  "feature": "security"
+}

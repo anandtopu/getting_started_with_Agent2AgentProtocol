@@ -1,0 +1,10 @@
+{
+  "id": "06-25",
+  "module": "06",
+  "title": "Receive Saffron's data and PDF together",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:parts:multi_part",
+  "feature": "parts"
+}

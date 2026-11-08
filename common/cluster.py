@@ -120,6 +120,8 @@ class ClusterStore(VersionedTaskStore, TaskEventStream):
                 if self.callbacks:
                     await self.callbacks.initialize()
                 async with self.engine.begin() as connection:
+                    if self.engine.dialect.name == "sqlite":
+                        await connection.exec_driver_sql("PRAGMA journal_mode=WAL")
                     await connection.run_sync(self.legacy.task_model.metadata.create_all)
                     await connection.run_sync(self.metadata.create_all)
                 self._ready = True
@@ -279,11 +281,13 @@ class ClusterStore(VersionedTaskStore, TaskEventStream):
         # of creating a second non-atomic publication path or duplicating delivery.
         async with self.engine.connect() as connection:
             rows = (
-                await connection.execute(select(self.events).where(self.events.c.id == task_id))
-            ).mappings()
+                (await connection.execute(select(self.events).where(self.events.c.id == task_id)))
+                .mappings()
+                .all()
+            )
             if not any(
                 TaskVersion(r["version"]) == event.version
-                and r["body"] == event.event.SerializeToString()
+                and EVENTS[r["kind"]].FromString(r["body"]) == event.event
                 for r in rows
             ):
                 raise ValueError("Publish requires an atomically committed event")

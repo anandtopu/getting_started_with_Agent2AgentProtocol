@@ -1,0 +1,10 @@
+{
+  "id": "07-24",
+  "module": "07",
+  "title": "Separate the final data artifact from progress",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:stream:quote",
+  "feature": "stream"
+}

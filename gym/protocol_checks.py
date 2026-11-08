@@ -45,6 +45,23 @@ def run(kind: str, learner) -> None:
 
 
 async def check(kind: str, learner) -> None:
+    if kind.startswith("advanced:"):
+        from gym.advanced_checks import check as advanced_check
+
+        await advanced_check(kind.removeprefix("advanced:"), learner)
+        return
+    if kind.startswith("boundary:"):
+        from gym.boundary_checks import check as boundary_check
+        from gym.boundary_checks import push_check, security_check
+
+        target = kind.removeprefix("boundary:")
+        if target.startswith("security:"):
+            await security_check(target.split(":")[1], learner)
+        elif target.startswith("push:"):
+            await push_check(target.split(":")[1], learner)
+        else:
+            await boundary_check(target, learner)
+        return
     if kind == "resume":
         async with client("catering") as http:
             first = (

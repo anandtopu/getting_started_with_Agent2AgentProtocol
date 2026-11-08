@@ -1,0 +1,10 @@
+{
+  "id": "06-23",
+  "module": "06",
+  "title": "Attach inline artwork as a raw Part",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:parts:raw_input",
+  "feature": "parts"
+}

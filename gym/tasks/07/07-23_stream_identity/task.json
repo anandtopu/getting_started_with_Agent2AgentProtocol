@@ -1,0 +1,10 @@
+{
+  "id": "07-23",
+  "module": "07",
+  "title": "Keep task identity across all event variants",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:stream:identity",
+  "feature": "stream"
+}

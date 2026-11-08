@@ -1,0 +1,10 @@
+{
+  "id": "02-20",
+  "module": "02",
+  "title": "Discover binding preference order",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:discovery:interfaces",
+  "feature": "discovery"
+}

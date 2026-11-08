@@ -1,0 +1,10 @@
+{
+  "id": "14-45",
+  "module": "14",
+  "title": "Reject a revoked card key",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:trust:revocation",
+  "feature": "trust"
+}

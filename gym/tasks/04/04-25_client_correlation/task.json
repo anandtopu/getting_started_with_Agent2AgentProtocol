@@ -1,0 +1,10 @@
+{
+  "id": "04-25",
+  "module": "04",
+  "title": "Separate exchange and work-order identities",
+  "type": "fix",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:client:correlation",
+  "feature": "client"
+}

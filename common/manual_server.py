@@ -1,6 +1,6 @@
 """A deliberately small JSON-RPC subset, written without importing an A2A SDK.
 
-This first-lesson microscope implements SendMessage only. Later lessons use the
+This first-lesson microscope implements SendMessage and GetTask. Later lessons use the
 official SDK for the complete lifecycle, conformance, persistence and security.
 """
 
@@ -14,6 +14,7 @@ from agents.business import quote
 
 def manual_app():
     app = FastAPI()
+    tasks = {}
 
     @app.post("/rpc")
     async def rpc(incoming: Request):
@@ -32,6 +33,13 @@ def manual_app():
 
         if not isinstance(body, dict) or body.get("jsonrpc") != "2.0" or "id" not in body:
             return error(-32600, "Invalid request")
+        if body.get("method") == "GetTask":
+            params = body.get("params", {})
+            if not isinstance(params, dict) or not isinstance(params.get("id"), str):
+                return error(-32602, "Invalid params")
+            if params["id"] not in tasks:
+                return error(-32001, "Task not found")
+            return {"jsonrpc": "2.0", "id": identifier, "result": tasks[params["id"]]}
         if body.get("method") != "SendMessage":
             return error(-32601, "Method not found")
         try:
@@ -58,6 +66,7 @@ def manual_app():
         except ValueError:
             task["status"] = {"state": "TASK_STATE_REJECTED"}
         # KEY IDEA: RPC id correlates the exchange; task id identifies the work.
+        tasks[task["id"]] = task
         return {"jsonrpc": "2.0", "id": identifier, "result": {"task": task}}
 
     return app

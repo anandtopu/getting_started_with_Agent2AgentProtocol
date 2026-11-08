@@ -1,0 +1,10 @@
+{
+  "id": "07-27",
+  "module": "07",
+  "title": "Retrieve one callback configuration",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:push:get",
+  "feature": "push"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "16-20",
+  "module": "16",
+  "title": "Reject an unknown operation",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:conformance:method",
+  "feature": "conformance"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "07-31",
+  "module": "07",
+  "title": "Deliver completion through an authenticated outbox",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:push:delivery",
+  "feature": "push"
+}

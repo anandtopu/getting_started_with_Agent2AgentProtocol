@@ -1,0 +1,10 @@
+{
+  "id": "08-40",
+  "module": "08",
+  "title": "Send a protobuf request to Inkwell",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:grpc:send",
+  "feature": "grpc"
+}

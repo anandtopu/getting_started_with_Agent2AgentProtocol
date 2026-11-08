@@ -1,0 +1,10 @@
+{
+  "id": "14-44",
+  "module": "14",
+  "title": "Keep valid keys during rotation overlap",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:trust:rotation",
+  "feature": "trust"
+}

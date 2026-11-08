@@ -1,0 +1,10 @@
+{
+  "id": "18-42",
+  "module": "18",
+  "title": "Reject an unmet required extension",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:extensions:required_missing",
+  "feature": "extensions"
+}

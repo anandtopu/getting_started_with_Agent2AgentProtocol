@@ -1,0 +1,10 @@
+{
+  "id": "07-20",
+  "module": "07",
+  "title": "Read state transitions from a real stream",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:stream:status",
+  "feature": "stream"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "04-24",
+  "module": "04",
+  "title": "Handle an unknown task without retrying",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:client:missing",
+  "feature": "client"
+}

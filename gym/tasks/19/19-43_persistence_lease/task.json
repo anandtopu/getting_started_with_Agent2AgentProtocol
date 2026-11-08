@@ -1,0 +1,10 @@
+{
+  "id": "19-43",
+  "module": "19",
+  "title": "Fence an expired delivery worker",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:persistence:lease",
+  "feature": "persistence"
+}

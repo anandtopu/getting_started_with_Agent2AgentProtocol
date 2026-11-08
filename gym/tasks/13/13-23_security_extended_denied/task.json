@@ -1,0 +1,10 @@
+{
+  "id": "13-23",
+  "module": "13",
+  "title": "Enforce the extended-card partner scope",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:security:extended_denied",
+  "feature": "security"
+}

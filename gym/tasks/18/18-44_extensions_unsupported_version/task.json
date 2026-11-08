@@ -1,0 +1,10 @@
+{
+  "id": "18-44",
+  "module": "18",
+  "title": "Reject unsupported protocol negotiation",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:extensions:unsupported_version",
+  "feature": "extensions"
+}

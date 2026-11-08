@@ -1,0 +1,10 @@
+{
+  "id": "06-24",
+  "module": "06",
+  "title": "Negotiate supported file media types",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:parts:unsupported",
+  "feature": "parts"
+}

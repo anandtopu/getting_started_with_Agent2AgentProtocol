@@ -1,0 +1,10 @@
+{
+  "id": "18-40",
+  "module": "18",
+  "title": "Omit an optional extension",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:extensions:optional",
+  "feature": "extensions"
+}

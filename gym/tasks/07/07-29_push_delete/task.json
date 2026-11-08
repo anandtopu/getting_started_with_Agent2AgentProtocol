@@ -1,0 +1,10 @@
+{
+  "id": "07-29",
+  "module": "07",
+  "title": "Remove a callback without canceling work",
+  "type": "fix",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:push:delete",
+  "feature": "push"
+}

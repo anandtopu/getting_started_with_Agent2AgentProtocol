@@ -1,0 +1,10 @@
+{
+  "id": "02-23",
+  "module": "02",
+  "title": "Choose an advertised input representation",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:discovery:media",
+  "feature": "discovery"
+}

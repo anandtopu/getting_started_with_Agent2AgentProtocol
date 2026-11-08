@@ -1,0 +1,10 @@
+{
+  "id": "06-21",
+  "module": "06",
+  "title": "Read and validate a structured quote",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:parts:data",
+  "feature": "parts"
+}

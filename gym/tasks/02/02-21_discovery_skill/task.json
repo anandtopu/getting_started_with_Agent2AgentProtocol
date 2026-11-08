@@ -1,0 +1,10 @@
+{
+  "id": "02-21",
+  "module": "02",
+  "title": "Select Granite's quote contract",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:discovery:skill",
+  "feature": "discovery"
+}

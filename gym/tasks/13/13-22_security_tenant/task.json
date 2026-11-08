@@ -1,0 +1,10 @@
+{
+  "id": "13-22",
+  "module": "13",
+  "title": "Reject a forged tenant header",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:security:tenant",
+  "feature": "security"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "19-41",
+  "module": "19",
+  "title": "Reject a stale task writer",
+  "type": "fix",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:persistence:stale",
+  "feature": "persistence"
+}

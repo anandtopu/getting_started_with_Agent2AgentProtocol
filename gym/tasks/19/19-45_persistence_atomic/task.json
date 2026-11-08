@@ -1,0 +1,10 @@
+{
+  "id": "19-45",
+  "module": "19",
+  "title": "Inspect the atomic event and outbox commit",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:persistence:atomic",
+  "feature": "persistence"
+}

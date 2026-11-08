@@ -1,0 +1,10 @@
+{
+  "id": "05-24",
+  "module": "05",
+  "title": "Pause for out-of-band authorization",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:lifecycle:auth",
+  "feature": "lifecycle"
+}

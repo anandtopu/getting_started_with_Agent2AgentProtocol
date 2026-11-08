@@ -135,9 +135,22 @@ class Concierge:
 
         delegations = await asyncio.gather(*(delegate(vendor) for vendor in vendors))
         total = sum(q["total_cents"] for item in delegations for q in item["quotes"])
-        return {
+        result = {
             "delegations": delegations,
             "total_cents": total,
             "within_budget": total <= brief.get("budget_cents", 0),
             "approval_required": True,
         }
+        if brief.get("tentative_holds"):
+            if not {"venues", "travel"} <= set(vendors):
+                raise ValueError("Tentative holds require venue and travel delegates")
+            if all(d["state"] == "TASK_STATE_COMPLETED" for d in delegations):
+                from common.saga import reserve_pair
+
+                hold_request = brief.get("hold_request_id")
+                if not isinstance(hold_request, str) or not 1 <= len(hold_request) <= 100:
+                    raise ValueError("Provide a stable hold_request_id for safe retries")
+                result["reservations"] = await reserve_pair(
+                    self.clients["travel"], self.clients["venues"], hold_request
+                )
+        return result

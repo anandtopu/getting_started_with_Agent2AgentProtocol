@@ -1,0 +1,10 @@
+{
+  "id": "16-23",
+  "module": "16",
+  "title": "Reject an unsupported protocol version",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:conformance:version",
+  "feature": "conformance"
+}

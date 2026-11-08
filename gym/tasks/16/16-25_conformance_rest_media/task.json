@@ -1,0 +1,10 @@
+{
+  "id": "16-25",
+  "module": "16",
+  "title": "Verify the HTTP error representation",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:conformance:rest_media",
+  "feature": "conformance"
+}

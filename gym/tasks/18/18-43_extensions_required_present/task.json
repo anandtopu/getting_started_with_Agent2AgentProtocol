@@ -1,0 +1,10 @@
+{
+  "id": "18-43",
+  "module": "18",
+  "title": "Satisfy a required extension",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:extensions:required_present",
+  "feature": "extensions"
+}

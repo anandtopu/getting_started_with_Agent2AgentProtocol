@@ -1,0 +1,10 @@
+{
+  "id": "07-26",
+  "module": "07",
+  "title": "Register an approved callback",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:push:create",
+  "feature": "push"
+}

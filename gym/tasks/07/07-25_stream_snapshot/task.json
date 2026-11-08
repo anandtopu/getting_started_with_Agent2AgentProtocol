@@ -1,0 +1,10 @@
+{
+  "id": "07-25",
+  "module": "07",
+  "title": "Reconcile streamed chunks with stored state",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:stream:snapshot",
+  "feature": "stream"
+}

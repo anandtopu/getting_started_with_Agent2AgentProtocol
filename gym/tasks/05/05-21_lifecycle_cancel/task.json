@@ -1,0 +1,10 @@
+{
+  "id": "05-21",
+  "module": "05",
+  "title": "Cancel paused catering work",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:lifecycle:cancel",
+  "feature": "lifecycle"
+}

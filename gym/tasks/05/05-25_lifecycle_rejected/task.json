@@ -1,0 +1,10 @@
+{
+  "id": "05-25",
+  "module": "05",
+  "title": "Reject an impossible catering request",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:lifecycle:rejected",
+  "feature": "lifecycle"
+}

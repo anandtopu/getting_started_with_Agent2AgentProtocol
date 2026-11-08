@@ -1,0 +1,10 @@
+{
+  "id": "16-22",
+  "module": "16",
+  "title": "Reject an unsupported Part media type",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:conformance:media",
+  "feature": "conformance"
+}

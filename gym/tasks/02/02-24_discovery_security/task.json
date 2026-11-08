@@ -1,0 +1,10 @@
+{
+  "id": "02-24",
+  "module": "02",
+  "title": "Resolve a named security requirement",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:discovery:security",
+  "feature": "discovery"
+}

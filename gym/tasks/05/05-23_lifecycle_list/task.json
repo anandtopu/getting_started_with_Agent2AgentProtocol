@@ -1,0 +1,10 @@
+{
+  "id": "05-23",
+  "module": "05",
+  "title": "Page through owner-scoped tasks",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:lifecycle:list",
+  "feature": "lifecycle"
+}

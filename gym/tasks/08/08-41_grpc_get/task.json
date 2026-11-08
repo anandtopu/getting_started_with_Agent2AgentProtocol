@@ -1,0 +1,10 @@
+{
+  "id": "08-41",
+  "module": "08",
+  "title": "Call GetTask over gRPC",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:grpc:get",
+  "feature": "grpc"
+}

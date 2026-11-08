@@ -1,0 +1,10 @@
+{
+  "id": "13-25",
+  "module": "13",
+  "title": "Reject a credential smuggled in task data",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:security:body_secret",
+  "feature": "security"
+}

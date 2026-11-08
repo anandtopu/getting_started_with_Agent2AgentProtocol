@@ -1,0 +1,10 @@
+{
+  "id": "14-42",
+  "module": "14",
+  "title": "Reject a self-appointed signing key",
+  "type": "secure",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:trust:unknown",
+  "feature": "trust"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "08-43",
+  "module": "08",
+  "title": "List tasks through protobuf",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:grpc:list",
+  "feature": "grpc"
+}

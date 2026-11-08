@@ -1,0 +1,10 @@
+{
+  "id": "02-25",
+  "module": "02",
+  "title": "Validate discovered ProtoJSON",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:discovery:validate",
+  "feature": "discovery"
+}

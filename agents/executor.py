@@ -14,6 +14,7 @@ from google.protobuf.json_format import MessageToDict, ParseDict
 
 from agents.business import quote
 from agents.catalog import QUOTE_EXTENSION
+from common.artifact_files import quote_pdf
 from common.protocol import brief_from, data_part
 
 
@@ -84,13 +85,29 @@ class VendorExecutor(AgentExecutor):
                 artifact=Artifact(
                     artifact_id="quote",
                     name="quote",
-                    parts=[data_part(result)],
+                    parts=[data_part(result)]
+                    + (
+                        [quote_pdf(int(result["guests"]), int(result["total_cents"]))]
+                        if self.vendor == "catering" and brief.get("include_files")
+                        else []
+                    ),
                     extensions=[QUOTE_EXTENSION]
                     if QUOTE_EXTENSION in context.requested_extensions
                     else [],
                 ),
             )
         )
+        if self.vendor == "venues" and brief.get("include_files"):
+            from common.artifact_files import floor_plan
+
+            await event_queue.enqueue_event(
+                TaskArtifactUpdateEvent(
+                    task_id=task.id,
+                    context_id=task.context_id,
+                    artifact=Artifact(artifact_id="floor-plan", parts=[floor_plan()]),
+                    last_chunk=True,
+                )
+            )
         await state(TaskState.TASK_STATE_COMPLETED, "Quote ready; no money has been spent.")
 
     async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:

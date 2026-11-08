@@ -1,0 +1,10 @@
+{
+  "id": "08-42",
+  "module": "08",
+  "title": "Call CancelTask over gRPC",
+  "type": "interop",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:grpc:cancel",
+  "feature": "grpc"
+}

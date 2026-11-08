@@ -1,0 +1,10 @@
+{
+  "id": "19-40",
+  "module": "19",
+  "title": "Load a task through another replica",
+  "type": "build",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "advanced:persistence:reload",
+  "feature": "persistence"
+}

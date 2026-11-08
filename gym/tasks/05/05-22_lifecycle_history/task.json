@@ -1,0 +1,10 @@
+{
+  "id": "05-22",
+  "module": "05",
+  "title": "Request bounded task history",
+  "type": "conformance",
+  "level": "hard",
+  "harness": "protocol",
+  "check": "boundary:lifecycle:history",
+  "feature": "lifecycle"
+}
