@@ -2,7 +2,7 @@
 
 ## Release gate
 
-All findings R1–R9 are implemented. Require Ruff, default no-network tests, all gym
+All findings R1–R10 are implemented. Require Ruff, default no-network tests, all gym
 starter/solution checks, all examples/notebooks, links, native interoperability,
 PostgreSQL recovery, both Compose profiles, live Ollama and the documented TCK
 regression baseline before declaring the pushed main revision validated.
@@ -17,6 +17,7 @@ regression baseline before declaring the pushed main revision validated.
 | R4 | Observability | Preserve recording span across SDK boundary | Parentage, ID attributes and metric example |
 | R6 | Conformance | Match known failure diagnostics | Unmodified TCK and raw report artifact |
 | R8, R9 | Business examples | Explicit reconciliation and invalid-input rejection | Reservation and manual-server regressions |
+| R10 | Live model integration | Explicit routing tool prompt and consistent bounded timeouts | Model/workflow/golden tests and actual Ollama end-to-end CI |
 
 ## Follow-up backlog
 

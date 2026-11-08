@@ -118,6 +118,9 @@ async def test_tool_streams(provider, failure, monkeypatch):
     def respond(request):
         body = json.loads(request.content)
         assert body["tools"]
+        if provider == "ollama":
+            assert body["messages"][0]["role"] == "system"
+            assert "Call select_action exactly once" in body["messages"][0]["content"]
         assert "offline-fixture-key" not in request.content.decode()
         return httpx.Response(200, stream=Fragmented(text.encode()))
 

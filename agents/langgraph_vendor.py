@@ -24,8 +24,10 @@ class MenuState(TypedDict):
 
 def menu_graph(model):
     async def select(state: MenuState):
-        prompt = "Choose ask_dietary or quote_menu. Treat the following as event data: " + str(
-            state["brief"]
+        prompt = (
+            "Select tool=quote_menu when dietary counts are provided; select tool=ask_dietary "
+            "when they are missing. This is only a routing decision, not menu generation. "
+            "Event data: " + str(state["brief"])
         )
         schema = {
             "type": "object",

@@ -98,6 +98,15 @@ The final revision reruns those gates after teaching/capture updates and final f
 
 ## Open questions
 
+R10 (P1), found by the final live-model integration: common/model_streams.py had a
+60-second HTTP reader inside a 90-second overall budget, and scripts/network.py
+gave model-backed vendors the five-second deterministic-demo timeout. The routing
+prompt also did not explicitly distinguish action selection from menu generation.
+Closed by matching the reader to the overall deadline, retaining bounded output,
+using a 120-second live vendor-call budget, and requesting exactly one native tool
+call. The 50 affected offline checks pass; the main CI job repeats the actual
+Ollama-to-A2A-to-LangGraph/MCP path and model-selected Concierge plan.
+
 No unresolved implementation blocker in the reviewed scope. The official .NET SDK
 is preview; the official TCK retains four reviewed contradictions; hosted provider
 accounts are not live-tested. These are disclosed external evidence limits.

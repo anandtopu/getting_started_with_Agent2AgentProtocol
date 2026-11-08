@@ -78,7 +78,7 @@ def main() -> None:
                 "MAPLEWOOD_TOKEN": tokens[vendor],
                 "MAPLEWOOD_SIGNING_KEY": b64(keys[vendor].private_bytes_raw()),
                 "MAPLEWOOD_TRUSTED_KEYS": json.dumps(trust),
-                "MAPLEWOOD_VENDOR_TIMEOUT": "90" if args.frameworks else "5",
+                "MAPLEWOOD_VENDOR_TIMEOUT": "120" if args.llm else "90" if args.frameworks else "5",
                 "MAPLEWOOD_VENDOR_TOKENS": json.dumps(
                     {k: v for k, v in tokens.items() if k != "concierge"}
                 ),

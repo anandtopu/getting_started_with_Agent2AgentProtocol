@@ -40,6 +40,12 @@ The executor emits bounded A2A progress updates and final artifacts without expo
 private model reasoning. Provider-native streaming and A2A streaming remain separate
 layers with different framing and completion rules.
 
+The model request explicitly asks for one routing tool call, not a generated menu.
+Its HTTP read budget matches the 90-second overall model deadline. The live-network
+launcher gives model-backed vendor calls 120 seconds so that the model can return
+its bounded result or failure instead of being cut off by the five-second quote-demo
+budget. The bound is still enforced; incomplete output never becomes a tool invocation.
+
 ~~~console
 uv run python scripts/check_live_model.py
 ~~~
