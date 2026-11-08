@@ -25,23 +25,19 @@ class MenuState(TypedDict):
 
 def menu_graph(model):
     async def select(state: MenuState):
-        dietary_status = "provided" if "dietary" in state["brief"] else "missing"
+        routing = (
+            "Dietary counts are complete. Choose quote_menu."
+            if "dietary" in state["brief"]
+            else "Dietary counts are missing. Choose ask_dietary."
+        )
         prompt = (
-            "Route a catering request. Dietary counts are " + dietary_status + ". "
-            'If provided, call select_action with {"tool":"quote_menu"}. '
-            'If missing, call select_action with {"tool":"ask_dietary"}. '
-            "Do not request counts that are already provided. The kitchen validates the quote. "
+            "Use select_action. Maplewood needs a catering menu. " + routing + " "
+            "The kitchen validates the quote. "
             "Event data (JSON): " + json.dumps(state["brief"], sort_keys=True)
         )
         schema = {
             "type": "object",
-            "properties": {
-                "tool": {
-                    "type": "string",
-                    "description": "quote_menu for provided dietary counts; ask_dietary for missing counts",
-                    "enum": ["quote_menu", "ask_dietary"],
-                }
-            },
+            "properties": {"tool": {"type": "string", "enum": ["quote_menu", "ask_dietary"]}},
             "required": ["tool"],
             "additionalProperties": False,
         }
